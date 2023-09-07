@@ -56,7 +56,7 @@ the array, and the latter identifying the concrete type of array.</p>
         <span class="kw">_ </span>=&gt; <span class="macro">unimplemented!</span>()
     }
 }</code></pre></div>
-<p>To facilitate downcasting, the <a href="array/trait.AsArray.html" title="trait arrow::array::AsArray"><code>AsArray</code></a> extension trait can be used</p>
+<p>To facilitate downcasting, the <a href="array/cast/trait.AsArray.html" title="trait arrow::array::cast::AsArray"><code>AsArray</code></a> extension trait can be used</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">fn </span>impl_string(array: <span class="kw-2">&amp;</span>StringArray) {}
 <span class="kw">fn </span>impl_f32(array: <span class="kw-2">&amp;</span>Float32Array) {}
@@ -153,7 +153,7 @@ and a corresponding list of <a href="array/type.ArrayRef.html" title="type arrow
 <p><a href="../arrow_json/reader/struct.Decoder.html" title="struct arrow_json::reader::Decoder"><code>arrow_json::reader::Decoder</code></a> provides a mechanism to convert arbitrary, serde-compatible
 structures into <a href="record_batch/struct.RecordBatch.html" title="struct arrow::record_batch::RecordBatch"><code>RecordBatch</code></a>.</p>
 <p>Whilst likely less performant than implementing a custom builder, as described in
-<a href="../arrow_array/builder/index.html" title="mod arrow_array::builder">arrow_array::builder</a>, this provides a simple mechanism to get up and running quickly</p>
+<a href="array/builder/index.html" title="mod arrow::array::builder">arrow_array::builder</a>, this provides a simple mechanism to get up and running quickly</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attr">#[derive(Serialize)]
 </span><span class="kw">struct </span>MyStruct {
