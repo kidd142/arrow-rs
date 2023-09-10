@@ -1713,7 +1713,7 @@
 
         <span class="comment">// Construct a map array from the above two
         </span><span class="kw">let </span>map_data_type =
-            DataType::Map(Arc::new(Field::new(<span class="string">&quot;entries&quot;</span>, entry_struct, <span class="bool-val">true</span>)), <span class="bool-val">true</span>);
+            DataType::Map(Arc::new(Field::new(<span class="string">&quot;entries&quot;</span>, entry_struct, <span class="bool-val">false</span>)), <span class="bool-val">true</span>);
 
         <span class="kw">let </span>arrow_schema = FFI_ArrowSchema::try_from(map_data_type).unwrap();
         <span class="macro">assert!</span>(arrow_schema.map_keys_sorted());

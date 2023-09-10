@@ -3176,8 +3176,8 @@
         <span class="kw">let </span>keys_field = Arc::new(Field::new_dict(
             <span class="string">&quot;keys&quot;</span>,
             DataType::Dictionary(Box::new(DataType::Int8), Box::new(DataType::Utf8)),
-            <span class="bool-val">true</span>,
-            <span class="number">1</span>,
+            <span class="bool-val">true</span>, <span class="comment">// It is technically not legal for this field to be null.
+            </span><span class="number">1</span>,
             <span class="bool-val">false</span>,
         ));
         <span class="kw">let </span>values_field = Arc::new(Field::new_dict(
@@ -3195,7 +3195,7 @@
             Arc::new(Field::new(
                 <span class="string">&quot;entries&quot;</span>,
                 entry_struct.data_type().clone(),
-                <span class="bool-val">true</span>,
+                <span class="bool-val">false</span>,
             )),
             <span class="bool-val">false</span>,
         );
