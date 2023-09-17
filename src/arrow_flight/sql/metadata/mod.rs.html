@@ -129,7 +129,7 @@
         .iter()
         .map(|a| SortField::new(a.data_type().clone()))
         .collect();
-    <span class="kw">let </span><span class="kw-2">mut </span>converter = RowConverter::new(fields).unwrap();
+    <span class="kw">let </span>converter = RowConverter::new(fields).unwrap();
     <span class="kw">let </span>rows = converter.convert_columns(arrays).unwrap();
     <span class="kw">let </span><span class="kw-2">mut </span>sort: Vec&lt;<span class="kw">_</span>&gt; = rows.iter().enumerate().collect();
     sort.sort_unstable_by(|(<span class="kw">_</span>, a), (<span class="kw">_</span>, b)| a.cmp(b));
