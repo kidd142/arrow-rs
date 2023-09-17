@@ -1581,6 +1581,8 @@
 <a href="#1581" id="1581">1581</a>
 <a href="#1582" id="1582">1582</a>
 <a href="#1583" id="1583">1583</a>
+<a href="#1584" id="1584">1584</a>
+<a href="#1585" id="1585">1585</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -2951,13 +2953,15 @@
     }
 
     <span class="kw">impl </span>ByteArrayNativeType <span class="kw">for </span>[u8] {
-        <span class="kw">unsafe fn </span>from_bytes_unchecked(b: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="kw-2">&amp;</span><span class="self">Self </span>{
+        <span class="attr">#[inline]
+        </span><span class="kw">unsafe fn </span>from_bytes_unchecked(b: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="kw-2">&amp;</span><span class="self">Self </span>{
             b
         }
     }
 
     <span class="kw">impl </span>ByteArrayNativeType <span class="kw">for </span>str {
-        <span class="kw">unsafe fn </span>from_bytes_unchecked(b: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="kw-2">&amp;</span><span class="self">Self </span>{
+        <span class="attr">#[inline]
+        </span><span class="kw">unsafe fn </span>from_bytes_unchecked(b: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="kw-2">&amp;</span><span class="self">Self </span>{
             std::str::from_utf8_unchecked(b)
         }
     }

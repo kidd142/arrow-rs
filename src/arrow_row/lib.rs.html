@@ -2481,6 +2481,12 @@
 <a href="#2481" id="2481">2481</a>
 <a href="#2482" id="2482">2482</a>
 <a href="#2483" id="2483">2483</a>
+<a href="#2484" id="2484">2484</a>
+<a href="#2485" id="2485">2485</a>
+<a href="#2486" id="2486">2486</a>
+<a href="#2487" id="2487">2487</a>
+<a href="#2488" id="2488">2488</a>
+<a href="#2489" id="2489">2489</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -2715,13 +2721,13 @@
 /// A non-null, non-empty byte array is encoded as `2_u8` followed by the byte array
 /// encoded using a block based scheme described below.
 ///
-/// The byte array is broken up into 32-byte blocks, each block is written in turn
+/// The byte array is broken up into fixed-width blocks, each block is written in turn
 /// to the output, followed by `0xFF_u8`. The final block is padded to 32-bytes
 /// with `0_u8` and written to the output, followed by the un-padded length in bytes
-/// of this final block as a `u8`.
+/// of this final block as a `u8`. The first 4 blocks have a length of 8, with subsequent
+/// blocks using a length of 32, this is to reduce space amplification for small strings.
 ///
-/// Note the following example encodings use a block size of 4 bytes,
-/// as opposed to 32 bytes for brevity:
+/// Note the following example encodings use a block size of 4 bytes for brevity:
 ///
 /// ```text
 ///                       ┌───┬───┬───┬───┬───┬───┐
@@ -4181,12 +4187,18 @@
             <span class="prelude-val">None</span>,
             <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">0_u8</span>; <span class="number">0</span>]),
             <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">0_u8</span>; <span class="number">6</span>]),
+            <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">0_u8</span>; variable::MINI_BLOCK_SIZE]),
+            <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">0_u8</span>; variable::MINI_BLOCK_SIZE + <span class="number">1</span>]),
             <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">0_u8</span>; variable::BLOCK_SIZE]),
             <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">0_u8</span>; variable::BLOCK_SIZE + <span class="number">1</span>]),
             <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">1_u8</span>; <span class="number">6</span>]),
+            <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">1_u8</span>; variable::MINI_BLOCK_SIZE]),
+            <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">1_u8</span>; variable::MINI_BLOCK_SIZE + <span class="number">1</span>]),
             <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">1_u8</span>; variable::BLOCK_SIZE]),
             <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">1_u8</span>; variable::BLOCK_SIZE + <span class="number">1</span>]),
             <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">0xFF_u8</span>; <span class="number">6</span>]),
+            <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">0xFF_u8</span>; variable::MINI_BLOCK_SIZE]),
+            <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">0xFF_u8</span>; variable::MINI_BLOCK_SIZE + <span class="number">1</span>]),
             <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">0xFF_u8</span>; variable::BLOCK_SIZE]),
             <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">0xFF_u8</span>; variable::BLOCK_SIZE + <span class="number">1</span>]),
         ])) <span class="kw">as </span>ArrayRef;
@@ -4704,7 +4716,7 @@
         }
 
         <span class="kw">for </span>r <span class="kw">in </span>r2.iter() {
-            <span class="macro">assert_eq!</span>(r.data.len(), <span class="number">34</span>);
+            <span class="macro">assert_eq!</span>(r.data.len(), <span class="number">10</span>);
         }
     }
 
