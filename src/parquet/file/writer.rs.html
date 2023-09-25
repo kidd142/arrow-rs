@@ -1727,6 +1727,7 @@
 <a href="#1727" id="1727">1727</a>
 <a href="#1728" id="1728">1728</a>
 <a href="#1729" id="1729">1729</a>
+<a href="#1730" id="1730">1730</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -1844,7 +1845,8 @@
             Vec&lt;<span class="prelude-ty">Option</span>&lt;ColumnIndex&gt;&gt;,
             Vec&lt;<span class="prelude-ty">Option</span>&lt;OffsetIndex&gt;&gt;,
         ) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;
-        + <span class="lifetime">&#39;a</span>,
+        + <span class="lifetime">&#39;a
+        </span>+ Send,
 &gt;;
 
 <span class="comment">// ----------------------------------------------------------------------

@@ -2658,6 +2658,8 @@
 <a href="#2658" id="2658">2658</a>
 <a href="#2659" id="2659">2659</a>
 <a href="#2660" id="2660">2660</a>
+<a href="#2661" id="2661">2661</a>
+<a href="#2662" id="2662">2662</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -2908,7 +2910,7 @@
 
 <span class="doccomment">/// A list of [`Bytes`] comprising a single column chunk
 </span><span class="attr">#[derive(Default)]
-</span><span class="kw">struct </span>ArrowColumnChunk {
+</span><span class="kw">pub struct </span>ArrowColumnChunk {
     length: usize,
     data: Vec&lt;Bytes&gt;,
 }
@@ -2920,11 +2922,13 @@
 }
 
 <span class="kw">impl </span>ChunkReader <span class="kw">for </span>ArrowColumnChunk {
-    <span class="kw">type </span>T = ChainReader;
+    <span class="kw">type </span>T = ArrowColumnChunkReader;
 
     <span class="kw">fn </span>get_read(<span class="kw-2">&amp;</span><span class="self">self</span>, start: u64) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::T&gt; {
         <span class="macro">assert_eq!</span>(start, <span class="number">0</span>); <span class="comment">// Assume append_column writes all data in one-shot
-        </span><span class="prelude-val">Ok</span>(ChainReader(<span class="self">self</span>.data.clone().into_iter().peekable()))
+        </span><span class="prelude-val">Ok</span>(ArrowColumnChunkReader(
+            <span class="self">self</span>.data.clone().into_iter().peekable(),
+        ))
     }
 
     <span class="kw">fn </span>get_bytes(<span class="kw-2">&amp;</span><span class="self">self</span>, _start: u64, _length: usize) -&gt; <span class="prelude-ty">Result</span>&lt;Bytes&gt; {
@@ -2933,9 +2937,9 @@
 }
 
 <span class="doccomment">/// A [`Read`] for an iterator of [`Bytes`]
-</span><span class="kw">struct </span>ChainReader(Peekable&lt;IntoIter&lt;Bytes&gt;&gt;);
+</span><span class="kw">pub struct </span>ArrowColumnChunkReader(Peekable&lt;IntoIter&lt;Bytes&gt;&gt;);
 
-<span class="kw">impl </span>Read <span class="kw">for </span>ChainReader {
+<span class="kw">impl </span>Read <span class="kw">for </span>ArrowColumnChunkReader {
     <span class="kw">fn </span>read(<span class="kw-2">&amp;mut </span><span class="self">self</span>, out: <span class="kw-2">&amp;mut </span>[u8]) -&gt; std::io::Result&lt;usize&gt; {
         <span class="kw">let </span>buffer = <span class="kw">loop </span>{
             <span class="kw">match </span><span class="self">self</span>.<span class="number">0</span>.peek_mut() {
@@ -3022,14 +3026,14 @@
 }
 
 <span class="doccomment">/// Encodes [`RecordBatch`] to a parquet row group
-</span><span class="kw">struct </span>ArrowRowGroupWriter {
+</span><span class="kw">pub struct </span>ArrowRowGroupWriter {
     writers: Vec&lt;(SharedColumnChunk, ArrowColumnWriter)&gt;,
     schema: SchemaRef,
     buffered_rows: usize,
 }
 
 <span class="kw">impl </span>ArrowRowGroupWriter {
-    <span class="kw">fn </span>new(
+    <span class="kw">pub fn </span>new(
         parquet: <span class="kw-2">&amp;</span>SchemaDescriptor,
         props: <span class="kw-2">&amp;</span>WriterPropertiesPtr,
         arrow: <span class="kw-2">&amp;</span>SchemaRef,
@@ -3046,7 +3050,7 @@
         })
     }
 
-    <span class="kw">fn </span>write(<span class="kw-2">&amp;mut </span><span class="self">self</span>, batch: <span class="kw-2">&amp;</span>RecordBatch) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    <span class="kw">pub fn </span>write(<span class="kw-2">&amp;mut </span><span class="self">self</span>, batch: <span class="kw-2">&amp;</span>RecordBatch) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
         <span class="self">self</span>.buffered_rows += batch.num_rows();
         <span class="kw">let </span><span class="kw-2">mut </span>writers = <span class="self">self</span>.writers.iter_mut().map(|(<span class="kw">_</span>, x)| x);
         <span class="kw">for </span>(array, field) <span class="kw">in </span>batch.columns().iter().zip(<span class="kw-2">&amp;</span><span class="self">self</span>.schema.fields) {
@@ -3056,7 +3060,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn </span>close(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;(ArrowColumnChunk, ColumnCloseResult)&gt;&gt; {
+    <span class="kw">pub fn </span>close(<span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;(ArrowColumnChunk, ColumnCloseResult)&gt;&gt; {
         <span class="self">self</span>.writers
             .into_iter()
             .map(|(chunk, writer)| {
