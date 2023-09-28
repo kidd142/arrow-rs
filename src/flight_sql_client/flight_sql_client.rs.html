@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-flight/src/bin/flight_sql_client.rs`."><title>flight_sql_client.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="flight_sql_client" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-nightly (5ae769f06 2023-09-26)" data-channel="nightly" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../flight_sql_client/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-flight/src/bin/flight_sql_client.rs`."><title>flight_sql_client.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-fa3bb1812debf86c.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="flight_sql_client" data-themes="" data-resource-suffix="" data-rustdoc-version="1.74.0-nightly (e7c502d93 2023-09-27)" data-channel="nightly" data-search-js="search-8be46b629f5f14a8.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-c5bd66d33317d69f.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../flight_sql_client/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -283,6 +283,7 @@
 <a href="#283" id="283">283</a>
 <a href="#284" id="284">284</a>
 <a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -302,13 +303,14 @@
 
 </span><span class="kw">use </span>std::{error::Error, sync::Arc, time::Duration};
 
+<span class="kw">use </span>anyhow::{Context, <span class="prelude-ty">Result</span>};
 <span class="kw">use </span>arrow_array::{ArrayRef, Datum, RecordBatch, StringArray};
 <span class="kw">use </span>arrow_cast::{cast_with_options, pretty::pretty_format_batches, CastOptions};
 <span class="kw">use </span>arrow_flight::{
     sql::client::FlightSqlServiceClient, utils::flight_data_to_batches, FlightData,
     FlightInfo,
 };
-<span class="kw">use </span>arrow_schema::{ArrowError, Schema};
+<span class="kw">use </span>arrow_schema::Schema;
 <span class="kw">use </span>clap::{Parser, Subcommand};
 <span class="kw">use </span>futures::TryStreamExt;
 <span class="kw">use </span>tonic::transport::{Channel, ClientTlsConfig, Endpoint};
@@ -401,21 +403,23 @@
 }
 
 <span class="attr">#[tokio::main]
-</span><span class="kw">async fn </span>main() {
+</span><span class="kw">async fn </span>main() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
     <span class="kw">let </span>args = Args::parse();
-    setup_logging();
-    <span class="kw">let </span><span class="kw-2">mut </span>client = setup_client(args.client_args).<span class="kw">await</span>.expect(<span class="string">&quot;setup client&quot;</span>);
+    setup_logging()<span class="question-mark">?</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>client = setup_client(args.client_args)
+        .<span class="kw">await
+        </span>.context(<span class="string">&quot;setup client&quot;</span>)<span class="question-mark">?</span>;
 
     <span class="kw">let </span>flight_info = <span class="kw">match </span>args.cmd {
         Command::StatementQuery { query } =&gt; client
             .execute(query, <span class="prelude-val">None</span>)
             .<span class="kw">await
-            </span>.expect(<span class="string">&quot;execute statement&quot;</span>),
+            </span>.context(<span class="string">&quot;execute statement&quot;</span>)<span class="question-mark">?</span>,
         Command::PreparedStatementQuery { query, params } =&gt; {
             <span class="kw">let </span><span class="kw-2">mut </span>prepared_stmt = client
                 .prepare(query, <span class="prelude-val">None</span>)
                 .<span class="kw">await
-                </span>.expect(<span class="string">&quot;prepare statement&quot;</span>);
+                </span>.context(<span class="string">&quot;prepare statement&quot;</span>)<span class="question-mark">?</span>;
 
             <span class="kw">if </span>!params.is_empty() {
                 prepared_stmt
@@ -424,33 +428,35 @@
                             <span class="kw-2">&amp;</span>params,
                             prepared_stmt
                                 .parameter_schema()
-                                .expect(<span class="string">&quot;get parameter schema&quot;</span>),
+                                .context(<span class="string">&quot;get parameter schema&quot;</span>)<span class="question-mark">?</span>,
                         )
-                        .expect(<span class="string">&quot;construct parameters&quot;</span>),
+                        .context(<span class="string">&quot;construct parameters&quot;</span>)<span class="question-mark">?</span>,
                     )
-                    .expect(<span class="string">&quot;bind parameters&quot;</span>)
+                    .context(<span class="string">&quot;bind parameters&quot;</span>)<span class="question-mark">?</span>;
             }
 
             prepared_stmt
                 .execute()
                 .<span class="kw">await
-                </span>.expect(<span class="string">&quot;execute prepared statement&quot;</span>)
-        }
+                </span>.context(<span class="string">&quot;execute prepared statement&quot;</span>)<span class="question-mark">?
+        </span>}
     };
 
     <span class="kw">let </span>batches = execute_flight(<span class="kw-2">&amp;mut </span>client, flight_info)
         .<span class="kw">await
-        </span>.expect(<span class="string">&quot;read flight data&quot;</span>);
+        </span>.context(<span class="string">&quot;read flight data&quot;</span>)<span class="question-mark">?</span>;
 
-    <span class="kw">let </span>res = pretty_format_batches(batches.as_slice()).expect(<span class="string">&quot;format results&quot;</span>);
+    <span class="kw">let </span>res = pretty_format_batches(batches.as_slice()).context(<span class="string">&quot;format results&quot;</span>)<span class="question-mark">?</span>;
     <span class="macro">println!</span>(<span class="string">&quot;{res}&quot;</span>);
+
+    <span class="prelude-val">Ok</span>(())
 }
 
 <span class="kw">async fn </span>execute_flight(
     client: <span class="kw-2">&amp;mut </span>FlightSqlServiceClient&lt;Channel&gt;,
     info: FlightInfo,
-) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;RecordBatch&gt;, ArrowError&gt; {
-    <span class="kw">let </span>schema = Arc::new(Schema::try_from(info.clone()).expect(<span class="string">&quot;valid schema&quot;</span>));
+) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;RecordBatch&gt;&gt; {
+    <span class="kw">let </span>schema = Arc::new(Schema::try_from(info.clone()).context(<span class="string">&quot;valid schema&quot;</span>)<span class="question-mark">?</span>);
     <span class="kw">let </span><span class="kw-2">mut </span>batches = Vec::with_capacity(info.endpoint.len() + <span class="number">1</span>);
     batches.push(RecordBatch::new_empty(schema));
     <span class="macro">info!</span>(<span class="string">&quot;decoded schema&quot;</span>);
@@ -459,13 +465,13 @@
         <span class="kw">let </span><span class="prelude-val">Some</span>(ticket) = <span class="kw-2">&amp;</span>endpoint.ticket <span class="kw">else </span>{
             <span class="macro">panic!</span>(<span class="string">&quot;did not get ticket&quot;</span>);
         };
-        <span class="kw">let </span>flight_data = client.do_get(ticket.clone()).<span class="kw">await</span>.expect(<span class="string">&quot;do get&quot;</span>);
+        <span class="kw">let </span>flight_data = client.do_get(ticket.clone()).<span class="kw">await</span>.context(<span class="string">&quot;do get&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>flight_data: Vec&lt;FlightData&gt; = flight_data
             .try_collect()
             .<span class="kw">await
-            </span>.expect(<span class="string">&quot;collect data stream&quot;</span>);
+            </span>.context(<span class="string">&quot;collect data stream&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>endpoint_batches = flight_data_to_batches(<span class="kw-2">&amp;</span>flight_data)
-            .expect(<span class="string">&quot;convert flight data to record batches&quot;</span>);
+            .context(<span class="string">&quot;convert flight data to record batches&quot;</span>)<span class="question-mark">?</span>;
         batches.append(<span class="kw-2">&amp;mut </span>endpoint_batches);
     }
     <span class="macro">info!</span>(<span class="string">&quot;received data&quot;</span>);
@@ -476,7 +482,7 @@
 <span class="kw">fn </span>construct_record_batch_from_params(
     params: <span class="kw-2">&amp;</span>[(String, String)],
     parameter_schema: <span class="kw-2">&amp;</span>Schema,
-) -&gt; <span class="prelude-ty">Result</span>&lt;RecordBatch, ArrowError&gt; {
+) -&gt; <span class="prelude-ty">Result</span>&lt;RecordBatch&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>items = Vec::&lt;(<span class="kw-2">&amp;</span>String, ArrayRef)&gt;::new();
 
     <span class="kw">for </span>(name, value) <span class="kw">in </span>params {
@@ -490,23 +496,22 @@
         items.push((name, casted))
     }
 
-    RecordBatch::try_from_iter(items)
+    <span class="prelude-val">Ok</span>(RecordBatch::try_from_iter(items)<span class="question-mark">?</span>)
 }
 
-<span class="kw">fn </span>setup_logging() {
-    tracing_log::LogTracer::init().expect(<span class="string">&quot;tracing log init&quot;</span>);
+<span class="kw">fn </span>setup_logging() -&gt; <span class="prelude-ty">Result</span>&lt;()&gt; {
+    tracing_log::LogTracer::init().context(<span class="string">&quot;tracing log init&quot;</span>)<span class="question-mark">?</span>;
     tracing_subscriber::fmt::init();
+    <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">async fn </span>setup_client(
-    args: ClientArgs,
-) -&gt; <span class="prelude-ty">Result</span>&lt;FlightSqlServiceClient&lt;Channel&gt;, ArrowError&gt; {
+<span class="kw">async fn </span>setup_client(args: ClientArgs) -&gt; <span class="prelude-ty">Result</span>&lt;FlightSqlServiceClient&lt;Channel&gt;&gt; {
     <span class="kw">let </span>port = args.port.unwrap_or(<span class="kw">if </span>args.tls { <span class="number">443 </span>} <span class="kw">else </span>{ <span class="number">80 </span>});
 
     <span class="kw">let </span>protocol = <span class="kw">if </span>args.tls { <span class="string">&quot;https&quot; </span>} <span class="kw">else </span>{ <span class="string">&quot;http&quot; </span>};
 
     <span class="kw">let </span><span class="kw-2">mut </span>endpoint = Endpoint::new(<span class="macro">format!</span>(<span class="string">&quot;{}://{}:{}&quot;</span>, protocol, args.host, port))
-        .map_err(|<span class="kw">_</span>| ArrowError::IpcError(<span class="string">&quot;Cannot create endpoint&quot;</span>.to_string()))<span class="question-mark">?
+        .context(<span class="string">&quot;create endpoint&quot;</span>)<span class="question-mark">?
         </span>.connect_timeout(Duration::from_secs(<span class="number">20</span>))
         .timeout(Duration::from_secs(<span class="number">20</span>))
         .tcp_nodelay(<span class="bool-val">true</span>) <span class="comment">// Disable Nagle&#39;s Algorithm since we don&#39;t want packets to wait
@@ -517,15 +522,12 @@
 
     <span class="kw">if </span>args.tls {
         <span class="kw">let </span>tls_config = ClientTlsConfig::new();
-        endpoint = endpoint.tls_config(tls_config).map_err(|<span class="kw">_</span>| {
-            ArrowError::IpcError(<span class="string">&quot;Cannot create TLS endpoint&quot;</span>.to_string())
-        })<span class="question-mark">?</span>;
+        endpoint = endpoint
+            .tls_config(tls_config)
+            .context(<span class="string">&quot;create TLS endpoint&quot;</span>)<span class="question-mark">?</span>;
     }
 
-    <span class="kw">let </span>channel = endpoint
-        .connect()
-        .<span class="kw">await
-        </span>.map_err(|e| ArrowError::IpcError(<span class="macro">format!</span>(<span class="string">&quot;Cannot connect to endpoint: {e}&quot;</span>)))<span class="question-mark">?</span>;
+    <span class="kw">let </span>channel = endpoint.connect().<span class="kw">await</span>.context(<span class="string">&quot;connect to endpoint&quot;</span>)<span class="question-mark">?</span>;
 
     <span class="kw">let </span><span class="kw-2">mut </span>client = FlightSqlServiceClient::new(channel);
     <span class="macro">info!</span>(<span class="string">&quot;connected&quot;</span>);
@@ -545,7 +547,7 @@
             client
                 .handshake(<span class="kw-2">&amp;</span>username, <span class="kw-2">&amp;</span>password)
                 .<span class="kw">await
-                </span>.expect(<span class="string">&quot;handshake&quot;</span>);
+                </span>.context(<span class="string">&quot;handshake&quot;</span>)<span class="question-mark">?</span>;
             <span class="macro">info!</span>(<span class="string">&quot;performed handshake&quot;</span>);
         }
         (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; {
