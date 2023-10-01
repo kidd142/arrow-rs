@@ -593,6 +593,15 @@
 <a href="#593" id="593">593</a>
 <a href="#594" id="594">594</a>
 <a href="#595" id="595">595</a>
+<a href="#596" id="596">596</a>
+<a href="#597" id="597">597</a>
+<a href="#598" id="598">598</a>
+<a href="#599" id="599">599</a>
+<a href="#600" id="600">600</a>
+<a href="#601" id="601">601</a>
+<a href="#602" id="602">602</a>
+<a href="#603" id="603">603</a>
+<a href="#604" id="604">604</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -614,7 +623,7 @@
 <span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span><span class="kw">crate</span>::arrow::schema::primitive::convert_primitive;
-<span class="kw">use </span><span class="kw">crate</span>::arrow::ProjectionMask;
+<span class="kw">use </span><span class="kw">crate</span>::arrow::{ProjectionMask, PARQUET_FIELD_ID_META_KEY};
 <span class="kw">use </span><span class="kw">crate</span>::basic::{ConvertedType, Repetition};
 <span class="kw">use </span><span class="kw">crate</span>::errors::ParquetError;
 <span class="kw">use </span><span class="kw">crate</span>::errors::Result;
@@ -1145,7 +1154,16 @@
 
             field.with_metadata(hint.metadata().clone())
         }
-        <span class="prelude-val">None </span>=&gt; Field::new(name, data_type, nullable),
+        <span class="prelude-val">None </span>=&gt; {
+            <span class="kw">let </span><span class="kw-2">mut </span>ret = Field::new(name, data_type, nullable);
+            <span class="kw">let </span>basic_info = parquet_type.get_basic_info();
+            <span class="kw">if </span>basic_info.has_id() {
+                <span class="kw">let </span><span class="kw-2">mut </span>meta = HashMap::with_capacity(<span class="number">1</span>);
+                meta.insert(PARQUET_FIELD_ID_META_KEY.to_string(), basic_info.id().to_string());
+                ret.set_metadata(meta);
+            }
+            ret
+        },
     }
 }
 
