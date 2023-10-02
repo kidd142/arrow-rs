@@ -1130,6 +1130,23 @@
 <a href="#1130" id="1130">1130</a>
 <a href="#1131" id="1131">1131</a>
 <a href="#1132" id="1132">1132</a>
+<a href="#1133" id="1133">1133</a>
+<a href="#1134" id="1134">1134</a>
+<a href="#1135" id="1135">1135</a>
+<a href="#1136" id="1136">1136</a>
+<a href="#1137" id="1137">1137</a>
+<a href="#1138" id="1138">1138</a>
+<a href="#1139" id="1139">1139</a>
+<a href="#1140" id="1140">1140</a>
+<a href="#1141" id="1141">1141</a>
+<a href="#1142" id="1142">1142</a>
+<a href="#1143" id="1143">1143</a>
+<a href="#1144" id="1144">1144</a>
+<a href="#1145" id="1145">1145</a>
+<a href="#1146" id="1146">1146</a>
+<a href="#1147" id="1147">1147</a>
+<a href="#1148" id="1148">1148</a>
+<a href="#1149" id="1149">1149</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -1606,6 +1623,7 @@
     statistics: <span class="prelude-ty">Option</span>&lt;Statistics&gt;,
     encoding_stats: <span class="prelude-ty">Option</span>&lt;Vec&lt;PageEncodingStats&gt;&gt;,
     bloom_filter_offset: <span class="prelude-ty">Option</span>&lt;i64&gt;,
+    bloom_filter_length: <span class="prelude-ty">Option</span>&lt;i32&gt;,
     offset_index_offset: <span class="prelude-ty">Option</span>&lt;i64&gt;,
     offset_index_length: <span class="prelude-ty">Option</span>&lt;i32&gt;,
     column_index_offset: <span class="prelude-ty">Option</span>&lt;i64&gt;,
@@ -1723,6 +1741,11 @@
         <span class="self">self</span>.bloom_filter_offset
     }
 
+    <span class="doccomment">/// Returns the offset for the bloom filter.
+    </span><span class="kw">pub fn </span>bloom_filter_length(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i32&gt; {
+        <span class="self">self</span>.bloom_filter_length
+    }
+
     <span class="doccomment">/// Returns the offset for the column index.
     </span><span class="kw">pub fn </span>column_index_offset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;i64&gt; {
         <span class="self">self</span>.column_index_offset
@@ -1789,6 +1812,7 @@
             })
             .transpose()<span class="question-mark">?</span>;
         <span class="kw">let </span>bloom_filter_offset = col_metadata.bloom_filter_offset;
+        <span class="kw">let </span>bloom_filter_length = col_metadata.bloom_filter_length;
         <span class="kw">let </span>offset_index_offset = cc.offset_index_offset;
         <span class="kw">let </span>offset_index_length = cc.offset_index_length;
         <span class="kw">let </span>column_index_offset = cc.column_index_offset;
@@ -1809,6 +1833,7 @@
             statistics,
             encoding_stats,
             bloom_filter_offset,
+            bloom_filter_length,
             offset_index_offset,
             offset_index_length,
             column_index_offset,
@@ -1854,6 +1879,7 @@
                 .as_ref()
                 .map(|vec| vec.iter().map(page_encoding_stats::to_thrift).collect()),
             bloom_filter_offset: <span class="self">self</span>.bloom_filter_offset,
+            bloom_filter_length: <span class="self">self</span>.bloom_filter_length,
         }
     }
 
@@ -1884,6 +1910,7 @@
             statistics: <span class="prelude-val">None</span>,
             encoding_stats: <span class="prelude-val">None</span>,
             bloom_filter_offset: <span class="prelude-val">None</span>,
+            bloom_filter_length: <span class="prelude-val">None</span>,
             offset_index_offset: <span class="prelude-val">None</span>,
             offset_index_length: <span class="prelude-val">None</span>,
             column_index_offset: <span class="prelude-val">None</span>,
@@ -1966,6 +1993,12 @@
     <span class="doccomment">/// Sets optional bloom filter offset in bytes.
     </span><span class="kw">pub fn </span>set_bloom_filter_offset(<span class="kw-2">mut </span><span class="self">self</span>, value: <span class="prelude-ty">Option</span>&lt;i64&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.<span class="number">0</span>.bloom_filter_offset = value;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Sets optional bloom filter length in bytes.
+    </span><span class="kw">pub fn </span>set_bloom_filter_length(<span class="kw-2">mut </span><span class="self">self</span>, value: <span class="prelude-ty">Option</span>&lt;i32&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.<span class="number">0</span>.bloom_filter_length = value;
         <span class="self">self
     </span>}
 
@@ -2185,6 +2218,7 @@
                 },
             ])
             .set_bloom_filter_offset(<span class="prelude-val">Some</span>(<span class="number">6000</span>))
+            .set_bloom_filter_length(<span class="prelude-val">Some</span>(<span class="number">25</span>))
             .set_offset_index_offset(<span class="prelude-val">Some</span>(<span class="number">7000</span>))
             .set_offset_index_length(<span class="prelude-val">Some</span>(<span class="number">25</span>))
             .set_column_index_offset(<span class="prelude-val">Some</span>(<span class="number">8000</span>))
