@@ -346,6 +346,9 @@
 <a href="#346" id="346">346</a>
 <a href="#347" id="347">347</a>
 <a href="#348" id="348">348</a>
+<a href="#349" id="349">349</a>
+<a href="#350" id="350">350</a>
+<a href="#351" id="351">351</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -363,7 +366,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-</span><span class="kw">use </span>std::{error::Error, sync::Arc, time::Duration};
+</span><span class="kw">use </span>std::{sync::Arc, time::Duration};
 
 <span class="kw">use </span>anyhow::{bail, Context, <span class="prelude-ty">Result</span>};
 <span class="kw">use </span>arrow_array::{ArrayRef, Datum, RecordBatch, StringArray};
@@ -378,45 +381,17 @@
 };
 <span class="kw">use </span>tracing_log::log::info;
 
-<span class="doccomment">/// A &#39;:&#39; separated key value pair
-</span><span class="attr">#[derive(Debug, Clone)]
-</span><span class="kw">struct </span>KeyValue&lt;K, V&gt; {
-    <span class="kw">pub </span>key: K,
-    <span class="kw">pub </span>value: V,
-}
-
-<span class="kw">impl</span>&lt;K, V&gt; std::str::FromStr <span class="kw">for </span>KeyValue&lt;K, V&gt;
-<span class="kw">where
-    </span>K: std::str::FromStr,
-    V: std::str::FromStr,
-    K::Err: std::fmt::Display,
-    V::Err: std::fmt::Display,
-{
-    <span class="kw">type </span><span class="prelude-val">Err </span>= String;
-
-    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; std::result::Result&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
-        <span class="kw">let </span>parts = s.splitn(<span class="number">2</span>, <span class="string">&#39;:&#39;</span>).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
-        <span class="kw">match </span>parts.as_slice() {
-            [key, value] =&gt; {
-                <span class="kw">let </span>key = K::from_str(key).map_err(|e| e.to_string())<span class="question-mark">?</span>;
-                <span class="kw">let </span>value = V::from_str(value.trim()).map_err(|e| e.to_string())<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ key, value })
-            }
-            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(<span class="macro">format!</span>(
-                <span class="string">&quot;Invalid key value pair - expected &#39;KEY:VALUE&#39; got &#39;{s}&#39;&quot;
-            </span>)),
-        }
-    }
-}
-
 <span class="doccomment">/// Logging CLI config.
 </span><span class="attr">#[derive(Debug, Parser)]
 </span><span class="kw">pub struct </span>LoggingArgs {
     <span class="doccomment">/// Log verbosity.
     ///
-    /// Use `-v for warn, `-vv for info, -vvv for debug, -vvvv for trace.
+    /// Defaults to &quot;warn&quot;.
     ///
-    /// Note you can also set logging level using `RUST_LOG` environment variable: `RUST_LOG=debug`
+    /// Use `-v` for &quot;info&quot;, `-vv` for &quot;debug&quot;, `-vvv` for &quot;trace&quot;.
+    ///
+    /// Note you can also set logging level using `RUST_LOG` environment variable:
+    /// `RUST_LOG=debug`.
     </span><span class="attr">#[clap(
         short = <span class="string">&#39;v&#39;</span>,
         long = <span class="string">&quot;verbose&quot;</span>,
@@ -429,16 +404,22 @@
 </span><span class="kw">struct </span>ClientArgs {
     <span class="doccomment">/// Additional headers.
     ///
-    /// Values should be key value pairs separated by &#39;:&#39;
-    </span><span class="attr">#[clap(long, value_delimiter = <span class="string">&#39;,&#39;</span>)]
-    </span>headers: Vec&lt;KeyValue&lt;String, String&gt;&gt;,
+    /// Can be given multiple times. Headers and values are separated by &#39;=&#39;.
+    ///
+    /// Example: `-H foo=bar -H baz=42`
+    </span><span class="attr">#[clap(long = <span class="string">&quot;header&quot;</span>, short = <span class="string">&#39;H&#39;</span>, value_parser = parse_key_val)]
+    </span>headers: Vec&lt;(String, String)&gt;,
 
-    <span class="doccomment">/// Username
-    </span><span class="attr">#[clap(long)]
+    <span class="doccomment">/// Username.
+    ///
+    /// Optional. If given, `password` must also be set.
+    </span><span class="attr">#[clap(long, requires = <span class="string">&quot;password&quot;</span>)]
     </span>username: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
-    <span class="doccomment">/// Password
-    </span><span class="attr">#[clap(long)]
+    <span class="doccomment">/// Password.
+    ///
+    /// Optional. If given, `username` must also be set.
+    </span><span class="attr">#[clap(long, requires = <span class="string">&quot;username&quot;</span>)]
     </span>password: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
     <span class="doccomment">/// Auth token.
@@ -446,14 +427,20 @@
     </span>token: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
     <span class="doccomment">/// Use TLS.
+    ///
+    /// If not provided, use cleartext connection.
     </span><span class="attr">#[clap(long)]
     </span>tls: bool,
 
     <span class="doccomment">/// Server host.
+    ///
+    /// Required.
     </span><span class="attr">#[clap(long)]
     </span>host: String,
 
     <span class="doccomment">/// Server port.
+    ///
+    /// Defaults to `443` if `tls` is set, otherwise defaults to `80`.
     </span><span class="attr">#[clap(long)]
     </span>port: <span class="prelude-ty">Option</span>&lt;u16&gt;,
 }
@@ -472,14 +459,35 @@
     </span>cmd: Command,
 }
 
-<span class="attr">#[derive(Debug, Subcommand)]
+<span class="doccomment">/// Different available commands.
+</span><span class="attr">#[derive(Debug, Subcommand)]
 </span><span class="kw">enum </span>Command {
-    StatementQuery {
-        query: String,
+    <span class="doccomment">/// Execute given statement.
+    </span>StatementQuery {
+        <span class="doccomment">/// SQL query.
+        ///
+        /// Required.
+        </span>query: String,
     },
-    PreparedStatementQuery {
-        query: String,
-        <span class="attr">#[clap(short, value_parser = parse_key_val)]
+
+    <span class="doccomment">/// Prepare given statement and then execute it.
+    </span>PreparedStatementQuery {
+        <span class="doccomment">/// SQL query.
+        ///
+        /// Required.
+        ///
+        /// Can contains placeholders like `$1`.
+        ///
+        /// Example: `SELECT * FROM t WHERE x = $1`
+        </span>query: String,
+
+        <span class="doccomment">/// Additional parameters.
+        ///
+        /// Can be given multiple times. Names and values are separated by &#39;=&#39;. Values will be
+        /// converted to the type that the server reported for the prepared statement.
+        ///
+        /// Example: `-p $1=42`
+        </span><span class="attr">#[clap(short, value_parser = parse_key_val)]
         </span>params: Vec&lt;(String, String)&gt;,
     },
 }
@@ -632,8 +640,8 @@
     <span class="kw">let </span><span class="kw-2">mut </span>client = FlightSqlServiceClient::new(channel);
     <span class="macro">info!</span>(<span class="string">&quot;connected&quot;</span>);
 
-    <span class="kw">for </span>kv <span class="kw">in </span>args.headers {
-        client.set_header(kv.key, kv.value);
+    <span class="kw">for </span>(k, v) <span class="kw">in </span>args.headers {
+        client.set_header(k, v);
     }
 
     <span class="kw">if let </span><span class="prelude-val">Some</span>(token) = args.token {
@@ -662,13 +670,11 @@
 }
 
 <span class="doccomment">/// Parse a single key-value pair
-</span><span class="kw">fn </span>parse_key_val(
-    s: <span class="kw-2">&amp;</span>str,
-) -&gt; <span class="prelude-ty">Result</span>&lt;(String, String), Box&lt;<span class="kw">dyn </span>Error + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt; {
+</span><span class="kw">fn </span>parse_key_val(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;(String, String), String&gt; {
     <span class="kw">let </span>pos = s
         .find(<span class="string">&#39;=&#39;</span>)
         .ok_or_else(|| <span class="macro">format!</span>(<span class="string">&quot;invalid KEY=value: no `=` found in `{s}`&quot;</span>))<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>((s[..pos].parse()<span class="question-mark">?</span>, s[pos + <span class="number">1</span>..].parse()<span class="question-mark">?</span>))
+    <span class="prelude-val">Ok</span>((s[..pos].to_owned(), s[pos + <span class="number">1</span>..].to_owned()))
 }
 
 <span class="doccomment">/// Log headers/trailers.
