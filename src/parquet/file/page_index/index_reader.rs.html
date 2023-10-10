@@ -143,8 +143,6 @@
 <a href="#143" id="143">143</a>
 <a href="#144" id="144">144</a>
 <a href="#145" id="145">145</a>
-<a href="#146" id="146">146</a>
-<a href="#147" id="147">147</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -171,9 +169,8 @@
 <span class="kw">use </span><span class="kw">crate</span>::file::page_index::index::{Index, NativeIndex};
 <span class="kw">use </span><span class="kw">crate</span>::file::reader::ChunkReader;
 <span class="kw">use </span><span class="kw">crate</span>::format::{ColumnIndex, OffsetIndex, PageLocation};
-<span class="kw">use </span>std::io::Cursor;
+<span class="kw">use </span><span class="kw">crate</span>::thrift::{TCompactSliceInputProtocol, TSerializable};
 <span class="kw">use </span>std::ops::Range;
-<span class="kw">use </span>thrift::protocol::{TCompactInputProtocol, TSerializable};
 
 <span class="doccomment">/// Computes the covering range of two optional ranges
 ///
@@ -263,7 +260,7 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>decode_offset_index(
     data: <span class="kw-2">&amp;</span>[u8],
 ) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;PageLocation&gt;, ParquetError&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>prot = TCompactInputProtocol::new(data);
+    <span class="kw">let </span><span class="kw-2">mut </span>prot = TCompactSliceInputProtocol::new(data);
     <span class="kw">let </span>offset = OffsetIndex::read_from_in_protocol(<span class="kw-2">&amp;mut </span>prot)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(offset.page_locations)
 }
@@ -272,8 +269,7 @@
     data: <span class="kw-2">&amp;</span>[u8],
     column_type: Type,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;Index, ParquetError&gt; {
-    <span class="kw">let </span><span class="kw-2">mut </span>d = Cursor::new(data);
-    <span class="kw">let </span><span class="kw-2">mut </span>prot = TCompactInputProtocol::new(<span class="kw-2">&amp;mut </span>d);
+    <span class="kw">let </span><span class="kw-2">mut </span>prot = TCompactSliceInputProtocol::new(data);
 
     <span class="kw">let </span>index = ColumnIndex::read_from_in_protocol(<span class="kw-2">&amp;mut </span>prot)<span class="question-mark">?</span>;
 

@@ -235,6 +235,7 @@
 <a href="#235" id="235">235</a>
 <a href="#236" id="236">236</a>
 <a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -275,12 +276,13 @@
 
 <span class="kw">use </span>clap::Parser;
 <span class="kw">use </span>serde::Serialize;
-<span class="kw">use </span>thrift::protocol::{TCompactInputProtocol, TSerializable};
+<span class="kw">use </span>thrift::protocol::TCompactInputProtocol;
 
 <span class="kw">use </span>parquet::basic::{Compression, Encoding};
 <span class="kw">use </span>parquet::errors::Result;
 <span class="kw">use </span>parquet::file::reader::ChunkReader;
 <span class="kw">use </span>parquet::format::PageHeader;
+<span class="kw">use </span>parquet::thrift::TSerializable;
 
 <span class="attr">#[derive(Serialize, Debug)]
 </span><span class="kw">struct </span>ParquetFile {

@@ -1764,7 +1764,6 @@
 //! Also contains implementations of the ChunkReader for files (with buffering) and byte arrays (RAM)
 
 </span><span class="kw">use </span>std::collections::VecDeque;
-<span class="kw">use </span>std::io::Cursor;
 <span class="kw">use </span>std::iter;
 <span class="kw">use </span>std::{convert::TryFrom, fs::File, io::Read, path::Path, sync::Arc};
 
@@ -1785,8 +1784,9 @@
 <span class="kw">use </span><span class="kw">crate</span>::record::reader::RowIter;
 <span class="kw">use </span><span class="kw">crate</span>::record::Row;
 <span class="kw">use </span><span class="kw">crate</span>::schema::types::Type <span class="kw">as </span>SchemaType;
+<span class="kw">use </span><span class="kw">crate</span>::thrift::{TCompactSliceInputProtocol, TSerializable};
 <span class="kw">use </span><span class="kw">crate</span>::util::memory::ByteBufferPtr;
-<span class="kw">use </span>thrift::protocol::{TCompactInputProtocol, TSerializable};
+<span class="kw">use </span>thrift::protocol::TCompactInputProtocol;
 
 <span class="kw">impl </span>TryFrom&lt;File&gt; <span class="kw">for </span>SerializedFileReader&lt;File&gt; {
     <span class="kw">type </span>Error = ParquetError;
@@ -2406,11 +2406,11 @@
 
                     <span class="kw">let </span>buffer = <span class="self">self</span>.reader.get_bytes(front.offset <span class="kw">as </span>u64, page_len)<span class="question-mark">?</span>;
 
-                    <span class="kw">let </span><span class="kw-2">mut </span>cursor = Cursor::new(buffer.as_ref());
-                    <span class="kw">let </span>header = read_page_header(<span class="kw-2">&amp;mut </span>cursor)<span class="question-mark">?</span>;
-                    <span class="kw">let </span>offset = cursor.position();
+                    <span class="kw">let </span><span class="kw-2">mut </span>prot = TCompactSliceInputProtocol::new(buffer.as_ref());
+                    <span class="kw">let </span>header = PageHeader::read_from_in_protocol(<span class="kw-2">&amp;mut </span>prot)<span class="question-mark">?</span>;
+                    <span class="kw">let </span>offset = buffer.len() - prot.as_slice().len();
 
-                    <span class="kw">let </span>bytes = buffer.slice(offset <span class="kw">as </span>usize..);
+                    <span class="kw">let </span>bytes = buffer.slice(offset..);
                     decode_page(
                         header,
                         bytes.into(),

@@ -373,9 +373,6 @@
 <a href="#373" id="373">373</a>
 <a href="#374" id="374">374</a>
 <a href="#375" id="375">375</a>
-<a href="#376" id="376">376</a>
-<a href="#377" id="377">377</a>
-<a href="#378" id="378">378</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -395,7 +392,7 @@
 
 </span><span class="kw">use </span><span class="kw">crate</span>::arrow::async_reader::AsyncFileReader;
 <span class="kw">use </span><span class="kw">crate</span>::errors::{ParquetError, <span class="prelude-ty">Result</span>};
-<span class="kw">use </span><span class="kw">crate</span>::file::footer::{decode_footer, read_metadata};
+<span class="kw">use </span><span class="kw">crate</span>::file::footer::{decode_footer, decode_metadata};
 <span class="kw">use </span><span class="kw">crate</span>::file::metadata::ParquetMetaData;
 <span class="kw">use </span><span class="kw">crate</span>::file::page_index::index::Index;
 <span class="kw">use </span><span class="kw">crate</span>::file::page_index::index_reader::{
@@ -405,7 +402,6 @@
 <span class="kw">use </span>futures::future::BoxFuture;
 <span class="kw">use </span>futures::FutureExt;
 <span class="kw">use </span>std::future::Future;
-<span class="kw">use </span>std::io::Read;
 <span class="kw">use </span>std::ops::Range;
 
 <span class="doccomment">/// A data source that can be used with [`MetadataLoader`] to load [`ParquetMetaData`]
@@ -473,16 +469,14 @@
         <span class="comment">// Did not fetch the entire file metadata in the initial read, need to make a second request
         </span><span class="kw">let </span>(metadata, remainder) = <span class="kw">if </span>length &gt; suffix_len - <span class="number">8 </span>{
             <span class="kw">let </span>metadata_start = file_size - length - <span class="number">8</span>;
-            <span class="kw">let </span>remaining_metadata = fetch.fetch(metadata_start..footer_start).<span class="kw">await</span><span class="question-mark">?</span>;
-
-            <span class="kw">let </span>reader = remaining_metadata.as_ref().chain(<span class="kw-2">&amp;</span>suffix[..suffix_len - <span class="number">8</span>]);
-            (read_metadata(reader)<span class="question-mark">?</span>, <span class="prelude-val">None</span>)
+            <span class="kw">let </span>meta = fetch.fetch(metadata_start..file_size - <span class="number">8</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+            (decode_metadata(<span class="kw-2">&amp;</span>meta)<span class="question-mark">?</span>, <span class="prelude-val">None</span>)
         } <span class="kw">else </span>{
             <span class="kw">let </span>metadata_start = file_size - length - <span class="number">8 </span>- footer_start;
 
             <span class="kw">let </span>slice = <span class="kw-2">&amp;</span>suffix[metadata_start..suffix_len - <span class="number">8</span>];
             (
-                read_metadata(slice)<span class="question-mark">?</span>,
+                decode_metadata(slice)<span class="question-mark">?</span>,
                 <span class="prelude-val">Some</span>((footer_start, suffix.slice(..metadata_start))),
             )
         };

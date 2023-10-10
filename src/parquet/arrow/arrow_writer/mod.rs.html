@@ -2770,6 +2770,7 @@
 <a href="#2770" id="2770">2770</a>
 <a href="#2771" id="2771">2771</a>
 <a href="#2772" id="2772">2772</a>
+<a href="#2773" id="2773">2773</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -2795,7 +2796,7 @@
 <span class="kw">use </span>std::slice::Iter;
 <span class="kw">use </span>std::sync::{Arc, Mutex};
 <span class="kw">use </span>std::vec::IntoIter;
-<span class="kw">use </span>thrift::protocol::{TCompactOutputProtocol, TSerializable};
+<span class="kw">use </span>thrift::protocol::TCompactOutputProtocol;
 
 <span class="kw">use </span>arrow_array::cast::AsArray;
 <span class="kw">use </span>arrow_array::types::<span class="kw-2">*</span>;
@@ -2822,6 +2823,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::file::reader::{ChunkReader, Length};
 <span class="kw">use </span><span class="kw">crate</span>::file::writer::{SerializedFileWriter, SerializedRowGroupWriter};
 <span class="kw">use </span><span class="kw">crate</span>::schema::types::{ColumnDescPtr, SchemaDescriptor};
+<span class="kw">use </span><span class="kw">crate</span>::thrift::TSerializable;
 <span class="kw">use </span>levels::{calculate_array_levels, ArrayLevels};
 
 <span class="kw">mod </span>byte_array;

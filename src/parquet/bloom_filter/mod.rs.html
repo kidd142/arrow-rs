@@ -470,11 +470,6 @@
 <a href="#470" id="470">470</a>
 <a href="#471" id="471">471</a>
 <a href="#472" id="472">472</a>
-<a href="#473" id="473">473</a>
-<a href="#474" id="474">474</a>
-<a href="#475" id="475">475</a>
-<a href="#476" id="476">476</a>
-<a href="#477" id="477">477</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -503,13 +498,12 @@
     BloomFilterAlgorithm, BloomFilterCompression, BloomFilterHash, BloomFilterHeader,
     SplitBlockAlgorithm, Uncompressed, XxHash,
 };
-<span class="kw">use </span>bytes::{Buf, Bytes};
+<span class="kw">use </span><span class="kw">crate</span>::thrift::{TCompactSliceInputProtocol, TSerializable};
+<span class="kw">use </span>bytes::Bytes;
 <span class="kw">use </span>std::hash::Hasher;
 <span class="kw">use </span>std::io::Write;
 <span class="kw">use </span>std::sync::Arc;
-<span class="kw">use </span>thrift::protocol::{
-    TCompactInputProtocol, TCompactOutputProtocol, TOutputProtocol, TSerializable,
-};
+<span class="kw">use </span>thrift::protocol::{TCompactOutputProtocol, TOutputProtocol};
 <span class="kw">use </span>twox_hash::XxHash64;
 
 <span class="doccomment">/// Salt as defined in the [spec](https://github.com/apache/parquet-format/blob/master/BloomFilter.md#technical-approach).
@@ -629,15 +623,11 @@
     buffer: Bytes,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;(BloomFilterHeader, u64), ParquetError&gt; {
     <span class="kw">let </span>total_length = buffer.len();
-    <span class="kw">let </span><span class="kw-2">mut </span>buf_reader = buffer.reader();
-    <span class="kw">let </span><span class="kw-2">mut </span>prot = TCompactInputProtocol::new(<span class="kw-2">&amp;mut </span>buf_reader);
+    <span class="kw">let </span><span class="kw-2">mut </span>prot = TCompactSliceInputProtocol::new(buffer.as_ref());
     <span class="kw">let </span>header = BloomFilterHeader::read_from_in_protocol(<span class="kw-2">&amp;mut </span>prot).map_err(|e| {
         ParquetError::General(<span class="macro">format!</span>(<span class="string">&quot;Could not read bloom filter header: {e}&quot;</span>))
     })<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>((
-        header,
-        (total_length - buf_reader.into_inner().remaining()) <span class="kw">as </span>u64,
-    ))
+    <span class="prelude-val">Ok</span>((header, (total_length - prot.as_slice().len()) <span class="kw">as </span>u64))
 }
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>BITSET_MIN_LENGTH: usize = <span class="number">32</span>;

@@ -226,11 +226,6 @@
 <a href="#226" id="226">226</a>
 <a href="#227" id="227">227</a>
 <a href="#228" id="228">228</a>
-<a href="#229" id="229">229</a>
-<a href="#230" id="230">230</a>
-<a href="#231" id="231">231</a>
-<a href="#232" id="232">232</a>
-<a href="#233" id="233">233</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -251,7 +246,7 @@
 </span><span class="kw">use </span>std::{io::Read, sync::Arc};
 
 <span class="kw">use </span><span class="kw">crate</span>::format::{ColumnOrder <span class="kw">as </span>TColumnOrder, FileMetaData <span class="kw">as </span>TFileMetaData};
-<span class="kw">use </span>thrift::protocol::{TCompactInputProtocol, TSerializable};
+<span class="kw">use </span><span class="kw">crate</span>::thrift::{TCompactSliceInputProtocol, TSerializable};
 
 <span class="kw">use </span><span class="kw">crate</span>::basic::ColumnOrder;
 
@@ -295,18 +290,13 @@
     }
 
     <span class="kw">let </span>start = file_size - footer_metadata_len <span class="kw">as </span>u64;
-    read_metadata(chunk_reader.get_read(start)<span class="question-mark">?</span>)
+    decode_metadata(chunk_reader.get_bytes(start, metadata_len)<span class="question-mark">?</span>.as_ref())
 }
 
 <span class="doccomment">/// Decodes [`ParquetMetaData`] from the provided bytes
-</span><span class="kw">pub fn </span>decode_metadata(metadata_read: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;ParquetMetaData&gt; {
-    read_metadata(metadata_read)
-}
-
-<span class="doccomment">/// Decodes [`ParquetMetaData`] from the provided [`Read`]
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read_metadata&lt;R: Read&gt;(read: R) -&gt; <span class="prelude-ty">Result</span>&lt;ParquetMetaData&gt; {
+</span><span class="kw">pub fn </span>decode_metadata(buf: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;ParquetMetaData&gt; {
     <span class="comment">// TODO: row group filtering
-    </span><span class="kw">let </span><span class="kw-2">mut </span>prot = TCompactInputProtocol::new(read);
+    </span><span class="kw">let </span><span class="kw-2">mut </span>prot = TCompactSliceInputProtocol::new(buf);
     <span class="kw">let </span>t_file_metadata: TFileMetaData = TFileMetaData::read_from_in_protocol(<span class="kw-2">&amp;mut </span>prot)
         .map_err(|e| ParquetError::General(<span class="macro">format!</span>(<span class="string">&quot;Could not parse metadata: {e}&quot;</span>)))<span class="question-mark">?</span>;
     <span class="kw">let </span>schema = types::from_thrift(<span class="kw-2">&amp;</span>t_file_metadata.schema)<span class="question-mark">?</span>;

@@ -1731,6 +1731,7 @@
 <a href="#1731" id="1731">1731</a>
 <a href="#1732" id="1732">1732</a>
 <a href="#1733" id="1733">1733</a>
+<a href="#1734" id="1734">1734</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -1754,10 +1755,11 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::bloom_filter::Sbbf;
 <span class="kw">use </span><span class="kw">crate</span>::format <span class="kw">as </span>parquet;
 <span class="kw">use </span><span class="kw">crate</span>::format::{ColumnIndex, OffsetIndex, RowGroup};
+<span class="kw">use </span><span class="kw">crate</span>::thrift::TSerializable;
 <span class="kw">use </span>std::fmt::Debug;
 <span class="kw">use </span>std::io::{BufWriter, IoSlice, Read};
 <span class="kw">use </span>std::{io::Write, sync::Arc};
-<span class="kw">use </span>thrift::protocol::{TCompactOutputProtocol, TSerializable};
+<span class="kw">use </span>thrift::protocol::TCompactOutputProtocol;
 
 <span class="kw">use </span><span class="kw">crate</span>::column::writer::{
     get_typed_column_writer_mut, ColumnCloseResult, ColumnWriterImpl,
