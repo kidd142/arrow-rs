@@ -604,11 +604,11 @@
 </span><span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>Sbbf(Vec&lt;Block&gt;);
 
-<span class="kw">const </span>SBBF_HEADER_SIZE_ESTIMATE: usize = <span class="number">20</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const </span>SBBF_HEADER_SIZE_ESTIMATE: usize = <span class="number">20</span>;
 
 <span class="doccomment">/// given an initial offset, and a byte buffer, try to read out a bloom filter header and return
 /// both the header and the offset after it (for bitset).
-</span><span class="kw">fn </span>chunk_read_bloom_filter_header_and_offset(
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>chunk_read_bloom_filter_header_and_offset(
     offset: u64,
     buffer: Bytes,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;(BloomFilterHeader, u64), ParquetError&gt; {
@@ -619,7 +619,7 @@
 <span class="doccomment">/// given a [Bytes] buffer, try to read out a bloom filter header and return both the header and
 /// length of the header.
 </span><span class="attr">#[inline]
-</span><span class="kw">fn </span>read_bloom_filter_header_and_length(
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>read_bloom_filter_header_and_length(
     buffer: Bytes,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;(BloomFilterHeader, u64), ParquetError&gt; {
     <span class="kw">let </span>total_length = buffer.len();
@@ -671,7 +671,7 @@
         <span class="self">Self</span>::new(<span class="kw-2">&amp;</span>bitset)
     }
 
-    <span class="kw">fn </span>new(bitset: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="self">Self </span>{
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>new(bitset: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>data = bitset
             .chunks_exact(<span class="number">4 </span>* <span class="number">8</span>)
             .map(|chunk| {
