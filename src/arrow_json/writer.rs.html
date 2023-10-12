@@ -1573,10 +1573,6 @@
 <a href="#1573" id="1573">1573</a>
 <a href="#1574" id="1574">1574</a>
 <a href="#1575" id="1575">1575</a>
-<a href="#1576" id="1576">1576</a>
-<a href="#1577" id="1577">1577</a>
-<a href="#1578" id="1578">1578</a>
-<a href="#1579" id="1579">1579</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -2917,11 +2913,7 @@
 
         <span class="kw">let </span>batch = reader.next().unwrap().unwrap();
 
-        <span class="kw">let </span>list_row = batch
-            .column(<span class="number">0</span>)
-            .as_any()
-            .downcast_ref::&lt;ListArray&gt;()
-            .unwrap();
+        <span class="kw">let </span>list_row = batch.column(<span class="number">0</span>).as_list::&lt;i32&gt;();
         <span class="kw">let </span>values = list_row.values();
         <span class="macro">assert_eq!</span>(values.len(), <span class="number">4</span>);
         <span class="macro">assert_eq!</span>(values.null_count(), <span class="number">1</span>);

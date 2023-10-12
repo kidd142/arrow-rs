@@ -911,11 +911,6 @@
 <a href="#911" id="911">911</a>
 <a href="#912" id="912">912</a>
 <a href="#913" id="913">913</a>
-<a href="#914" id="914">914</a>
-<a href="#915" id="915">915</a>
-<a href="#916" id="916">916</a>
-<a href="#917" id="917">917</a>
-<a href="#918" id="918">918</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -1215,7 +1210,8 @@
 </span><span class="kw">pub struct </span>TapeDecoder {
     elements: Vec&lt;TapeElement&gt;,
 
-    num_rows: usize,
+    <span class="doccomment">/// The number of rows decoded, including any in progress if `!stack.is_empty()`
+    </span>cur_row: usize,
 
     <span class="doccomment">/// Number of rows to read per batch
     </span>batch_size: usize,
@@ -1248,36 +1244,34 @@
             offsets,
             elements,
             batch_size,
-            num_rows: <span class="number">0</span>,
+            cur_row: <span class="number">0</span>,
             bytes: Vec::with_capacity(num_fields * <span class="number">2 </span>* <span class="number">8</span>),
             stack: Vec::with_capacity(<span class="number">10</span>),
         }
     }
 
     <span class="kw">pub fn </span>decode(<span class="kw-2">&amp;mut </span><span class="self">self</span>, buf: <span class="kw-2">&amp;</span>[u8]) -&gt; <span class="prelude-ty">Result</span>&lt;usize, ArrowError&gt; {
-        <span class="kw">if </span><span class="self">self</span>.num_rows &gt;= <span class="self">self</span>.batch_size {
-            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="number">0</span>);
-        }
-
         <span class="kw">let </span><span class="kw-2">mut </span>iter = BufIter::new(buf);
 
         <span class="kw">while </span>!iter.is_empty() {
-            <span class="kw">match </span><span class="self">self</span>.stack.last_mut() {
-                <span class="comment">// Start of row
-                </span><span class="prelude-val">None </span>=&gt; {
-                    <span class="comment">// Skip over leading whitespace
-                    </span>iter.skip_whitespace();
-                    <span class="kw">match </span><span class="macro">next!</span>(iter) {
-                        <span class="string">b&#39;{&#39; </span>=&gt; {
-                            <span class="kw">let </span>idx = <span class="self">self</span>.elements.len() <span class="kw">as </span>u32;
-                            <span class="self">self</span>.stack.push(DecoderState::Object(idx));
-                            <span class="self">self</span>.elements.push(TapeElement::StartObject(u32::MAX));
-                        }
-                        b =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(err(b, <span class="string">&quot;trimming leading whitespace&quot;</span>)),
+            <span class="kw">let </span>state = <span class="kw">match </span><span class="self">self</span>.stack.last_mut() {
+                <span class="prelude-val">Some</span>(l) =&gt; l,
+                <span class="prelude-val">None </span>=&gt; {
+                    iter.skip_whitespace();
+                    <span class="kw">if </span>iter.is_empty() || <span class="self">self</span>.cur_row &gt;= <span class="self">self</span>.batch_size {
+                        <span class="kw">break</span>;
                     }
+
+                    <span class="comment">// Start of row
+                    </span><span class="self">self</span>.cur_row += <span class="number">1</span>;
+                    <span class="self">self</span>.stack.push(DecoderState::Value);
+                    <span class="self">self</span>.stack.last_mut().unwrap()
                 }
+            };
+
+            <span class="kw">match </span>state {
                 <span class="comment">// Decoding an object
-                </span><span class="prelude-val">Some</span>(DecoderState::Object(start_idx)) =&gt; {
+                </span>DecoderState::Object(start_idx) =&gt; {
                     iter.advance_until(|b| !json_whitespace(b) &amp;&amp; b != <span class="string">b&#39;,&#39;</span>);
                     <span class="kw">match </span><span class="macro">next!</span>(iter) {
                         <span class="string">b&#39;&quot;&#39; </span>=&gt; {
@@ -1292,16 +1286,12 @@
                                 TapeElement::StartObject(end_idx);
                             <span class="self">self</span>.elements.push(TapeElement::EndObject(start_idx));
                             <span class="self">self</span>.stack.pop();
-                            <span class="self">self</span>.num_rows += <span class="self">self</span>.stack.is_empty() <span class="kw">as </span>usize;
-                            <span class="kw">if </span><span class="self">self</span>.num_rows &gt;= <span class="self">self</span>.batch_size {
-                                <span class="kw">break</span>;
-                            }
                         }
                         b =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(err(b, <span class="string">&quot;parsing object&quot;</span>)),
                     }
                 }
                 <span class="comment">// Decoding a list
-                </span><span class="prelude-val">Some</span>(DecoderState::List(start_idx)) =&gt; {
+                </span>DecoderState::List(start_idx) =&gt; {
                     iter.advance_until(|b| !json_whitespace(b) &amp;&amp; b != <span class="string">b&#39;,&#39;</span>);
                     <span class="kw">match </span>iter.peek() {
                         <span class="prelude-val">Some</span>(<span class="string">b&#39;]&#39;</span>) =&gt; {
@@ -1318,7 +1308,7 @@
                     }
                 }
                 <span class="comment">// Decoding a string
-                </span><span class="prelude-val">Some</span>(DecoderState::String) =&gt; {
+                </span>DecoderState::String =&gt; {
                     <span class="kw">let </span>s = iter.advance_until(|b| <span class="macro">matches!</span>(b, <span class="string">b&#39;\\&#39; </span>| <span class="string">b&#39;&quot;&#39;</span>));
                     <span class="self">self</span>.bytes.extend_from_slice(s);
 
@@ -1333,7 +1323,7 @@
                         b =&gt; <span class="macro">unreachable!</span>(<span class="string">&quot;{}&quot;</span>, b),
                     }
                 }
-                <span class="prelude-val">Some</span>(state @ DecoderState::Value) =&gt; {
+                state @ DecoderState::Value =&gt; {
                     iter.skip_whitespace();
                     <span class="kw-2">*</span>state = <span class="kw">match </span><span class="macro">next!</span>(iter) {
                         <span class="string">b&#39;&quot;&#39; </span>=&gt; DecoderState::String,
@@ -1357,7 +1347,7 @@
                         b =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(err(b, <span class="string">&quot;parsing value&quot;</span>)),
                     };
                 }
-                <span class="prelude-val">Some</span>(DecoderState::Number) =&gt; {
+                DecoderState::Number =&gt; {
                     <span class="kw">let </span>s = iter.advance_until(|b| {
                         !<span class="macro">matches!</span>(b, <span class="string">b&#39;0&#39;</span>..=<span class="string">b&#39;9&#39; </span>| <span class="string">b&#39;-&#39; </span>| <span class="string">b&#39;+&#39; </span>| <span class="string">b&#39;.&#39; </span>| <span class="string">b&#39;e&#39; </span>| <span class="string">b&#39;E&#39;</span>)
                     });
@@ -1370,14 +1360,14 @@
                         <span class="self">self</span>.offsets.push(<span class="self">self</span>.bytes.len());
                     }
                 }
-                <span class="prelude-val">Some</span>(DecoderState::Colon) =&gt; {
+                DecoderState::Colon =&gt; {
                     iter.skip_whitespace();
                     <span class="kw">match </span><span class="macro">next!</span>(iter) {
                         <span class="string">b&#39;:&#39; </span>=&gt; <span class="self">self</span>.stack.pop(),
                         b =&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(err(b, <span class="string">&quot;parsing colon&quot;</span>)),
                     };
                 }
-                <span class="prelude-val">Some</span>(DecoderState::Literal(literal, idx)) =&gt; {
+                DecoderState::Literal(literal, idx) =&gt; {
                     <span class="kw">let </span>bytes = literal.bytes();
                     <span class="kw">let </span>expected = bytes.iter().skip(<span class="kw-2">*</span>idx <span class="kw">as </span>usize).copied();
                     <span class="kw">for </span>(expected, b) <span class="kw">in </span>expected.zip(<span class="kw-2">&amp;mut </span>iter) {
@@ -1392,7 +1382,7 @@
                         <span class="self">self</span>.elements.push(element);
                     }
                 }
-                <span class="prelude-val">Some</span>(DecoderState::Escape) =&gt; {
+                DecoderState::Escape =&gt; {
                     <span class="kw">let </span>v = <span class="kw">match </span><span class="macro">next!</span>(iter) {
                         <span class="string">b&#39;u&#39; </span>=&gt; {
                             <span class="self">self</span>.stack.pop();
@@ -1414,7 +1404,7 @@
                     <span class="self">self</span>.bytes.push(v);
                 }
                 <span class="comment">// Parse a unicode escape sequence
-                </span><span class="prelude-val">Some</span>(DecoderState::Unicode(high, low, idx)) =&gt; <span class="kw">loop </span>{
+                </span>DecoderState::Unicode(high, low, idx) =&gt; <span class="kw">loop </span>{
                     <span class="kw">match </span><span class="kw-2">*</span>idx {
                         <span class="number">0</span>..=<span class="number">3 </span>=&gt; <span class="kw-2">*</span>high = <span class="kw-2">*</span>high &lt;&lt; <span class="number">4 </span>| parse_hex(<span class="macro">next!</span>(iter))<span class="question-mark">? </span><span class="kw">as </span>u16,
                         <span class="number">4 </span>=&gt; {
@@ -1465,7 +1455,7 @@
             .try_for_each(|row| row.serialize(<span class="kw-2">&amp;mut </span>serializer))
             .map_err(|e| ArrowError::JsonError(e.to_string()))<span class="question-mark">?</span>;
 
-        <span class="self">self</span>.num_rows += rows.len();
+        <span class="self">self</span>.cur_row += rows.len();
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -1509,7 +1499,7 @@
             strings,
             elements: <span class="kw-2">&amp;</span><span class="self">self</span>.elements,
             string_offsets: <span class="kw-2">&amp;</span><span class="self">self</span>.offsets,
-            num_rows: <span class="self">self</span>.num_rows,
+            num_rows: <span class="self">self</span>.cur_row,
         })
     }
 
@@ -1517,7 +1507,7 @@
     </span><span class="kw">pub fn </span>clear(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
         <span class="macro">assert!</span>(<span class="self">self</span>.stack.is_empty());
 
-        <span class="self">self</span>.num_rows = <span class="number">0</span>;
+        <span class="self">self</span>.cur_row = <span class="number">0</span>;
         <span class="self">self</span>.bytes.clear();
         <span class="self">self</span>.elements.clear();
         <span class="self">self</span>.elements.push(TapeElement::Null);
@@ -1755,7 +1745,7 @@
         <span class="kw">let </span>err = decoder.decode(<span class="string">b&quot;hello&quot;</span>).unwrap_err().to_string();
         <span class="macro">assert_eq!</span>(
             err,
-            <span class="string">&quot;Json error: Encountered unexpected &#39;h&#39; whilst trimming leading whitespace&quot;
+            <span class="string">&quot;Json error: Encountered unexpected &#39;h&#39; whilst parsing value&quot;
         </span>);
 
         <span class="kw">let </span><span class="kw-2">mut </span>decoder = TapeDecoder::new(<span class="number">16</span>, <span class="number">2</span>);
