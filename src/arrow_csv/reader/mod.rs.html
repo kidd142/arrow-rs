@@ -2408,6 +2408,8 @@
 <a href="#2408" id="2408">2408</a>
 <a href="#2409" id="2409">2409</a>
 <a href="#2410" id="2410">2410</a>
+<a href="#2411" id="2411">2411</a>
+<a href="#2412" id="2412">2412</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -3201,7 +3203,10 @@
                 }
                 DataType::Utf8 =&gt; <span class="prelude-val">Ok</span>(Arc::new(
                     rows.iter()
-                        .map(|row| <span class="prelude-val">Some</span>(row.get(i)))
+                        .map(|row| {
+                            <span class="kw">let </span>s = row.get(i);
+                            (!null_regex.is_null(s)).then_some(s)
+                        })
                         .collect::&lt;StringArray&gt;(),
                 ) <span class="kw">as </span>ArrayRef),
                 DataType::Dictionary(key_type, value_type)
@@ -3905,7 +3910,7 @@
         <span class="kw">let </span>schema = Arc::new(Schema::new(<span class="macro">vec!</span>[
             Field::new(<span class="string">&quot;c_int&quot;</span>, DataType::UInt64, <span class="bool-val">false</span>),
             Field::new(<span class="string">&quot;c_float&quot;</span>, DataType::Float32, <span class="bool-val">true</span>),
-            Field::new(<span class="string">&quot;c_string&quot;</span>, DataType::Utf8, <span class="bool-val">false</span>),
+            Field::new(<span class="string">&quot;c_string&quot;</span>, DataType::Utf8, <span class="bool-val">true</span>),
             Field::new(<span class="string">&quot;c_bool&quot;</span>, DataType::Boolean, <span class="bool-val">false</span>),
         ]));
 
@@ -4006,8 +4011,7 @@
         </span><span class="macro">assert!</span>(batch.column(<span class="number">0</span>).is_null(<span class="number">1</span>));
         <span class="macro">assert!</span>(batch.column(<span class="number">1</span>).is_null(<span class="number">2</span>));
         <span class="macro">assert!</span>(batch.column(<span class="number">3</span>).is_null(<span class="number">4</span>));
-        <span class="comment">// String won&#39;t be empty
-        </span><span class="macro">assert!</span>(!batch.column(<span class="number">2</span>).is_null(<span class="number">3</span>));
+        <span class="macro">assert!</span>(batch.column(<span class="number">2</span>).is_null(<span class="number">3</span>));
         <span class="macro">assert!</span>(!batch.column(<span class="number">2</span>).is_null(<span class="number">4</span>));
     }
 
@@ -4647,8 +4651,8 @@
 
     <span class="kw">fn </span>err_test(csv: <span class="kw-2">&amp;</span>[u8], expected: <span class="kw-2">&amp;</span>str) {
         <span class="kw">let </span>schema = Arc::new(Schema::new(<span class="macro">vec!</span>[
-            Field::new(<span class="string">&quot;text1&quot;</span>, DataType::Utf8, <span class="bool-val">false</span>),
-            Field::new(<span class="string">&quot;text2&quot;</span>, DataType::Utf8, <span class="bool-val">false</span>),
+            Field::new(<span class="string">&quot;text1&quot;</span>, DataType::Utf8, <span class="bool-val">true</span>),
+            Field::new(<span class="string">&quot;text2&quot;</span>, DataType::Utf8, <span class="bool-val">true</span>),
         ]));
         <span class="kw">let </span>buffer = std::io::BufReader::with_capacity(<span class="number">2</span>, Cursor::new(csv));
         <span class="kw">let </span>b = ReaderBuilder::new(schema)
