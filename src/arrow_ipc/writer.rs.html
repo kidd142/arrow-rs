@@ -2162,6 +2162,12 @@
 <a href="#2162" id="2162">2162</a>
 <a href="#2163" id="2163">2163</a>
 <a href="#2164" id="2164">2164</a>
+<a href="#2165" id="2165">2165</a>
+<a href="#2166" id="2166">2166</a>
+<a href="#2167" id="2167">2167</a>
+<a href="#2168" id="2168">2168</a>
+<a href="#2169" id="2169">2169</a>
+<a href="#2170" id="2170">2170</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -2187,6 +2193,7 @@
 </span><span class="kw">use </span>std::cmp::min;
 <span class="kw">use </span>std::collections::HashMap;
 <span class="kw">use </span>std::io::{BufWriter, Write};
+<span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>flatbuffers::FlatBufferBuilder;
 
@@ -2860,7 +2867,7 @@
     <span class="doccomment">/// IPC write options
     </span>write_options: IpcWriteOptions,
     <span class="doccomment">/// A reference to the schema, used in validating record batches
-    </span>schema: Schema,
+    </span>schema: SchemaRef,
     <span class="doccomment">/// The number of bytes between each block of bytes, as an offset for random access
     </span>block_offsets: usize,
     <span class="doccomment">/// Dictionary blocks that will be written as part of the IPC footer
@@ -2903,7 +2910,7 @@
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             writer,
             write_options,
-            schema: schema.clone(),
+            schema: Arc::new(schema.clone()),
             block_offsets: meta + data + header_size,
             dictionary_blocks: <span class="macro">vec!</span>[],
             record_blocks: <span class="macro">vec!</span>[],
@@ -2994,6 +3001,11 @@
         <span class="self">self</span>.finished = <span class="bool-val">true</span>;
 
         <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="doccomment">/// Returns the arrow [`SchemaRef`] for this arrow file.
+    </span><span class="kw">pub fn </span>schema(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>SchemaRef {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.schema
     }
 
     <span class="doccomment">/// Gets a reference to the underlying writer.
