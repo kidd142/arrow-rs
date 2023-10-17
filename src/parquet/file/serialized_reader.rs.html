@@ -1743,6 +1743,15 @@
 <a href="#1743" id="1743">1743</a>
 <a href="#1744" id="1744">1744</a>
 <a href="#1745" id="1745">1745</a>
+<a href="#1746" id="1746">1746</a>
+<a href="#1747" id="1747">1747</a>
+<a href="#1748" id="1748">1748</a>
+<a href="#1749" id="1749">1749</a>
+<a href="#1750" id="1750">1750</a>
+<a href="#1751" id="1751">1751</a>
+<a href="#1752" id="1752">1752</a>
+<a href="#1753" id="1753">1753</a>
+<a href="#1754" id="1754">1754</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -2513,6 +2522,15 @@
 
                 <span class="prelude-val">Ok</span>(())
             }
+        }
+    }
+
+    <span class="kw">fn </span>at_record_boundary(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;bool&gt; {
+        <span class="kw">match </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.state {
+            SerializedPageReaderState::Values { .. } =&gt; {
+                <span class="prelude-val">Ok</span>(<span class="self">self</span>.peek_next_page()<span class="question-mark">?</span>.is_none())
+            }
+            SerializedPageReaderState::Pages { .. } =&gt; <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
         }
     }
 }

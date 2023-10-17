@@ -1678,6 +1678,98 @@
 <a href="#1678" id="1678">1678</a>
 <a href="#1679" id="1679">1679</a>
 <a href="#1680" id="1680">1680</a>
+<a href="#1681" id="1681">1681</a>
+<a href="#1682" id="1682">1682</a>
+<a href="#1683" id="1683">1683</a>
+<a href="#1684" id="1684">1684</a>
+<a href="#1685" id="1685">1685</a>
+<a href="#1686" id="1686">1686</a>
+<a href="#1687" id="1687">1687</a>
+<a href="#1688" id="1688">1688</a>
+<a href="#1689" id="1689">1689</a>
+<a href="#1690" id="1690">1690</a>
+<a href="#1691" id="1691">1691</a>
+<a href="#1692" id="1692">1692</a>
+<a href="#1693" id="1693">1693</a>
+<a href="#1694" id="1694">1694</a>
+<a href="#1695" id="1695">1695</a>
+<a href="#1696" id="1696">1696</a>
+<a href="#1697" id="1697">1697</a>
+<a href="#1698" id="1698">1698</a>
+<a href="#1699" id="1699">1699</a>
+<a href="#1700" id="1700">1700</a>
+<a href="#1701" id="1701">1701</a>
+<a href="#1702" id="1702">1702</a>
+<a href="#1703" id="1703">1703</a>
+<a href="#1704" id="1704">1704</a>
+<a href="#1705" id="1705">1705</a>
+<a href="#1706" id="1706">1706</a>
+<a href="#1707" id="1707">1707</a>
+<a href="#1708" id="1708">1708</a>
+<a href="#1709" id="1709">1709</a>
+<a href="#1710" id="1710">1710</a>
+<a href="#1711" id="1711">1711</a>
+<a href="#1712" id="1712">1712</a>
+<a href="#1713" id="1713">1713</a>
+<a href="#1714" id="1714">1714</a>
+<a href="#1715" id="1715">1715</a>
+<a href="#1716" id="1716">1716</a>
+<a href="#1717" id="1717">1717</a>
+<a href="#1718" id="1718">1718</a>
+<a href="#1719" id="1719">1719</a>
+<a href="#1720" id="1720">1720</a>
+<a href="#1721" id="1721">1721</a>
+<a href="#1722" id="1722">1722</a>
+<a href="#1723" id="1723">1723</a>
+<a href="#1724" id="1724">1724</a>
+<a href="#1725" id="1725">1725</a>
+<a href="#1726" id="1726">1726</a>
+<a href="#1727" id="1727">1727</a>
+<a href="#1728" id="1728">1728</a>
+<a href="#1729" id="1729">1729</a>
+<a href="#1730" id="1730">1730</a>
+<a href="#1731" id="1731">1731</a>
+<a href="#1732" id="1732">1732</a>
+<a href="#1733" id="1733">1733</a>
+<a href="#1734" id="1734">1734</a>
+<a href="#1735" id="1735">1735</a>
+<a href="#1736" id="1736">1736</a>
+<a href="#1737" id="1737">1737</a>
+<a href="#1738" id="1738">1738</a>
+<a href="#1739" id="1739">1739</a>
+<a href="#1740" id="1740">1740</a>
+<a href="#1741" id="1741">1741</a>
+<a href="#1742" id="1742">1742</a>
+<a href="#1743" id="1743">1743</a>
+<a href="#1744" id="1744">1744</a>
+<a href="#1745" id="1745">1745</a>
+<a href="#1746" id="1746">1746</a>
+<a href="#1747" id="1747">1747</a>
+<a href="#1748" id="1748">1748</a>
+<a href="#1749" id="1749">1749</a>
+<a href="#1750" id="1750">1750</a>
+<a href="#1751" id="1751">1751</a>
+<a href="#1752" id="1752">1752</a>
+<a href="#1753" id="1753">1753</a>
+<a href="#1754" id="1754">1754</a>
+<a href="#1755" id="1755">1755</a>
+<a href="#1756" id="1756">1756</a>
+<a href="#1757" id="1757">1757</a>
+<a href="#1758" id="1758">1758</a>
+<a href="#1759" id="1759">1759</a>
+<a href="#1760" id="1760">1760</a>
+<a href="#1761" id="1761">1761</a>
+<a href="#1762" id="1762">1762</a>
+<a href="#1763" id="1763">1763</a>
+<a href="#1764" id="1764">1764</a>
+<a href="#1765" id="1765">1765</a>
+<a href="#1766" id="1766">1766</a>
+<a href="#1767" id="1767">1767</a>
+<a href="#1768" id="1768">1768</a>
+<a href="#1769" id="1769">1769</a>
+<a href="#1770" id="1770">1770</a>
+<a href="#1771" id="1771">1771</a>
+<a href="#1772" id="1772">1772</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -2558,12 +2650,17 @@
     <span class="kw">use </span><span class="kw">crate</span>::file::properties::WriterProperties;
     <span class="kw">use </span>arrow::compute::kernels::cmp::eq;
     <span class="kw">use </span>arrow::error::Result <span class="kw">as </span>ArrowResult;
+    <span class="kw">use </span>arrow_array::builder::{ListBuilder, StringBuilder};
     <span class="kw">use </span>arrow_array::cast::AsArray;
     <span class="kw">use </span>arrow_array::types::Int32Type;
-    <span class="kw">use </span>arrow_array::{Array, ArrayRef, Int32Array, Int8Array, Scalar, StringArray};
-    <span class="kw">use </span>futures::TryStreamExt;
+    <span class="kw">use </span>arrow_array::{
+        Array, ArrayRef, Int32Array, Int8Array, Scalar, StringArray, UInt64Array,
+    };
+    <span class="kw">use </span>arrow_schema::{DataType, Field, Schema};
+    <span class="kw">use </span>futures::{StreamExt, TryStreamExt};
     <span class="kw">use </span>rand::{thread_rng, Rng};
     <span class="kw">use </span>std::sync::Mutex;
+    <span class="kw">use </span>tempfile::tempfile;
 
     <span class="attr">#[derive(Clone)]
     </span><span class="kw">struct </span>TestReader {
@@ -3356,6 +3453,93 @@
             .unwrap();
         <span class="macro">assert!</span>(sbbf.check(<span class="kw-2">&amp;</span><span class="string">&quot;Hello&quot;</span>));
         <span class="macro">assert!</span>(!sbbf.check(<span class="kw-2">&amp;</span><span class="string">&quot;Hello_Not_Exists&quot;</span>));
+    }
+
+    <span class="attr">#[tokio::test]
+    </span><span class="kw">async fn </span>test_nested_skip() {
+        <span class="kw">let </span>schema = Arc::new(Schema::new(<span class="macro">vec!</span>[
+            Field::new(<span class="string">&quot;col_1&quot;</span>, DataType::UInt64, <span class="bool-val">false</span>),
+            Field::new_list(<span class="string">&quot;col_2&quot;</span>, Field::new(<span class="string">&quot;item&quot;</span>, DataType::Utf8, <span class="bool-val">true</span>), <span class="bool-val">true</span>),
+        ]));
+
+        <span class="comment">// Default writer properties
+        </span><span class="kw">let </span>props = WriterProperties::builder()
+            .set_data_page_row_count_limit(<span class="number">256</span>)
+            .set_write_batch_size(<span class="number">256</span>)
+            .set_max_row_group_size(<span class="number">1024</span>);
+
+        <span class="comment">// Write data
+        </span><span class="kw">let </span><span class="kw-2">mut </span>file = tempfile().unwrap();
+        <span class="kw">let </span><span class="kw-2">mut </span>writer =
+            ArrowWriter::try_new(<span class="kw-2">&amp;mut </span>file, schema.clone(), <span class="prelude-val">Some</span>(props.build())).unwrap();
+
+        <span class="kw">let </span><span class="kw-2">mut </span>builder = ListBuilder::new(StringBuilder::new());
+        <span class="kw">for </span>id <span class="kw">in </span><span class="number">0</span>..<span class="number">1024 </span>{
+            <span class="kw">match </span>id % <span class="number">3 </span>{
+                <span class="number">0 </span>=&gt; builder
+                    .append_value([<span class="prelude-val">Some</span>(<span class="string">&quot;val_1&quot;</span>.to_string()), <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;id_{id}&quot;</span>))]),
+                <span class="number">1 </span>=&gt; builder.append_value([<span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;id_{id}&quot;</span>))]),
+                <span class="kw">_ </span>=&gt; builder.append_null(),
+            }
+        }
+        <span class="kw">let </span>refs = <span class="macro">vec!</span>[
+            Arc::new(UInt64Array::from_iter_values(<span class="number">0</span>..<span class="number">1024</span>)) <span class="kw">as </span>ArrayRef,
+            Arc::new(builder.finish()) <span class="kw">as </span>ArrayRef,
+        ];
+
+        <span class="kw">let </span>batch = RecordBatch::try_new(schema.clone(), refs).unwrap();
+        writer.write(<span class="kw-2">&amp;</span>batch).unwrap();
+        writer.close().unwrap();
+
+        <span class="kw">let </span>selections = [
+            RowSelection::from(<span class="macro">vec!</span>[
+                RowSelector::skip(<span class="number">313</span>),
+                RowSelector::select(<span class="number">1</span>),
+                RowSelector::skip(<span class="number">709</span>),
+                RowSelector::select(<span class="number">1</span>),
+            ]),
+            RowSelection::from(<span class="macro">vec!</span>[
+                RowSelector::skip(<span class="number">255</span>),
+                RowSelector::select(<span class="number">1</span>),
+                RowSelector::skip(<span class="number">767</span>),
+                RowSelector::select(<span class="number">1</span>),
+            ]),
+            RowSelection::from(<span class="macro">vec!</span>[
+                RowSelector::select(<span class="number">255</span>),
+                RowSelector::skip(<span class="number">1</span>),
+                RowSelector::select(<span class="number">767</span>),
+                RowSelector::skip(<span class="number">1</span>),
+            ]),
+            RowSelection::from(<span class="macro">vec!</span>[
+                RowSelector::skip(<span class="number">254</span>),
+                RowSelector::select(<span class="number">1</span>),
+                RowSelector::select(<span class="number">1</span>),
+                RowSelector::skip(<span class="number">767</span>),
+                RowSelector::select(<span class="number">1</span>),
+            ]),
+        ];
+
+        <span class="kw">for </span>selection <span class="kw">in </span>selections {
+            <span class="kw">let </span>expected = selection.row_count();
+            <span class="comment">// Read data
+            </span><span class="kw">let </span><span class="kw-2">mut </span>reader = ParquetRecordBatchStreamBuilder::new_with_options(
+                tokio::fs::File::from_std(file.try_clone().unwrap()),
+                ArrowReaderOptions::new().with_page_index(<span class="bool-val">true</span>),
+            )
+            .<span class="kw">await
+            </span>.unwrap();
+
+            reader = reader.with_row_selection(selection);
+
+            <span class="kw">let </span><span class="kw-2">mut </span>stream = reader.build().unwrap();
+
+            <span class="kw">let </span><span class="kw-2">mut </span>total_rows = <span class="number">0</span>;
+            <span class="kw">while let </span><span class="prelude-val">Some</span>(rb) = stream.next().<span class="kw">await </span>{
+                <span class="kw">let </span>rb = rb.unwrap();
+                total_rows += rb.num_rows();
+            }
+            <span class="macro">assert_eq!</span>(total_rows, expected);
+        }
     }
 }
 </code></pre></div></section></main></body></html>

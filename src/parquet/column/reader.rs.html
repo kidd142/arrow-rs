@@ -1732,7 +1732,7 @@
                         <span class="comment">// Reached end of page, which implies records_read &lt; remaining_records
                         // as otherwise would have stopped reading before reaching the end
                         </span><span class="macro">assert!</span>(records_read &lt; remaining_records); <span class="comment">// Sanity check
-                        </span>records_read += <span class="number">1</span>;
+                        </span>records_read += reader.flush_partial() <span class="kw">as </span>usize;
                     }
                     (records_read, levels_read)
                 }
@@ -1843,7 +1843,7 @@
                         <span class="comment">// Reached end of page, which implies records_read &lt; remaining_records
                         // as otherwise would have stopped reading before reaching the end
                         </span><span class="macro">assert!</span>(records_read &lt; remaining_records); <span class="comment">// Sanity check
-                        </span>records_read += <span class="number">1</span>;
+                        </span>records_read += decoder.flush_partial() <span class="kw">as </span>usize;
                     }
 
                     (records_read, levels_read)
@@ -1954,7 +1954,7 @@
                                 offset += bytes_read;
 
                                 <span class="self">self</span>.has_record_delimiter =
-                                    <span class="self">self</span>.page_reader.peek_next_page()<span class="question-mark">?</span>.is_none();
+                                    <span class="self">self</span>.page_reader.at_record_boundary()<span class="question-mark">?</span>;
 
                                 <span class="self">self</span>.rep_level_decoder
                                     .as_mut()
@@ -2011,7 +2011,7 @@
                                 // across multiple pages, however, the parquet writer
                                 // used to do this so we preserve backwards compatibility
                                 </span><span class="self">self</span>.has_record_delimiter =
-                                    <span class="self">self</span>.page_reader.peek_next_page()<span class="question-mark">?</span>.is_none();
+                                    <span class="self">self</span>.page_reader.at_record_boundary()<span class="question-mark">?</span>;
 
                                 <span class="self">self</span>.rep_level_decoder.as_mut().unwrap().set_data(
                                     Encoding::RLE,
