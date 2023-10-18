@@ -2410,6 +2410,14 @@
 <a href="#2410" id="2410">2410</a>
 <a href="#2411" id="2411">2411</a>
 <a href="#2412" id="2412">2412</a>
+<a href="#2413" id="2413">2413</a>
+<a href="#2414" id="2414">2414</a>
+<a href="#2415" id="2415">2415</a>
+<a href="#2416" id="2416">2416</a>
+<a href="#2417" id="2417">2417</a>
+<a href="#2418" id="2418">2418</a>
+<a href="#2419" id="2419">2419</a>
+<a href="#2420" id="2420">2420</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -2637,7 +2645,7 @@
 <span class="doccomment">/// The format specification for the CSV file
 </span><span class="attr">#[derive(Debug, Clone, Default)]
 </span><span class="kw">pub struct </span>Format {
-    has_header: bool,
+    header: bool,
     delimiter: <span class="prelude-ty">Option</span>&lt;u8&gt;,
     escape: <span class="prelude-ty">Option</span>&lt;u8&gt;,
     quote: <span class="prelude-ty">Option</span>&lt;u8&gt;,
@@ -2647,7 +2655,7 @@
 
 <span class="kw">impl </span>Format {
     <span class="kw">pub fn </span>with_header(<span class="kw-2">mut </span><span class="self">self</span>, has_header: bool) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.has_header = has_header;
+        <span class="self">self</span>.header = has_header;
         <span class="self">self
     </span>}
 
@@ -2692,7 +2700,7 @@
 
         <span class="comment">// get or create header names
         // when has_header is false, creates default column names with column_ prefix
-        </span><span class="kw">let </span>headers: Vec&lt;String&gt; = <span class="kw">if </span><span class="self">self</span>.has_header {
+        </span><span class="kw">let </span>headers: Vec&lt;String&gt; = <span class="kw">if </span><span class="self">self</span>.header {
             <span class="kw">let </span>headers = <span class="kw-2">&amp;</span>csv_reader.headers().map_err(map_csv_error)<span class="question-mark">?</span>.clone();
             headers.iter().map(|s| s.to_string()).collect()
         } <span class="kw">else </span>{
@@ -2743,7 +2751,7 @@
     <span class="doccomment">/// Build a [`csv::Reader`] for this [`Format`]
     </span><span class="kw">fn </span>build_reader&lt;R: Read&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, reader: R) -&gt; csv::Reader&lt;R&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>builder = csv::ReaderBuilder::new();
-        builder.has_headers(<span class="self">self</span>.has_header);
+        builder.has_headers(<span class="self">self</span>.header);
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(c) = <span class="self">self</span>.delimiter {
             builder.delimiter(c);
@@ -2815,7 +2823,7 @@
 ) -&gt; <span class="prelude-ty">Result</span>&lt;(Schema, usize), ArrowError&gt; {
     <span class="kw">let </span>format = Format {
         delimiter: <span class="prelude-val">Some</span>(delimiter),
-        has_header,
+        header: has_header,
         ..Default::default()
     };
     format.infer_schema(reader, max_read_records)
@@ -2837,7 +2845,7 @@
     <span class="kw">let </span><span class="kw-2">mut </span>records_to_read = max_read_records.unwrap_or(usize::MAX);
     <span class="kw">let </span>format = Format {
         delimiter: <span class="prelude-val">Some</span>(delimiter),
-        has_header,
+        header: has_header,
         ..Default::default()
     };
 
@@ -3507,8 +3515,16 @@
     }
 
     <span class="doccomment">/// Set whether the CSV file has headers
+    </span><span class="attr">#[deprecated(note = <span class="string">&quot;Use with_header&quot;</span>)]
+    #[doc(hidden)]
     </span><span class="kw">pub fn </span>has_header(<span class="kw-2">mut </span><span class="self">self</span>, has_header: bool) -&gt; <span class="self">Self </span>{
-        <span class="self">self</span>.format.has_header = has_header;
+        <span class="self">self</span>.format.header = has_header;
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Set whether the CSV file has a header
+    </span><span class="kw">pub fn </span>with_header(<span class="kw-2">mut </span><span class="self">self</span>, has_header: bool) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.format.header = has_header;
         <span class="self">self
     </span>}
 
@@ -3588,7 +3604,7 @@
         <span class="kw">let </span>delimiter = <span class="self">self</span>.format.build_parser();
         <span class="kw">let </span>record_decoder = RecordDecoder::new(delimiter, <span class="self">self</span>.schema.fields().len());
 
-        <span class="kw">let </span>header = <span class="self">self</span>.format.has_header <span class="kw">as </span>usize;
+        <span class="kw">let </span>header = <span class="self">self</span>.format.header <span class="kw">as </span>usize;
 
         <span class="kw">let </span>(start, end) = <span class="kw">match </span><span class="self">self</span>.bounds {
             <span class="prelude-val">Some</span>((start, end)) =&gt; (start + header, end + header),
@@ -3729,7 +3745,7 @@
             .chain(Cursor::new(<span class="string">&quot;\n&quot;</span>.to_string()))
             .chain(file_without_headers);
         <span class="kw">let </span><span class="kw-2">mut </span>csv = ReaderBuilder::new(Arc::new(schema))
-            .has_header(<span class="bool-val">true</span>)
+            .with_header(<span class="bool-val">true</span>)
             .build(both_files)
             .unwrap();
         <span class="kw">let </span>batch = csv.next().unwrap().unwrap();
@@ -3747,7 +3763,7 @@
             .unwrap();
 
         file.rewind().unwrap();
-        <span class="kw">let </span>builder = ReaderBuilder::new(Arc::new(schema)).has_header(<span class="bool-val">true</span>);
+        <span class="kw">let </span>builder = ReaderBuilder::new(Arc::new(schema)).with_header(<span class="bool-val">true</span>);
 
         <span class="kw">let </span><span class="kw-2">mut </span>csv = builder.build(file).unwrap();
         <span class="kw">let </span>expected_schema = Schema::new(<span class="macro">vec!</span>[
@@ -3917,7 +3933,7 @@
         <span class="kw">let </span>file = File::open(<span class="string">&quot;test/data/null_test.csv&quot;</span>).unwrap();
 
         <span class="kw">let </span><span class="kw-2">mut </span>csv = ReaderBuilder::new(schema)
-            .has_header(<span class="bool-val">true</span>)
+            .with_header(<span class="bool-val">true</span>)
             .build(file)
             .unwrap();
 
@@ -3942,7 +3958,7 @@
         <span class="kw">let </span>file = File::open(<span class="string">&quot;test/data/init_null_test.csv&quot;</span>).unwrap();
 
         <span class="kw">let </span><span class="kw-2">mut </span>csv = ReaderBuilder::new(schema)
-            .has_header(<span class="bool-val">true</span>)
+            .with_header(<span class="bool-val">true</span>)
             .build(file)
             .unwrap();
 
@@ -4000,7 +4016,7 @@
         <span class="kw">let </span>null_regex = Regex::new(<span class="string">&quot;^nil$&quot;</span>).unwrap();
 
         <span class="kw">let </span><span class="kw-2">mut </span>csv = ReaderBuilder::new(schema)
-            .has_header(<span class="bool-val">true</span>)
+            .with_header(<span class="bool-val">true</span>)
             .with_null_regex(null_regex)
             .build(file)
             .unwrap();
@@ -4122,7 +4138,7 @@
         ]);
 
         <span class="kw">let </span>builder = ReaderBuilder::new(Arc::new(schema))
-            .has_header(<span class="bool-val">true</span>)
+            .with_header(<span class="bool-val">true</span>)
             .with_delimiter(<span class="string">b&#39;|&#39;</span>)
             .with_batch_size(<span class="number">512</span>)
             .with_projection(<span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]);
@@ -4449,7 +4465,7 @@
             Field::new(<span class="string">&quot;text2&quot;</span>, DataType::Utf8, <span class="bool-val">false</span>),
         ]);
         <span class="kw">let </span>builder = ReaderBuilder::new(Arc::new(schema))
-            .has_header(<span class="bool-val">false</span>)
+            .with_header(<span class="bool-val">false</span>)
             .with_quote(<span class="string">b&#39;~&#39;</span>); <span class="comment">// default is &quot;, change to ~
 
         </span><span class="kw">let </span><span class="kw-2">mut </span>csv_text = Vec::new();
@@ -4481,7 +4497,7 @@
             Field::new(<span class="string">&quot;text2&quot;</span>, DataType::Utf8, <span class="bool-val">false</span>),
         ]);
         <span class="kw">let </span>builder = ReaderBuilder::new(Arc::new(schema))
-            .has_header(<span class="bool-val">false</span>)
+            .with_header(<span class="bool-val">false</span>)
             .with_escape(<span class="string">b&#39;\\&#39;</span>); <span class="comment">// default is None, change to \
 
         </span><span class="kw">let </span><span class="kw-2">mut </span>csv_text = Vec::new();
@@ -4513,7 +4529,7 @@
             Field::new(<span class="string">&quot;text2&quot;</span>, DataType::Utf8, <span class="bool-val">false</span>),
         ]);
         <span class="kw">let </span>builder = ReaderBuilder::new(Arc::new(schema))
-            .has_header(<span class="bool-val">false</span>)
+            .with_header(<span class="bool-val">false</span>)
             .with_terminator(<span class="string">b&#39;\n&#39;</span>); <span class="comment">// default is CRLF, change to LF
 
         </span><span class="kw">let </span><span class="kw-2">mut </span>csv_text = Vec::new();
@@ -4555,7 +4571,7 @@
         ]));
 
         <span class="kw">for </span>(idx, (bounds, has_header, expected)) <span class="kw">in </span>tests.into_iter().enumerate() {
-            <span class="kw">let </span><span class="kw-2">mut </span>reader = ReaderBuilder::new(schema.clone()).has_header(has_header);
+            <span class="kw">let </span><span class="kw-2">mut </span>reader = ReaderBuilder::new(schema.clone()).with_header(has_header);
             <span class="kw">if let </span><span class="prelude-val">Some</span>((start, end)) = bounds {
                 reader = reader.with_bounds(start, end);
             }
@@ -4620,7 +4636,7 @@
                 <span class="kw">for </span>capacity <span class="kw">in </span>[<span class="number">1</span>, <span class="number">3</span>, <span class="number">7</span>, <span class="number">100</span>] {
                     <span class="kw">let </span>reader = ReaderBuilder::new(schema.clone())
                         .with_batch_size(batch_size)
-                        .has_header(has_header)
+                        .with_header(has_header)
                         .build(File::open(path).unwrap())
                         .unwrap();
 
@@ -4638,7 +4654,7 @@
 
                     <span class="kw">let </span>reader = ReaderBuilder::new(schema.clone())
                         .with_batch_size(batch_size)
-                        .has_header(has_header)
+                        .with_header(has_header)
                         .build_buffered(buffered)
                         .unwrap();
 

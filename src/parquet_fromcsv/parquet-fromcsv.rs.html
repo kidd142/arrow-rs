@@ -1077,7 +1077,7 @@
 
     <span class="kw">let </span><span class="kw-2">mut </span>builder = ReaderBuilder::new(arrow_schema)
         .with_batch_size(args.batch_size)
-        .has_header(args.has_header)
+        .with_header(args.has_header)
         .with_delimiter(args.get_delimiter());
 
     builder = configure_reader(
@@ -1362,7 +1362,7 @@
 
         <span class="kw">let </span>reader_builder = configure_reader_builder(<span class="kw-2">&amp;</span>args, arrow_schema);
         <span class="kw">let </span>builder_debug = <span class="macro">format!</span>(<span class="string">&quot;{reader_builder:?}&quot;</span>);
-        assert_debug_text(<span class="kw-2">&amp;</span>builder_debug, <span class="string">&quot;has_header&quot;</span>, <span class="string">&quot;false&quot;</span>);
+        assert_debug_text(<span class="kw-2">&amp;</span>builder_debug, <span class="string">&quot;header&quot;</span>, <span class="string">&quot;false&quot;</span>);
         assert_debug_text(<span class="kw-2">&amp;</span>builder_debug, <span class="string">&quot;delimiter&quot;</span>, <span class="string">&quot;Some(44)&quot;</span>);
         assert_debug_text(<span class="kw-2">&amp;</span>builder_debug, <span class="string">&quot;quote&quot;</span>, <span class="string">&quot;Some(34)&quot;</span>);
         assert_debug_text(<span class="kw-2">&amp;</span>builder_debug, <span class="string">&quot;terminator&quot;</span>, <span class="string">&quot;None&quot;</span>);
@@ -1397,7 +1397,7 @@
         ]));
         <span class="kw">let </span>reader_builder = configure_reader_builder(<span class="kw-2">&amp;</span>args, arrow_schema);
         <span class="kw">let </span>builder_debug = <span class="macro">format!</span>(<span class="string">&quot;{reader_builder:?}&quot;</span>);
-        assert_debug_text(<span class="kw-2">&amp;</span>builder_debug, <span class="string">&quot;has_header&quot;</span>, <span class="string">&quot;true&quot;</span>);
+        assert_debug_text(<span class="kw-2">&amp;</span>builder_debug, <span class="string">&quot;header&quot;</span>, <span class="string">&quot;true&quot;</span>);
         assert_debug_text(<span class="kw-2">&amp;</span>builder_debug, <span class="string">&quot;delimiter&quot;</span>, <span class="string">&quot;Some(9)&quot;</span>);
         assert_debug_text(<span class="kw-2">&amp;</span>builder_debug, <span class="string">&quot;quote&quot;</span>, <span class="string">&quot;None&quot;</span>);
         assert_debug_text(<span class="kw-2">&amp;</span>builder_debug, <span class="string">&quot;terminator&quot;</span>, <span class="string">&quot;Some(10)&quot;</span>);
