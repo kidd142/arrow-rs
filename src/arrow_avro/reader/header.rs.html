@@ -287,6 +287,7 @@
 <a href="#287" id="287">287</a>
 <a href="#288" id="288">288</a>
 <a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -529,6 +530,7 @@
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
     <span class="kw">use </span><span class="kw">crate</span>::reader::read_header;
     <span class="kw">use </span><span class="kw">crate</span>::schema::SCHEMA_METADATA_KEY;
+    <span class="kw">use </span><span class="kw">crate</span>::test_util::arrow_test_data;
     <span class="kw">use </span>std::fs::File;
     <span class="kw">use </span>std::io::{BufRead, BufReader};
 
@@ -555,7 +557,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_header() {
-        <span class="kw">let </span>header = decode_file(<span class="string">&quot;../testing/data/avro/alltypes_plain.avro&quot;</span>);
+        <span class="kw">let </span>header = decode_file(<span class="kw-2">&amp;</span>arrow_test_data(<span class="string">&quot;avro/alltypes_plain.avro&quot;</span>));
         <span class="kw">let </span>schema_json = header.get(SCHEMA_METADATA_KEY).unwrap();
         <span class="kw">let </span>expected = <span class="string">br#&quot;{&quot;type&quot;:&quot;record&quot;,&quot;name&quot;:&quot;topLevelRecord&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;id&quot;,&quot;type&quot;:[&quot;int&quot;,&quot;null&quot;]},{&quot;name&quot;:&quot;bool_col&quot;,&quot;type&quot;:[&quot;boolean&quot;,&quot;null&quot;]},{&quot;name&quot;:&quot;tinyint_col&quot;,&quot;type&quot;:[&quot;int&quot;,&quot;null&quot;]},{&quot;name&quot;:&quot;smallint_col&quot;,&quot;type&quot;:[&quot;int&quot;,&quot;null&quot;]},{&quot;name&quot;:&quot;int_col&quot;,&quot;type&quot;:[&quot;int&quot;,&quot;null&quot;]},{&quot;name&quot;:&quot;bigint_col&quot;,&quot;type&quot;:[&quot;long&quot;,&quot;null&quot;]},{&quot;name&quot;:&quot;float_col&quot;,&quot;type&quot;:[&quot;float&quot;,&quot;null&quot;]},{&quot;name&quot;:&quot;double_col&quot;,&quot;type&quot;:[&quot;double&quot;,&quot;null&quot;]},{&quot;name&quot;:&quot;date_string_col&quot;,&quot;type&quot;:[&quot;bytes&quot;,&quot;null&quot;]},{&quot;name&quot;:&quot;string_col&quot;,&quot;type&quot;:[&quot;bytes&quot;,&quot;null&quot;]},{&quot;name&quot;:&quot;timestamp_col&quot;,&quot;type&quot;:[{&quot;type&quot;:&quot;long&quot;,&quot;logicalType&quot;:&quot;timestamp-micros&quot;},&quot;null&quot;]}]}&quot;#</span>;
         <span class="macro">assert_eq!</span>(schema_json, expected);
@@ -565,7 +567,7 @@
             <span class="number">226966037233754408753420635932530907102
         </span>);
 
-        <span class="kw">let </span>header = decode_file(<span class="string">&quot;../testing/data/avro/fixed_length_decimal.avro&quot;</span>);
+        <span class="kw">let </span>header = decode_file(<span class="kw-2">&amp;</span>arrow_test_data(<span class="string">&quot;avro/fixed_length_decimal.avro&quot;</span>));
         <span class="kw">let </span>schema_json = header.get(SCHEMA_METADATA_KEY).unwrap();
         <span class="kw">let </span>expected = <span class="string">br#&quot;{&quot;type&quot;:&quot;record&quot;,&quot;name&quot;:&quot;topLevelRecord&quot;,&quot;fields&quot;:[{&quot;name&quot;:&quot;value&quot;,&quot;type&quot;:[{&quot;type&quot;:&quot;fixed&quot;,&quot;name&quot;:&quot;fixed&quot;,&quot;namespace&quot;:&quot;topLevelRecord.value&quot;,&quot;size&quot;:11,&quot;logicalType&quot;:&quot;decimal&quot;,&quot;precision&quot;:25,&quot;scale&quot;:2},&quot;null&quot;]}]}&quot;#</span>;
         <span class="macro">assert_eq!</span>(schema_json, expected);
