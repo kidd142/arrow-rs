@@ -264,8 +264,6 @@
 <a href="#264" id="264">264</a>
 <a href="#265" id="265">265</a>
 <a href="#266" id="266">266</a>
-<a href="#267" id="267">267</a>
-<a href="#268" id="268">268</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -321,9 +319,7 @@
 </span><span class="attr">#[inline]
 </span><span class="kw">pub fn </span>padded_length(a: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; usize {
     <span class="kw">match </span>a {
-        <span class="prelude-val">Some</span>(a) <span class="kw">if </span>a &lt;= BLOCK_SIZE =&gt; {
-            <span class="number">1 </span>+ ceil(a, MINI_BLOCK_SIZE) * (MINI_BLOCK_SIZE + <span class="number">1</span>)
-        }
+        <span class="prelude-val">Some</span>(a) <span class="kw">if </span>a &lt;= BLOCK_SIZE =&gt; <span class="number">1 </span>+ ceil(a, MINI_BLOCK_SIZE) * (MINI_BLOCK_SIZE + <span class="number">1</span>),
         <span class="comment">// Each miniblock ends with a 1 byte continuation, therefore add
         // `(MINI_BLOCK_COUNT - 1)` additional bytes over non-miniblock size
         </span><span class="prelude-val">Some</span>(a) =&gt; MINI_BLOCK_COUNT + ceil(a, BLOCK_SIZE) * (BLOCK_SIZE + <span class="number">1</span>),

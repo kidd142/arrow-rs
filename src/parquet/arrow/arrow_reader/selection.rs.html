@@ -1143,18 +1143,6 @@
 <a href="#1143" id="1143">1143</a>
 <a href="#1144" id="1144">1144</a>
 <a href="#1145" id="1145">1145</a>
-<a href="#1146" id="1146">1146</a>
-<a href="#1147" id="1147">1147</a>
-<a href="#1148" id="1148">1148</a>
-<a href="#1149" id="1149">1149</a>
-<a href="#1150" id="1150">1150</a>
-<a href="#1151" id="1151">1151</a>
-<a href="#1152" id="1152">1152</a>
-<a href="#1153" id="1153">1153</a>
-<a href="#1154" id="1154">1154</a>
-<a href="#1155" id="1155">1155</a>
-<a href="#1156" id="1156">1156</a>
-<a href="#1157" id="1157">1157</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -1260,8 +1248,7 @@
             <span class="kw">let </span>offset = next_offset;
             next_offset += filter.len();
             <span class="macro">assert_eq!</span>(filter.null_count(), <span class="number">0</span>);
-            SlicesIterator::new(filter)
-                .map(<span class="kw">move </span>|(start, end)| start + offset..end + offset)
+            SlicesIterator::new(filter).map(<span class="kw">move </span>|(start, end)| start + offset..end + offset)
         });
 
         <span class="self">Self</span>::from_consecutive_ranges(iter, total_rows)
@@ -1337,10 +1324,7 @@
     /// Note: this method does not make any effort to combine consecutive ranges, nor coalesce
     /// ranges that are close together. This is instead delegated to the IO subsystem to optimise,
     /// e.g. [`ObjectStore::get_ranges`](object_store::ObjectStore::get_ranges)
-    </span><span class="kw">pub fn </span>scan_ranges(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        page_locations: <span class="kw-2">&amp;</span>[<span class="kw">crate</span>::format::PageLocation],
-    ) -&gt; Vec&lt;Range&lt;usize&gt;&gt; {
+    </span><span class="kw">pub fn </span>scan_ranges(<span class="kw-2">&amp;</span><span class="self">self</span>, page_locations: <span class="kw-2">&amp;</span>[<span class="kw">crate</span>::format::PageLocation]) -&gt; Vec&lt;Range&lt;usize&gt;&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>ranges = <span class="macro">vec!</span>[];
         <span class="kw">let </span><span class="kw-2">mut </span>row_offset = <span class="number">0</span>;
 
@@ -1361,8 +1345,7 @@
 
             <span class="kw">if let </span><span class="prelude-val">Some</span>(next_page) = pages.peek() {
                 <span class="kw">if </span>row_offset + selector.row_count &gt; next_page.first_row_index <span class="kw">as </span>usize {
-                    <span class="kw">let </span>remaining_in_page =
-                        next_page.first_row_index <span class="kw">as </span>usize - row_offset;
+                    <span class="kw">let </span>remaining_in_page = next_page.first_row_index <span class="kw">as </span>usize - row_offset;
                     selector.row_count -= remaining_in_page;
                     row_offset += remaining_in_page;
                     current_page = pages.next();
@@ -1370,9 +1353,7 @@
 
                     <span class="kw">continue</span>;
                 } <span class="kw">else </span>{
-                    <span class="kw">if </span>row_offset + selector.row_count
-                        == next_page.first_row_index <span class="kw">as </span>usize
-                    {
+                    <span class="kw">if </span>row_offset + selector.row_count == next_page.first_row_index <span class="kw">as </span>usize {
                         current_page = pages.next();
                         current_page_included = <span class="bool-val">false</span>;
                     }
@@ -1629,10 +1610,7 @@
 /// other:     NYNNNNNNY
 ///
 /// returned:  NNNNNNNNYYNYN
-</span><span class="kw">fn </span>intersect_row_selections(
-    left: <span class="kw-2">&amp;</span>[RowSelector],
-    right: <span class="kw-2">&amp;</span>[RowSelector],
-) -&gt; Vec&lt;RowSelector&gt; {
+</span><span class="kw">fn </span>intersect_row_selections(left: <span class="kw-2">&amp;</span>[RowSelector], right: <span class="kw-2">&amp;</span>[RowSelector]) -&gt; Vec&lt;RowSelector&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>res = Vec::with_capacity(left.len());
     <span class="kw">let </span><span class="kw-2">mut </span>l_iter = left.iter().copied().peekable();
     <span class="kw">let </span><span class="kw-2">mut </span>r_iter = right.iter().copied().peekable();
@@ -2099,8 +2077,7 @@
                 }
             }
 
-            <span class="kw">let </span>expected =
-                RowSelection::from_filters(<span class="kw-2">&amp;</span>[BooleanArray::from(expected_bools)]);
+            <span class="kw">let </span>expected = RowSelection::from_filters(<span class="kw-2">&amp;</span>[BooleanArray::from(expected_bools)]);
 
             <span class="kw">let </span>total_rows: usize = expected.selectors.iter().map(|s| s.row_count).sum();
             <span class="macro">assert_eq!</span>(a_len, total_rows);
@@ -2129,8 +2106,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_limit() {
         <span class="comment">// Limit to existing limit should no-op
-        </span><span class="kw">let </span>selection =
-            RowSelection::from(<span class="macro">vec!</span>[RowSelector::select(<span class="number">10</span>), RowSelector::skip(<span class="number">90</span>)]);
+        </span><span class="kw">let </span>selection = RowSelection::from(<span class="macro">vec!</span>[RowSelector::select(<span class="number">10</span>), RowSelector::skip(<span class="number">90</span>)]);
         <span class="kw">let </span>limited = selection.limit(<span class="number">10</span>);
         <span class="macro">assert_eq!</span>(RowSelection::from(<span class="macro">vec!</span>[RowSelector::select(<span class="number">10</span>)]), limited);
 

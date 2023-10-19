@@ -99,12 +99,6 @@
 <a href="#99" id="99">99</a>
 <a href="#100" id="100">100</a>
 <a href="#101" id="101">101</a>
-<a href="#102" id="102">102</a>
-<a href="#103" id="103">103</a>
-<a href="#104" id="104">104</a>
-<a href="#105" id="105">105</a>
-<a href="#106" id="106">106</a>
-<a href="#107" id="107">107</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -124,9 +118,7 @@
 
 </span><span class="kw">use crate</span>::{AUTH_PASSWORD, AUTH_USERNAME};
 
-<span class="kw">use </span>arrow_flight::{
-    flight_service_client::FlightServiceClient, BasicAuth, HandshakeRequest,
-};
+<span class="kw">use </span>arrow_flight::{flight_service_client::FlightServiceClient, BasicAuth, HandshakeRequest};
 <span class="kw">use </span>futures::{stream, StreamExt};
 <span class="kw">use </span>prost::Message;
 <span class="kw">use </span>tonic::{metadata::MetadataValue, Request, Status};
@@ -185,11 +177,7 @@
     <span class="prelude-val">Ok</span>(())
 }
 
-<span class="kw">async fn </span>authenticate(
-    client: <span class="kw-2">&amp;mut </span>Client,
-    username: <span class="kw-2">&amp;</span>str,
-    password: <span class="kw-2">&amp;</span>str,
-) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
+<span class="kw">async fn </span>authenticate(client: <span class="kw-2">&amp;mut </span>Client, username: <span class="kw-2">&amp;</span>str, password: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;String&gt; {
     <span class="kw">let </span>auth = BasicAuth {
         username: username.into(),
         password: password.into(),

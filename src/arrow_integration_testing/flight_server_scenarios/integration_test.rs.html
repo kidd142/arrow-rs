@@ -388,12 +388,6 @@
 <a href="#388" id="388">388</a>
 <a href="#389" id="389">389</a>
 <a href="#390" id="390">390</a>
-<a href="#391" id="391">391</a>
-<a href="#392" id="392">392</a>
-<a href="#393" id="393">393</a>
-<a href="#394" id="394">394</a>
-<a href="#395" id="395">395</a>
-<a href="#396" id="396">396</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -426,9 +420,9 @@
 };
 <span class="kw">use </span>arrow_flight::{
     flight_descriptor::DescriptorType, flight_service_server::FlightService,
-    flight_service_server::FlightServiceServer, Action, ActionType, Criteria, Empty,
-    FlightData, FlightDescriptor, FlightEndpoint, FlightInfo, HandshakeRequest,
-    HandshakeResponse, IpcMessage, PutResult, SchemaAsIpc, SchemaResult, Ticket,
+    flight_service_server::FlightServiceServer, Action, ActionType, Criteria, Empty, FlightData,
+    FlightDescriptor, FlightEndpoint, FlightInfo, HandshakeRequest, HandshakeResponse, IpcMessage,
+    PutResult, SchemaAsIpc, SchemaResult, Ticket,
 };
 <span class="kw">use </span>futures::{channel::mpsc, sink::SinkExt, Stream, StreamExt};
 <span class="kw">use </span>std::convert::TryInto;
@@ -509,8 +503,7 @@
 
         <span class="kw">let </span>options = arrow::ipc::writer::IpcWriteOptions::default();
 
-        <span class="kw">let </span>schema =
-            std::iter::once(<span class="prelude-val">Ok</span>(SchemaAsIpc::new(<span class="kw-2">&amp;</span>flight.schema, <span class="kw-2">&amp;</span>options).into()));
+        <span class="kw">let </span>schema = std::iter::once(<span class="prelude-val">Ok</span>(SchemaAsIpc::new(<span class="kw-2">&amp;</span>flight.schema, <span class="kw-2">&amp;</span>options).into()));
 
         <span class="kw">let </span>batches = flight
             .chunks
@@ -522,12 +515,9 @@
 
                 <span class="kw">let </span>(encoded_dictionaries, encoded_batch) = data_gen
                     .encoded_batch(batch, <span class="kw-2">&amp;mut </span>dictionary_tracker, <span class="kw-2">&amp;</span>options)
-                    .expect(
-                        <span class="string">&quot;DictionaryTracker configured above to not error on replacement&quot;</span>,
-                    );
+                    .expect(<span class="string">&quot;DictionaryTracker configured above to not error on replacement&quot;</span>);
 
-                <span class="kw">let </span>dictionary_flight_data =
-                    encoded_dictionaries.into_iter().map(Into::into);
+                <span class="kw">let </span>dictionary_flight_data = encoded_dictionaries.into_iter().map(Into::into);
                 <span class="kw">let </span><span class="kw-2">mut </span>batch_flight_data: FlightData = encoded_batch.into();
 
                 <span class="comment">// Only the record batch&#39;s FlightData gets app_metadata
@@ -578,8 +568,7 @@
 
                 <span class="kw">let </span>endpoint = <span class="self">self</span>.endpoint_from_path(<span class="kw-2">&amp;</span>path[<span class="number">0</span>]);
 
-                <span class="kw">let </span>total_records: usize =
-                    flight.chunks.iter().map(|chunk| chunk.num_rows()).sum();
+                <span class="kw">let </span>total_records: usize = flight.chunks.iter().map(|chunk| chunk.num_rows()).sum();
 
                 <span class="kw">let </span>options = arrow::ipc::writer::IpcWriteOptions::default();
                 <span class="kw">let </span>message = SchemaAsIpc::new(<span class="kw-2">&amp;</span>flight.schema, <span class="kw-2">&amp;</span>options)
@@ -620,8 +609,7 @@
             .clone()
             .ok_or_else(|| Status::invalid_argument(<span class="string">&quot;Must have a descriptor&quot;</span>))<span class="question-mark">?</span>;
 
-        <span class="kw">if </span>descriptor.r#type != DescriptorType::Path <span class="kw">as </span>i32 || descriptor.path.is_empty()
-        {
+        <span class="kw">if </span>descriptor.r#type != DescriptorType::Path <span class="kw">as </span>i32 || descriptor.path.is_empty() {
             <span class="kw">return </span><span class="prelude-val">Err</span>(Status::invalid_argument(<span class="string">&quot;Must specify a path&quot;</span>));
         }
 
@@ -693,9 +681,9 @@
     schema_ref: SchemaRef,
     dictionaries_by_id: <span class="kw-2">&amp;</span>HashMap&lt;i64, ArrayRef&gt;,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;RecordBatch, Status&gt; {
-    <span class="kw">let </span>ipc_batch = message.header_as_record_batch().ok_or_else(|| {
-        Status::internal(<span class="string">&quot;Could not parse message header as record batch&quot;</span>)
-    })<span class="question-mark">?</span>;
+    <span class="kw">let </span>ipc_batch = message
+        .header_as_record_batch()
+        .ok_or_else(|| Status::internal(<span class="string">&quot;Could not parse message header as record batch&quot;</span>))<span class="question-mark">?</span>;
 
     <span class="kw">let </span>arrow_batch_result = reader::read_record_batch(
         data_body,
@@ -716,9 +704,9 @@
     schema_ref: SchemaRef,
     dictionaries_by_id: <span class="kw-2">&amp;mut </span>HashMap&lt;i64, ArrayRef&gt;,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;(), Status&gt; {
-    <span class="kw">let </span>ipc_batch = message.header_as_dictionary_batch().ok_or_else(|| {
-        Status::internal(<span class="string">&quot;Could not parse message header as dictionary batch&quot;</span>)
-    })<span class="question-mark">?</span>;
+    <span class="kw">let </span>ipc_batch = message
+        .header_as_dictionary_batch()
+        .ok_or_else(|| Status::internal(<span class="string">&quot;Could not parse message header as dictionary batch&quot;</span>))<span class="question-mark">?</span>;
 
     <span class="kw">let </span>dictionary_batch_result = reader::read_dictionary(
         data_body,

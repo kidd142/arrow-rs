@@ -647,12 +647,6 @@
 <a href="#647" id="647">647</a>
 <a href="#648" id="648">648</a>
 <a href="#649" id="649">649</a>
-<a href="#650" id="650">650</a>
-<a href="#651" id="651">651</a>
-<a href="#652" id="652">652</a>
-<a href="#653" id="653">653</a>
-<a href="#654" id="654">654</a>
-<a href="#655" id="655">655</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -828,9 +822,7 @@
     <span class="macro">macro_rules! </span>length_list_helper {
         (<span class="macro-nonterminal">$offset_ty</span>: ty, <span class="macro-nonterminal">$result_ty</span>: ty, <span class="macro-nonterminal">$element_ty</span>: ty, <span class="macro-nonterminal">$value</span>: expr, <span class="macro-nonterminal">$expected</span>: expr) =&gt; {{
             <span class="kw">let </span>array =
-                GenericListArray::&lt;<span class="macro-nonterminal">$offset_ty</span>&gt;::from_iter_primitive::&lt;<span class="macro-nonterminal">$element_ty</span>, <span class="kw">_</span>, <span class="kw">_</span>&gt;(
-                    <span class="macro-nonterminal">$value</span>,
-                );
+                GenericListArray::&lt;<span class="macro-nonterminal">$offset_ty</span>&gt;::from_iter_primitive::&lt;<span class="macro-nonterminal">$element_ty</span>, <span class="kw">_</span>, <span class="kw">_</span>&gt;(<span class="macro-nonterminal">$value</span>);
             <span class="kw">let </span>result = length(<span class="kw-2">&amp;</span>array).unwrap();
             <span class="kw">let </span>result = result.as_any().downcast_ref::&lt;<span class="macro-nonterminal">$result_ty</span>&gt;().unwrap();
             <span class="kw">let </span>expected: <span class="macro-nonterminal">$result_ty </span>= <span class="macro-nonterminal">$expected</span>.into();
@@ -1011,8 +1003,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>length_offsets_binary() {
-        <span class="kw">let </span>value: Vec&lt;<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt;&gt; =
-            <span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="string">b&quot;hello&quot;</span>), <span class="prelude-val">Some</span>(<span class="string">b&quot; &quot;</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[<span class="number">0xff</span>, <span class="number">0xf8</span>]), <span class="prelude-val">None</span>];
+        <span class="kw">let </span>value: Vec&lt;<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt;&gt; = <span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="string">b&quot;hello&quot;</span>), <span class="prelude-val">Some</span>(<span class="string">b&quot; &quot;</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[<span class="number">0xff</span>, <span class="number">0xf8</span>]), <span class="prelude-val">None</span>];
         <span class="kw">let </span>a = BinaryArray::from(value);
         <span class="kw">let </span>b = a.slice(<span class="number">1</span>, <span class="number">3</span>);
         <span class="kw">let </span>result = length(<span class="kw-2">&amp;</span>b).unwrap();
@@ -1161,8 +1152,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>bit_length_offsets_binary() {
-        <span class="kw">let </span>value: Vec&lt;<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt;&gt; =
-            <span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="string">b&quot;hello&quot;</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[]), <span class="prelude-val">Some</span>(<span class="string">b&quot;world&quot;</span>), <span class="prelude-val">None</span>];
+        <span class="kw">let </span>value: Vec&lt;<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[u8]&gt;&gt; = <span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="string">b&quot;hello&quot;</span>), <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>[]), <span class="prelude-val">Some</span>(<span class="string">b&quot;world&quot;</span>), <span class="prelude-val">None</span>];
         <span class="kw">let </span>a = BinaryArray::from(value);
         <span class="kw">let </span>b = a.slice(<span class="number">1</span>, <span class="number">3</span>);
         <span class="kw">let </span>result = bit_length(<span class="kw-2">&amp;</span>b).unwrap();
@@ -1276,10 +1266,8 @@
             .add_buffer(Buffer::from_slice_ref([<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>]))
             .build()
             .unwrap();
-        <span class="kw">let </span>list_data_type = DataType::FixedSizeList(
-            Arc::new(Field::new(<span class="string">&quot;item&quot;</span>, DataType::Int32, <span class="bool-val">false</span>)),
-            <span class="number">3</span>,
-        );
+        <span class="kw">let </span>list_data_type =
+            DataType::FixedSizeList(Arc::new(Field::new(<span class="string">&quot;item&quot;</span>, DataType::Int32, <span class="bool-val">false</span>)), <span class="number">3</span>);
         <span class="kw">let </span>nulls = NullBuffer::from(<span class="macro">vec!</span>[<span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>]);
         <span class="kw">let </span>list_data = ArrayData::builder(list_data_type)
             .len(<span class="number">3</span>)

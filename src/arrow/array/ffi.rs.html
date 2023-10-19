@@ -255,11 +255,6 @@
 <a href="#255" id="255">255</a>
 <a href="#256" id="256">256</a>
 <a href="#257" id="257">257</a>
-<a href="#258" id="258">258</a>
-<a href="#259" id="259">259</a>
-<a href="#260" id="260">260</a>
-<a href="#261" id="261">261</a>
-<a href="#262" id="262">262</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -317,8 +312,8 @@
     <span class="kw">use </span><span class="kw">crate</span>::util::bit_util;
     <span class="kw">use crate</span>::{
         array::{
-            Array, ArrayData, BooleanArray, FixedSizeBinaryArray, Int64Array,
-            StructArray, UInt32Array, UInt64Array,
+            Array, ArrayData, BooleanArray, FixedSizeBinaryArray, Int64Array, StructArray,
+            UInt32Array, UInt64Array,
         },
         datatypes::{DataType, Field},
         ffi::{from_ffi, FFI_ArrowArray, FFI_ArrowSchema},
@@ -364,8 +359,7 @@
         <span class="kw">let </span>inner = StructArray::from(<span class="macro">vec!</span>[
             (
                 Arc::new(Field::new(<span class="string">&quot;a1&quot;</span>, DataType::Boolean, <span class="bool-val">false</span>)),
-                Arc::new(BooleanArray::from(<span class="macro">vec!</span>[<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>]))
-                    <span class="kw">as </span>Arc&lt;<span class="kw">dyn </span>Array&gt;,
+                Arc::new(BooleanArray::from(<span class="macro">vec!</span>[<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>])) <span class="kw">as </span>Arc&lt;<span class="kw">dyn </span>Array&gt;,
             ),
             (
                 Arc::new(Field::new(<span class="string">&quot;a2&quot;</span>, DataType::UInt32, <span class="bool-val">false</span>)),
@@ -380,8 +374,7 @@
             ),
             (
                 Arc::new(Field::new(<span class="string">&quot;b&quot;</span>, DataType::Boolean, <span class="bool-val">false</span>)),
-                Arc::new(BooleanArray::from(<span class="macro">vec!</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>]))
-                    <span class="kw">as </span>Arc&lt;<span class="kw">dyn </span>Array&gt;,
+                Arc::new(BooleanArray::from(<span class="macro">vec!</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>])) <span class="kw">as </span>Arc&lt;<span class="kw">dyn </span>Array&gt;,
             ),
             (
                 Arc::new(Field::new(<span class="string">&quot;c&quot;</span>, DataType::UInt32, <span class="bool-val">false</span>)),
@@ -432,8 +425,7 @@
             <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">30</span>, <span class="number">30</span>, <span class="number">30</span>]),
             <span class="prelude-val">None</span>,
         ];
-        <span class="kw">let </span>array =
-            FixedSizeBinaryArray::try_from_sparse_iter_with_size(values.into_iter(), <span class="number">3</span>)<span class="question-mark">?</span>;
+        <span class="kw">let </span>array = FixedSizeBinaryArray::try_from_sparse_iter_with_size(values.into_iter(), <span class="number">3</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>data = array.into_data();
         test_round_trip(<span class="kw-2">&amp;</span>data)
@@ -506,10 +498,8 @@
         </span><span class="kw">let </span><span class="kw-2">mut </span>validity_bits: [u8; <span class="number">1</span>] = [<span class="number">0</span>; <span class="number">1</span>];
         bit_util::set_bit(<span class="kw-2">&amp;mut </span>validity_bits, <span class="number">2</span>);
 
-        <span class="kw">let </span>list_data_type = DataType::FixedSizeList(
-            Arc::new(Field::new(<span class="string">&quot;f&quot;</span>, inner_list_data_type, <span class="bool-val">false</span>)),
-            <span class="number">2</span>,
-        );
+        <span class="kw">let </span>list_data_type =
+            DataType::FixedSizeList(Arc::new(Field::new(<span class="string">&quot;f&quot;</span>, inner_list_data_type, <span class="bool-val">false</span>)), <span class="number">2</span>);
         <span class="kw">let </span>list_data = ArrayData::builder(list_data_type)
             .len(<span class="number">4</span>)
             .null_bit_buffer(<span class="prelude-val">Some</span>(Buffer::from(validity_bits)))

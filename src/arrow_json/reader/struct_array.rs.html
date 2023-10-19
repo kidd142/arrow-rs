@@ -225,8 +225,7 @@
 <span class="kw">impl </span>ArrayDecoder <span class="kw">for </span>StructArrayDecoder {
     <span class="kw">fn </span>decode(<span class="kw-2">&amp;mut </span><span class="self">self</span>, tape: <span class="kw-2">&amp;</span>Tape&lt;<span class="lifetime">&#39;_</span>&gt;, pos: <span class="kw-2">&amp;</span>[u32]) -&gt; <span class="prelude-ty">Result</span>&lt;ArrayData, ArrowError&gt; {
         <span class="kw">let </span>fields = struct_fields(<span class="kw-2">&amp;</span><span class="self">self</span>.data_type);
-        <span class="kw">let </span><span class="kw-2">mut </span>child_pos: Vec&lt;<span class="kw">_</span>&gt; =
-            (<span class="number">0</span>..fields.len()).map(|<span class="kw">_</span>| <span class="macro">vec!</span>[<span class="number">0</span>; pos.len()]).collect();
+        <span class="kw">let </span><span class="kw-2">mut </span>child_pos: Vec&lt;<span class="kw">_</span>&gt; = (<span class="number">0</span>..fields.len()).map(|<span class="kw">_</span>| <span class="macro">vec!</span>[<span class="number">0</span>; pos.len()]).collect();
 
         <span class="kw">let </span><span class="kw-2">mut </span>nulls = <span class="self">self
             </span>.is_nullable
@@ -279,10 +278,9 @@
             .zip(fields)
             .map(|((d, pos), f)| {
                 d.decode(tape, <span class="kw-2">&amp;</span>pos).map_err(|e| <span class="kw">match </span>e {
-                    ArrowError::JsonError(s) =&gt; ArrowError::JsonError(<span class="macro">format!</span>(
-                        <span class="string">&quot;whilst decoding field &#39;{}&#39;: {s}&quot;</span>,
-                        f.name()
-                    )),
+                    ArrowError::JsonError(s) =&gt; {
+                        ArrowError::JsonError(<span class="macro">format!</span>(<span class="string">&quot;whilst decoding field &#39;{}&#39;: {s}&quot;</span>, f.name()))
+                    }
                     e =&gt; e,
                 })
             })
@@ -294,11 +292,13 @@
             <span class="comment">// Sanity check
             </span><span class="macro">assert_eq!</span>(c.len(), pos.len());
             <span class="kw">if let </span><span class="prelude-val">Some</span>(a) = c.nulls() {
-                <span class="kw">let </span>nulls_valid = f.is_nullable()
-                    || nulls.as_ref().map(|n| n.contains(a)).unwrap_or_default();
+                <span class="kw">let </span>nulls_valid =
+                    f.is_nullable() || nulls.as_ref().map(|n| n.contains(a)).unwrap_or_default();
 
                 <span class="kw">if </span>!nulls_valid {
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::JsonError(<span class="macro">format!</span>(<span class="string">&quot;Encountered unmasked nulls in non-nullable StructArray child: {f}&quot;</span>)));
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::JsonError(<span class="macro">format!</span>(
+                        <span class="string">&quot;Encountered unmasked nulls in non-nullable StructArray child: {f}&quot;
+                    </span>)));
                 }
             }
         }

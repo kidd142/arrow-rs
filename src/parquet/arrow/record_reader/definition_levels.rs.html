@@ -462,21 +462,6 @@
 <a href="#462" id="462">462</a>
 <a href="#463" id="463">463</a>
 <a href="#464" id="464">464</a>
-<a href="#465" id="465">465</a>
-<a href="#466" id="466">466</a>
-<a href="#467" id="467">467</a>
-<a href="#468" id="468">468</a>
-<a href="#469" id="469">469</a>
-<a href="#470" id="470">470</a>
-<a href="#471" id="471">471</a>
-<a href="#472" id="472">472</a>
-<a href="#473" id="473">473</a>
-<a href="#474" id="474">474</a>
-<a href="#475" id="475">475</a>
-<a href="#476" id="476">476</a>
-<a href="#477" id="477">477</a>
-<a href="#478" id="478">478</a>
-<a href="#479" id="479">479</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -503,8 +488,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::arrow::buffer::bit_util::count_set_bits;
 <span class="kw">use </span><span class="kw">crate</span>::basic::Encoding;
 <span class="kw">use </span><span class="kw">crate</span>::column::reader::decoder::{
-    ColumnLevelDecoder, DefinitionLevelDecoder, DefinitionLevelDecoderImpl,
-    LevelsBufferSlice,
+    ColumnLevelDecoder, DefinitionLevelDecoder, DefinitionLevelDecoderImpl, LevelsBufferSlice,
 };
 <span class="kw">use </span><span class="kw">crate</span>::errors::{ParquetError, <span class="prelude-ty">Result</span>};
 <span class="kw">use </span><span class="kw">crate</span>::schema::types::ColumnDescPtr;
@@ -641,11 +625,7 @@
 }
 
 <span class="kw">impl </span>DefinitionLevelDecoder <span class="kw">for </span>DefinitionLevelBufferDecoder {
-    <span class="kw">fn </span>read_def_levels(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        writer: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Slice,
-        range: Range&lt;usize&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;usize&gt; {
+    <span class="kw">fn </span>read_def_levels(<span class="kw-2">&amp;mut </span><span class="self">self</span>, writer: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Slice, range: Range&lt;usize&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;usize&gt; {
         <span class="kw">match </span>(<span class="kw-2">&amp;mut </span>writer.inner, <span class="kw-2">&amp;mut </span><span class="self">self</span>.decoder) {
             (
                 BufferInner::Full {
@@ -680,15 +660,9 @@
         }
     }
 
-    <span class="kw">fn </span>skip_def_levels(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        num_levels: usize,
-        max_def_level: i16,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;(usize, usize)&gt; {
+    <span class="kw">fn </span>skip_def_levels(<span class="kw-2">&amp;mut </span><span class="self">self</span>, num_levels: usize, max_def_level: i16) -&gt; <span class="prelude-ty">Result</span>&lt;(usize, usize)&gt; {
         <span class="kw">match </span><span class="kw-2">&amp;mut </span><span class="self">self</span>.decoder {
-            MaybePacked::Fallback(decoder) =&gt; {
-                decoder.skip_def_levels(num_levels, max_def_level)
-            }
+            MaybePacked::Fallback(decoder) =&gt; decoder.skip_def_levels(num_levels, max_def_level),
             MaybePacked::Packed(decoder) =&gt; decoder.skip(num_levels),
         }
     }
@@ -728,8 +702,7 @@
             <span class="self">self</span>.rle_left = (indicator_value &gt;&gt; <span class="number">1</span>) <span class="kw">as </span>usize;
             <span class="kw">let </span>byte = <span class="kw-2">*</span><span class="self">self</span>.data.as_ref().get(<span class="self">self</span>.data_offset).ok_or_else(|| {
                 ParquetError::EOF(
-                    <span class="string">&quot;unexpected end of file whilst decoding definition levels rle value&quot;
-                        </span>.into(),
+                    <span class="string">&quot;unexpected end of file whilst decoding definition levels rle value&quot;</span>.into(),
                 )
             })<span class="question-mark">?</span>;
 
@@ -833,11 +806,10 @@
                     skipped_value += to_skip;
                 }
             } <span class="kw">else if </span><span class="self">self</span>.packed_count != <span class="self">self</span>.packed_offset {
-                <span class="kw">let </span>to_skip = (<span class="self">self</span>.packed_count - <span class="self">self</span>.packed_offset)
-                    .min(level_num - skipped_level);
+                <span class="kw">let </span>to_skip =
+                    (<span class="self">self</span>.packed_count - <span class="self">self</span>.packed_offset).min(level_num - skipped_level);
                 <span class="kw">let </span>offset = <span class="self">self</span>.data_offset * <span class="number">8 </span>+ <span class="self">self</span>.packed_offset;
-                <span class="kw">let </span>bit_chunk =
-                    UnalignedBitChunk::new(<span class="self">self</span>.data.as_ref(), offset, to_skip);
+                <span class="kw">let </span>bit_chunk = UnalignedBitChunk::new(<span class="self">self</span>.data.as_ref(), offset, to_skip);
                 skipped_value += bit_chunk.count_ones();
                 <span class="self">self</span>.packed_offset += to_skip;
                 skipped_level += to_skip;
@@ -931,14 +903,12 @@
             }
             <span class="kw">let </span>to_read_or_skip_level = rng.gen_range(<span class="number">1</span>..=remaining_levels);
             <span class="kw">if </span>rng.gen_bool(<span class="number">0.5</span>) {
-                <span class="kw">let </span>(skip_val_num, skip_level_num) =
-                    decoder.skip(to_read_or_skip_level).unwrap();
+                <span class="kw">let </span>(skip_val_num, skip_level_num) = decoder.skip(to_read_or_skip_level).unwrap();
                 skip_value += skip_val_num;
                 skip_level += skip_level_num
             } <span class="kw">else </span>{
                 <span class="kw">let </span><span class="kw-2">mut </span>decoded = BooleanBufferBuilder::new(to_read_or_skip_level);
-                <span class="kw">let </span>read_level_num =
-                    decoder.read(<span class="kw-2">&amp;mut </span>decoded, to_read_or_skip_level).unwrap();
+                <span class="kw">let </span>read_level_num = decoder.read(<span class="kw-2">&amp;mut </span>decoded, to_read_or_skip_level).unwrap();
                 read_level += read_level_num;
                 <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..read_level_num {
                     <span class="macro">assert!</span>(!decoded.is_empty());

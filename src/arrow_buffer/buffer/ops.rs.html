@@ -187,10 +187,6 @@
 <a href="#187" id="187">187</a>
 <a href="#188" id="188">188</a>
 <a href="#189" id="189">189</a>
-<a href="#190" id="190">190</a>
-<a href="#191" id="191">191</a>
-<a href="#192" id="192">192</a>
-<a href="#193" id="193">193</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -377,11 +373,7 @@
 
 <span class="doccomment">/// Apply a bitwise not to one input and return the result as a Buffer.
 /// The input is treated as a bitmap, meaning that offset and length are specified in number of bits.
-</span><span class="kw">pub fn </span>buffer_unary_not(
-    left: <span class="kw-2">&amp;</span>Buffer,
-    offset_in_bits: usize,
-    len_in_bits: usize,
-) -&gt; Buffer {
+</span><span class="kw">pub fn </span>buffer_unary_not(left: <span class="kw-2">&amp;</span>Buffer, offset_in_bits: usize, len_in_bits: usize) -&gt; Buffer {
     bitwise_unary_op_helper(left, offset_in_bits, len_in_bits, |a| !a)
 }
 </code></pre></div></section></main></body></html>

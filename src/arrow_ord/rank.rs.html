@@ -187,12 +187,6 @@
 <a href="#187" id="187">187</a>
 <a href="#188" id="188">188</a>
 <a href="#189" id="189">189</a>
-<a href="#190" id="190">190</a>
-<a href="#191" id="191">191</a>
-<a href="#192" id="192">192</a>
-<a href="#193" id="193">193</a>
-<a href="#194" id="194">194</a>
-<a href="#195" id="195">195</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -229,10 +223,7 @@
 /// let ranks = rank(&amp;array, None).unwrap();
 /// assert_eq!(ranks, &amp;[5, 2, 5, 2, 3]);
 /// ```
-</span><span class="kw">pub fn </span>rank(
-    array: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Array,
-    options: <span class="prelude-ty">Option</span>&lt;SortOptions&gt;,
-) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u32&gt;, ArrowError&gt; {
+</span><span class="kw">pub fn </span>rank(array: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Array, options: <span class="prelude-ty">Option</span>&lt;SortOptions&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;Vec&lt;u32&gt;, ArrowError&gt; {
     <span class="kw">let </span>options = options.unwrap_or_default();
     <span class="kw">let </span>ranks = <span class="macro">downcast_primitive_array! </span>{
         array =&gt; primitive_rank(array.values(), array.nulls(), options),
@@ -263,10 +254,7 @@
 }
 
 <span class="attr">#[inline(never)]
-</span><span class="kw">fn </span>bytes_rank&lt;T: ByteArrayType&gt;(
-    array: <span class="kw-2">&amp;</span>GenericByteArray&lt;T&gt;,
-    options: SortOptions,
-) -&gt; Vec&lt;u32&gt; {
+</span><span class="kw">fn </span>bytes_rank&lt;T: ByteArrayType&gt;(array: <span class="kw-2">&amp;</span>GenericByteArray&lt;T&gt;, options: SortOptions) -&gt; Vec&lt;u32&gt; {
     <span class="kw">let </span>to_sort: Vec&lt;(<span class="kw-2">&amp;</span>[u8], u32)&gt; = <span class="kw">match </span>array.nulls().filter(|n| n.null_count() &gt; <span class="number">0</span>) {
         <span class="prelude-val">Some</span>(n) =&gt; n
             .valid_indices()

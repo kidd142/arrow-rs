@@ -497,8 +497,6 @@
 <a href="#497" id="497">497</a>
 <a href="#498" id="498">498</a>
 <a href="#499" id="499">499</a>
-<a href="#500" id="500">500</a>
-<a href="#501" id="501">501</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -655,14 +653,12 @@
 
                 <span class="kw">if </span>cur_remainder != <span class="number">0 </span>{
                     <span class="comment">// Pad last byte with 1s
-                    </span><span class="kw-2">*</span><span class="self">self</span>.buffer.as_slice_mut().last_mut().unwrap() |=
-                        !((<span class="number">1 </span>&lt;&lt; cur_remainder) - <span class="number">1</span>)
+                    </span><span class="kw-2">*</span><span class="self">self</span>.buffer.as_slice_mut().last_mut().unwrap() |= !((<span class="number">1 </span>&lt;&lt; cur_remainder) - <span class="number">1</span>)
                 }
                 <span class="self">self</span>.buffer.resize(new_len_bytes, <span class="number">0xFF</span>);
                 <span class="kw">if </span>new_remainder != <span class="number">0 </span>{
                     <span class="comment">// Clear remaining bits
-                    </span><span class="kw-2">*</span><span class="self">self</span>.buffer.as_slice_mut().last_mut().unwrap() &amp;=
-                        (<span class="number">1 </span>&lt;&lt; new_remainder) - <span class="number">1
+                    </span><span class="kw-2">*</span><span class="self">self</span>.buffer.as_slice_mut().last_mut().unwrap() &amp;= (<span class="number">1 </span>&lt;&lt; new_remainder) - <span class="number">1
                 </span>}
                 <span class="self">self</span>.len = new_len;
             }

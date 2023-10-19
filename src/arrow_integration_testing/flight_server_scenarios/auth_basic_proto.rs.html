@@ -216,16 +216,6 @@
 <a href="#216" id="216">216</a>
 <a href="#217" id="217">217</a>
 <a href="#218" id="218">218</a>
-<a href="#219" id="219">219</a>
-<a href="#220" id="220">220</a>
-<a href="#221" id="221">221</a>
-<a href="#222" id="222">222</a>
-<a href="#223" id="223">223</a>
-<a href="#224" id="224">224</a>
-<a href="#225" id="225">225</a>
-<a href="#226" id="226">226</a>
-<a href="#227" id="227">227</a>
-<a href="#228" id="228">228</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -247,15 +237,13 @@
 <span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>arrow_flight::{
-    flight_service_server::FlightService, flight_service_server::FlightServiceServer,
-    Action, ActionType, BasicAuth, Criteria, Empty, FlightData, FlightDescriptor,
-    FlightInfo, HandshakeRequest, HandshakeResponse, PutResult, SchemaResult, Ticket,
+    flight_service_server::FlightService, flight_service_server::FlightServiceServer, Action,
+    ActionType, BasicAuth, Criteria, Empty, FlightData, FlightDescriptor, FlightInfo,
+    HandshakeRequest, HandshakeResponse, PutResult, SchemaResult, Ticket,
 };
 <span class="kw">use </span>futures::{channel::mpsc, sink::SinkExt, Stream, StreamExt};
 <span class="kw">use </span>tokio::sync::Mutex;
-<span class="kw">use </span>tonic::{
-    metadata::MetadataMap, transport::Server, Request, Response, Status, Streaming,
-};
+<span class="kw">use </span>tonic::{metadata::MetadataMap, transport::Server, Request, Response, Status, Streaming};
 <span class="kw">type </span>TonicStream&lt;T&gt; = Pin&lt;Box&lt;<span class="kw">dyn </span>Stream&lt;Item = T&gt; + Send + Sync + <span class="lifetime">&#39;static</span>&gt;&gt;;
 
 <span class="kw">type </span>Error = Box&lt;<span class="kw">dyn </span>std::error::Error + Send + Sync + <span class="lifetime">&#39;static</span>&gt;;
@@ -291,10 +279,7 @@
 }
 
 <span class="kw">impl </span>AuthBasicProtoScenarioImpl {
-    <span class="kw">async fn </span>check_auth(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        metadata: <span class="kw-2">&amp;</span>MetadataMap,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;GrpcServerCallContext, Status&gt; {
+    <span class="kw">async fn </span>check_auth(<span class="kw-2">&amp;</span><span class="self">self</span>, metadata: <span class="kw-2">&amp;</span>MetadataMap) -&gt; <span class="prelude-ty">Result</span>&lt;GrpcServerCallContext, Status&gt; {
         <span class="kw">let </span>token = metadata
             .get_bin(<span class="string">&quot;auth-token-bin&quot;</span>)
             .and_then(|v| v.to_bytes().ok())
@@ -302,10 +287,7 @@
         <span class="self">self</span>.is_valid(token).<span class="kw">await
     </span>}
 
-    <span class="kw">async fn </span>is_valid(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        token: <span class="prelude-ty">Option</span>&lt;String&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;GrpcServerCallContext, Status&gt; {
+    <span class="kw">async fn </span>is_valid(<span class="kw-2">&amp;</span><span class="self">self</span>, token: <span class="prelude-ty">Option</span>&lt;String&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;GrpcServerCallContext, Status&gt; {
         <span class="kw">match </span>token {
             <span class="prelude-val">Some</span>(t) <span class="kw">if </span>t == <span class="kw-2">*</span><span class="self">self</span>.username =&gt; <span class="prelude-val">Ok</span>(GrpcServerCallContext {
                 peer_identity: <span class="self">self</span>.username.to_string(),
@@ -370,12 +352,10 @@
                         <span class="kw">let </span>req = req.expect(<span class="string">&quot;Error reading handshake request&quot;</span>);
                         <span class="kw">let </span>HandshakeRequest { payload, .. } = req;
 
-                        <span class="kw">let </span>auth = BasicAuth::decode(<span class="kw-2">&amp;*</span>payload)
-                            .expect(<span class="string">&quot;Error parsing handshake request&quot;</span>);
+                        <span class="kw">let </span>auth =
+                            BasicAuth::decode(<span class="kw-2">&amp;*</span>payload).expect(<span class="string">&quot;Error parsing handshake request&quot;</span>);
 
-                        <span class="kw">let </span>resp = <span class="kw">if </span><span class="kw-2">*</span>auth.username == <span class="kw-2">*</span>username
-                            &amp;&amp; <span class="kw-2">*</span>auth.password == <span class="kw-2">*</span>password
-                        {
+                        <span class="kw">let </span>resp = <span class="kw">if </span><span class="kw-2">*</span>auth.username == <span class="kw-2">*</span>username &amp;&amp; <span class="kw-2">*</span>auth.password == <span class="kw-2">*</span>password {
                             <span class="prelude-val">Ok</span>(HandshakeResponse {
                                 payload: username.as_bytes().to_vec().into(),
                                 ..HandshakeResponse::default()

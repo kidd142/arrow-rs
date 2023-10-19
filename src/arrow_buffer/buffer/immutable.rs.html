@@ -814,10 +814,6 @@
 <a href="#814" id="814">814</a>
 <a href="#815" id="815">815</a>
 <a href="#816" id="816">816</a>
-<a href="#817" id="817">817</a>
-<a href="#818" id="818">818</a>
-<a href="#819" id="819">819</a>
-<a href="#820" id="820">820</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -1343,9 +1339,7 @@
     }
 
     <span class="attr">#[test]
-    #[should_panic(
-        expected = <span class="string">&quot;the offset of the new Buffer cannot exceed the existing length&quot;
-    </span>)]
+    #[should_panic(expected = <span class="string">&quot;the offset of the new Buffer cannot exceed the existing length&quot;</span>)]
     </span><span class="kw">fn </span>test_slice_offset_out_of_bound() {
         <span class="kw">let </span>buf = Buffer::from(<span class="kw-2">&amp;</span>[<span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">8</span>, <span class="number">10</span>]);
         buf.slice(<span class="number">6</span>);
@@ -1508,9 +1502,7 @@
     }
 
     <span class="attr">#[test]
-    #[should_panic(
-        expected = <span class="string">&quot;the offset of the new Buffer cannot exceed the existing length&quot;
-    </span>)]
+    #[should_panic(expected = <span class="string">&quot;the offset of the new Buffer cannot exceed the existing length&quot;</span>)]
     </span><span class="kw">fn </span>slice_overflow() {
         <span class="kw">let </span>buffer = Buffer::from(MutableBuffer::from_len_zeroed(<span class="number">12</span>));
         buffer.slice_with_length(<span class="number">2</span>, usize::MAX);

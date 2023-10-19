@@ -264,8 +264,6 @@
 <a href="#264" id="264">264</a>
 <a href="#265" id="265">265</a>
 <a href="#266" id="266">266</a>
-<a href="#267" id="267">267</a>
-<a href="#268" id="268">268</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -286,8 +284,8 @@
 </span><span class="doccomment">//! Idiomatic iterators for [`Array`](crate::Array)
 
 </span><span class="kw">use </span><span class="kw">crate</span>::array::{
-    ArrayAccessor, BooleanArray, FixedSizeBinaryArray, GenericBinaryArray,
-    GenericListArray, GenericStringArray, PrimitiveArray,
+    ArrayAccessor, BooleanArray, FixedSizeBinaryArray, GenericBinaryArray, GenericListArray,
+    GenericStringArray, PrimitiveArray,
 };
 <span class="kw">use crate</span>::{FixedSizeListArray, MapArray};
 <span class="kw">use </span>arrow_buffer::NullBuffer;
@@ -455,8 +453,7 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_string_array_iter_round_trip() {
-        <span class="kw">let </span>array =
-            StringArray::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="string">&quot;a&quot;</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;aaa&quot;</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;aaaaa&quot;</span>)]);
+        <span class="kw">let </span>array = StringArray::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="string">&quot;a&quot;</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;aaa&quot;</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;aaaaa&quot;</span>)]);
         <span class="kw">let </span>array = Arc::new(array) <span class="kw">as </span>ArrayRef;
 
         <span class="kw">let </span>array = array.as_any().downcast_ref::&lt;StringArray&gt;().unwrap();
@@ -479,8 +476,7 @@
 
         <span class="comment">// check if DoubleEndedIterator is implemented
         </span><span class="kw">let </span>result: StringArray = array.iter().rev().collect();
-        <span class="kw">let </span>rev_array =
-            StringArray::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="string">&quot;aaaaa&quot;</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;aaa&quot;</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;a&quot;</span>)]);
+        <span class="kw">let </span>rev_array = StringArray::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="string">&quot;aaaaa&quot;</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;aaa&quot;</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="string">&quot;a&quot;</span>)]);
         <span class="macro">assert_eq!</span>(result, rev_array);
         <span class="comment">// check if ExactSizeIterator is implemented
         </span><span class="kw">let _ </span>= array.iter().rposition(|opt_b| opt_b == <span class="prelude-val">Some</span>(<span class="string">&quot;a&quot;</span>));

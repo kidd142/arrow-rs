@@ -357,7 +357,6 @@
 <a href="#357" id="357">357</a>
 <a href="#358" id="358">358</a>
 <a href="#359" id="359">359</a>
-<a href="#360" id="360">360</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -655,9 +654,8 @@
         <span class="kw">if </span>!<span class="self">self</span>.is::&lt;M&gt;() {
             <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
         }
-        <span class="kw">let </span>m = Message::decode(<span class="kw-2">&amp;*</span><span class="self">self</span>.value).map_err(|err| {
-            ArrowError::ParseError(<span class="macro">format!</span>(<span class="string">&quot;Unable to decode Any value: {err}&quot;</span>))
-        })<span class="question-mark">?</span>;
+        <span class="kw">let </span>m = Message::decode(<span class="kw-2">&amp;*</span><span class="self">self</span>.value)
+            .map_err(|err| ArrowError::ParseError(<span class="macro">format!</span>(<span class="string">&quot;Unable to decode Any value: {err}&quot;</span>)))<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(m))
     }
 

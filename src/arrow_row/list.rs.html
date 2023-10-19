@@ -173,7 +173,6 @@
 <a href="#173" id="173">173</a>
 <a href="#174" id="174">174</a>
 <a href="#175" id="175">175</a>
-<a href="#176" id="176">176</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -320,8 +319,7 @@
         <span class="kw">let </span>row = <span class="kw-2">&amp;</span>canonical.value_data()[start..end];
         <span class="kw">let </span>element_count_start = row.len() - <span class="number">4</span>;
         <span class="kw">let </span>element_count =
-            u32::from_be_bytes((<span class="kw-2">&amp;</span>row[element_count_start..]).try_into().unwrap())
-                <span class="kw">as </span>usize;
+            u32::from_be_bytes((<span class="kw-2">&amp;</span>row[element_count_start..]).try_into().unwrap()) <span class="kw">as </span>usize;
 
         <span class="kw">let </span>lengths_start = element_count_start - (element_count * <span class="number">4</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>row_offset = <span class="number">0</span>;

@@ -559,12 +559,6 @@
 <a href="#559" id="559">559</a>
 <a href="#560" id="560">560</a>
 <a href="#561" id="561">561</a>
-<a href="#562" id="562">562</a>
-<a href="#563" id="563">563</a>
-<a href="#564" id="564">564</a>
-<a href="#565" id="565">565</a>
-<a href="#566" id="566">566</a>
-<a href="#567" id="567">567</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -625,32 +619,30 @@
     <span class="doccomment">/// Creates new triplet for column reader
     </span><span class="kw">pub fn </span>new(descr: ColumnDescPtr, reader: ColumnReader, batch_size: usize) -&gt; <span class="self">Self </span>{
         <span class="kw">match </span>descr.physical_type() {
-            PhysicalType::BOOLEAN =&gt; TripletIter::BoolTripletIter(TypedTripletIter::new(
-                descr, batch_size, reader,
-            )),
-            PhysicalType::INT32 =&gt; TripletIter::Int32TripletIter(TypedTripletIter::new(
-                descr, batch_size, reader,
-            )),
-            PhysicalType::INT64 =&gt; TripletIter::Int64TripletIter(TypedTripletIter::new(
-                descr, batch_size, reader,
-            )),
-            PhysicalType::INT96 =&gt; TripletIter::Int96TripletIter(TypedTripletIter::new(
-                descr, batch_size, reader,
-            )),
-            PhysicalType::FLOAT =&gt; TripletIter::FloatTripletIter(TypedTripletIter::new(
-                descr, batch_size, reader,
-            )),
-            PhysicalType::DOUBLE =&gt; TripletIter::DoubleTripletIter(
-                TypedTripletIter::new(descr, batch_size, reader),
-            ),
-            PhysicalType::BYTE_ARRAY =&gt; TripletIter::ByteArrayTripletIter(
-                TypedTripletIter::new(descr, batch_size, reader),
-            ),
-            PhysicalType::FIXED_LEN_BYTE_ARRAY =&gt; {
-                TripletIter::FixedLenByteArrayTripletIter(TypedTripletIter::new(
-                    descr, batch_size, reader,
-                ))
+            PhysicalType::BOOLEAN =&gt; {
+                TripletIter::BoolTripletIter(TypedTripletIter::new(descr, batch_size, reader))
             }
+            PhysicalType::INT32 =&gt; {
+                TripletIter::Int32TripletIter(TypedTripletIter::new(descr, batch_size, reader))
+            }
+            PhysicalType::INT64 =&gt; {
+                TripletIter::Int64TripletIter(TypedTripletIter::new(descr, batch_size, reader))
+            }
+            PhysicalType::INT96 =&gt; {
+                TripletIter::Int96TripletIter(TypedTripletIter::new(descr, batch_size, reader))
+            }
+            PhysicalType::FLOAT =&gt; {
+                TripletIter::FloatTripletIter(TypedTripletIter::new(descr, batch_size, reader))
+            }
+            PhysicalType::DOUBLE =&gt; {
+                TripletIter::DoubleTripletIter(TypedTripletIter::new(descr, batch_size, reader))
+            }
+            PhysicalType::BYTE_ARRAY =&gt; {
+                TripletIter::ByteArrayTripletIter(TypedTripletIter::new(descr, batch_size, reader))
+            }
+            PhysicalType::FIXED_LEN_BYTE_ARRAY =&gt; TripletIter::FixedLenByteArrayTripletIter(
+                TypedTripletIter::new(descr, batch_size, reader),
+            ),
         }
     }
 
@@ -726,16 +718,13 @@
             TripletIter::DoubleTripletIter(<span class="kw-2">ref </span>typed) =&gt; {
                 Field::convert_double(typed.column_descr(), <span class="kw-2">*</span>typed.current_value())
             }
-            TripletIter::ByteArrayTripletIter(<span class="kw-2">ref </span>typed) =&gt; Field::convert_byte_array(
-                typed.column_descr(),
-                typed.current_value().clone(),
-            )<span class="question-mark">?</span>,
-            TripletIter::FixedLenByteArrayTripletIter(<span class="kw-2">ref </span>typed) =&gt; {
-                Field::convert_byte_array(
-                    typed.column_descr(),
-                    typed.current_value().clone().into(),
-                )<span class="question-mark">?
+            TripletIter::ByteArrayTripletIter(<span class="kw-2">ref </span>typed) =&gt; {
+                Field::convert_byte_array(typed.column_descr(), typed.current_value().clone())<span class="question-mark">?
             </span>}
+            TripletIter::FixedLenByteArrayTripletIter(<span class="kw-2">ref </span>typed) =&gt; Field::convert_byte_array(
+                typed.column_descr(),
+                typed.current_value().clone().into(),
+            )<span class="question-mark">?</span>,
         };
         <span class="prelude-val">Ok</span>(field)
     }
@@ -938,8 +927,7 @@
     <span class="attr">#[test]
     #[should_panic(expected = <span class="string">&quot;Expected positive batch size, found: 0&quot;</span>)]
     </span><span class="kw">fn </span>test_triplet_zero_batch_size() {
-        <span class="kw">let </span>column_path =
-            ColumnPath::from(<span class="macro">vec!</span>[<span class="string">&quot;b_struct&quot;</span>.to_string(), <span class="string">&quot;b_c_int&quot;</span>.to_string()]);
+        <span class="kw">let </span>column_path = ColumnPath::from(<span class="macro">vec!</span>[<span class="string">&quot;b_struct&quot;</span>.to_string(), <span class="string">&quot;b_c_int&quot;</span>.to_string()]);
         test_column_in_file(<span class="string">&quot;nulls.snappy.parquet&quot;</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span>column_path, <span class="kw-2">&amp;</span>[], <span class="kw-2">&amp;</span>[], <span class="kw-2">&amp;</span>[]);
     }
 

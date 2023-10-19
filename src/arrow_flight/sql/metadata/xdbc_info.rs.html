@@ -426,10 +426,6 @@
 <a href="#426" id="426">426</a>
 <a href="#427" id="427">427</a>
 <a href="#428" id="428">428</a>
-<a href="#429" id="429">429</a>
-<a href="#430" id="430">430</a>
-<a href="#431" id="431">431</a>
-<a href="#432" id="432">432</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -468,9 +464,7 @@
 
 <span class="kw">use </span><span class="kw">super</span>::lexsort_to_indices;
 <span class="kw">use </span><span class="kw">crate</span>::error::<span class="kw-2">*</span>;
-<span class="kw">use </span><span class="kw">crate</span>::sql::{
-    CommandGetXdbcTypeInfo, Nullable, Searchable, XdbcDataType, XdbcDatetimeSubcode,
-};
+<span class="kw">use </span><span class="kw">crate</span>::sql::{CommandGetXdbcTypeInfo, Nullable, Searchable, XdbcDataType, XdbcDatetimeSubcode};
 
 <span class="doccomment">/// Data structure representing type information for xdbc types.
 </span><span class="attr">#[derive(Debug, Clone, Default)]
@@ -633,8 +627,7 @@
             minimum_scale_builder.append_option(info.minimum_scale);
             maximum_scale_builder.append_option(info.maximum_scale);
             sql_data_type_builder.append_value(info.sql_data_type <span class="kw">as </span>i32);
-            datetime_subcode_builder
-                .append_option(info.datetime_subcode.map(|code| code <span class="kw">as </span>i32));
+            datetime_subcode_builder.append_option(info.datetime_subcode.map(|code| code <span class="kw">as </span>i32));
             num_prec_radix_builder.append_option(info.num_prec_radix);
             interval_precision_builder.append_option(info.interval_precision);
         });
@@ -647,8 +640,7 @@
         <span class="kw">let </span>(field, offsets, values, nulls) = create_params_builder.finish().into_parts();
         <span class="comment">// Re-defined the field to be non-nullable
         </span><span class="kw">let </span>new_field = Arc::new(field.as_ref().clone().with_nullable(<span class="bool-val">false</span>));
-        <span class="kw">let </span>create_params =
-            Arc::new(ListArray::new(new_field, offsets, values, nulls)) <span class="kw">as </span>ArrayRef;
+        <span class="kw">let </span>create_params = Arc::new(ListArray::new(new_field, offsets, values, nulls)) <span class="kw">as </span>ArrayRef;
         <span class="kw">let </span>nullable = Arc::new(nullable_builder.finish());
         <span class="kw">let </span>case_sensitive = Arc::new(case_sensitive_builder.finish());
         <span class="kw">let </span>searchable = Arc::new(searchable_builder.finish());

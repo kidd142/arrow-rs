@@ -264,12 +264,6 @@
 <a href="#264" id="264">264</a>
 <a href="#265" id="265">265</a>
 <a href="#266" id="266">266</a>
-<a href="#267" id="267">267</a>
-<a href="#268" id="268">268</a>
-<a href="#269" id="269">269</a>
-<a href="#270" id="270">270</a>
-<a href="#271" id="271">271</a>
-<a href="#272" id="272">272</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -493,9 +487,7 @@
     }
 
     <span class="attr">#[test]
-    #[should_panic(
-        expected = <span class="string">&quot;Memory pointer is not aligned with the specified scalar type&quot;
-    </span>)]
+    #[should_panic(expected = <span class="string">&quot;Memory pointer is not aligned with the specified scalar type&quot;</span>)]
     </span><span class="kw">fn </span>test_unaligned() {
         <span class="kw">let </span>expected = [<span class="number">0_i32</span>, <span class="number">1</span>, <span class="number">2</span>];
         <span class="kw">let </span>buffer = Buffer::from_iter(expected.iter().cloned());
@@ -504,18 +496,14 @@
     }
 
     <span class="attr">#[test]
-    #[should_panic(
-        expected = <span class="string">&quot;the offset of the new Buffer cannot exceed the existing length&quot;
-    </span>)]
+    #[should_panic(expected = <span class="string">&quot;the offset of the new Buffer cannot exceed the existing length&quot;</span>)]
     </span><span class="kw">fn </span>test_length_out_of_bounds() {
         <span class="kw">let </span>buffer = Buffer::from_iter([<span class="number">0_i32</span>, <span class="number">1</span>, <span class="number">2</span>]);
         ScalarBuffer::&lt;i32&gt;::new(buffer, <span class="number">1</span>, <span class="number">3</span>);
     }
 
     <span class="attr">#[test]
-    #[should_panic(
-        expected = <span class="string">&quot;the offset of the new Buffer cannot exceed the existing length&quot;
-    </span>)]
+    #[should_panic(expected = <span class="string">&quot;the offset of the new Buffer cannot exceed the existing length&quot;</span>)]
     </span><span class="kw">fn </span>test_offset_out_of_bounds() {
         <span class="kw">let </span>buffer = Buffer::from_iter([<span class="number">0_i32</span>, <span class="number">1</span>, <span class="number">2</span>]);
         ScalarBuffer::&lt;i32&gt;::new(buffer, <span class="number">4</span>, <span class="number">0</span>);

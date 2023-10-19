@@ -310,9 +310,6 @@
 <a href="#310" id="310">310</a>
 <a href="#311" id="311">311</a>
 <a href="#312" id="312">312</a>
-<a href="#313" id="313">313</a>
-<a href="#314" id="314">314</a>
-<a href="#315" id="315">315</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -333,8 +330,7 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::basic::Encoding;
 <span class="kw">use </span><span class="kw">crate</span>::bloom_filter::Sbbf;
 <span class="kw">use </span><span class="kw">crate</span>::column::writer::{
-    compare_greater, fallback_encoding, has_dictionary_support, is_nan, update_max,
-    update_min,
+    compare_greater, fallback_encoding, has_dictionary_support, is_nan, update_max, update_min,
 };
 <span class="kw">use </span><span class="kw">crate</span>::data_type::private::ParquetValueType;
 <span class="kw">use </span><span class="kw">crate</span>::data_type::DataType;
@@ -483,9 +479,7 @@
         value_indices: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[usize]&gt;,
     ) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="self">Self</span>::T, <span class="self">Self</span>::T)&gt; {
         <span class="kw">match </span>value_indices {
-            <span class="prelude-val">Some</span>(indices) =&gt; {
-                get_min_max(<span class="kw-2">&amp;</span><span class="self">self</span>.descr, indices.iter().map(|x| <span class="kw-2">&amp;</span>values[<span class="kw-2">*</span>x]))
-            }
+            <span class="prelude-val">Some</span>(indices) =&gt; get_min_max(<span class="kw-2">&amp;</span><span class="self">self</span>.descr, indices.iter().map(|x| <span class="kw-2">&amp;</span>values[<span class="kw-2">*</span>x])),
             <span class="prelude-val">None </span>=&gt; get_min_max(<span class="kw-2">&amp;</span><span class="self">self</span>.descr, values.iter()),
         }
     }

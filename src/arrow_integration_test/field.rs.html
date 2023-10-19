@@ -566,12 +566,6 @@
 <a href="#566" id="566">566</a>
 <a href="#567" id="567">567</a>
 <a href="#568" id="568">568</a>
-<a href="#569" id="569">569</a>
-<a href="#570" id="570">570</a>
-<a href="#571" id="571">571</a>
-<a href="#572" id="572">572</a>
-<a href="#573" id="573">573</a>
-<a href="#574" id="574">574</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -637,18 +631,17 @@
                                         <span class="string">&quot;Field &#39;metadata&#39; must have exact two entries for each key-value map&quot;</span>.to_string(),
                                     ));
                                 }
-                                <span class="kw">if let </span>(<span class="prelude-val">Some</span>(k), <span class="prelude-val">Some</span>(v)) =
-                                    (map.get(<span class="string">&quot;key&quot;</span>), map.get(<span class="string">&quot;value&quot;</span>))
-                                {
-                                    <span class="kw">if let </span>(<span class="prelude-val">Some</span>(k_str), <span class="prelude-val">Some</span>(v_str)) =
-                                        (k.as_str(), v.as_str())
-                                    {
+                                <span class="kw">if let </span>(<span class="prelude-val">Some</span>(k), <span class="prelude-val">Some</span>(v)) = (map.get(<span class="string">&quot;key&quot;</span>), map.get(<span class="string">&quot;value&quot;</span>)) {
+                                    <span class="kw">if let </span>(<span class="prelude-val">Some</span>(k_str), <span class="prelude-val">Some</span>(v_str)) = (k.as_str(), v.as_str()) {
                                         res.insert(
                                             k_str.to_string().clone(),
                                             v_str.to_string().clone(),
                                         );
                                     } <span class="kw">else </span>{
-                                        <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::ParseError(<span class="string">&quot;Field &#39;metadata&#39; must have map value of string type&quot;</span>.to_string()));
+                                        <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::ParseError(
+                                            <span class="string">&quot;Field &#39;metadata&#39; must have map value of string type&quot;
+                                                </span>.to_string(),
+                                        ));
                                     }
                                 } <span class="kw">else </span>{
                                     <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::ParseError(<span class="string">&quot;Field &#39;metadata&#39; lacks map keys named \&quot;key\&quot; or \&quot;value\&quot;&quot;</span>.to_string()));
@@ -689,46 +682,47 @@
 
             <span class="comment">// if data_type is a struct or list, get its children
             </span><span class="kw">let </span>data_type = <span class="kw">match </span>data_type {
-                DataType::List(<span class="kw">_</span>)
-                | DataType::LargeList(<span class="kw">_</span>)
-                | DataType::FixedSizeList(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="kw">match </span>map.get(<span class="string">&quot;children&quot;</span>) {
-                    <span class="prelude-val">Some</span>(Value::Array(values)) =&gt; {
-                        <span class="kw">if </span>values.len() != <span class="number">1 </span>{
+                DataType::List(<span class="kw">_</span>) | DataType::LargeList(<span class="kw">_</span>) | DataType::FixedSizeList(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
+                    <span class="kw">match </span>map.get(<span class="string">&quot;children&quot;</span>) {
+                        <span class="prelude-val">Some</span>(Value::Array(values)) =&gt; {
+                            <span class="kw">if </span>values.len() != <span class="number">1 </span>{
+                                <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::ParseError(
+                                    <span class="string">&quot;Field &#39;children&#39; must have one element for a list data type&quot;
+                                        </span>.to_string(),
+                                ));
+                            }
+                            <span class="kw">match </span>data_type {
+                                DataType::List(<span class="kw">_</span>) =&gt; {
+                                    DataType::List(Arc::new(field_from_json(<span class="kw-2">&amp;</span>values[<span class="number">0</span>])<span class="question-mark">?</span>))
+                                }
+                                DataType::LargeList(<span class="kw">_</span>) =&gt; {
+                                    DataType::LargeList(Arc::new(field_from_json(<span class="kw-2">&amp;</span>values[<span class="number">0</span>])<span class="question-mark">?</span>))
+                                }
+                                DataType::FixedSizeList(<span class="kw">_</span>, int) =&gt; DataType::FixedSizeList(
+                                    Arc::new(field_from_json(<span class="kw-2">&amp;</span>values[<span class="number">0</span>])<span class="question-mark">?</span>),
+                                    int,
+                                ),
+                                <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(
+                                    <span class="string">&quot;Data type should be a list, largelist or fixedsizelist&quot;
+                                </span>),
+                            }
+                        }
+                        <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
                             <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::ParseError(
-                                <span class="string">&quot;Field &#39;children&#39; must have one element for a list data type&quot;</span>.to_string(),
+                                <span class="string">&quot;Field &#39;children&#39; must be an array&quot;</span>.to_string(),
+                            ))
+                        }
+                        <span class="prelude-val">None </span>=&gt; {
+                            <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::ParseError(
+                                <span class="string">&quot;Field missing &#39;children&#39; attribute&quot;</span>.to_string(),
                             ));
                         }
-                        <span class="kw">match </span>data_type {
-                            DataType::List(<span class="kw">_</span>) =&gt; {
-                                DataType::List(Arc::new(field_from_json(<span class="kw-2">&amp;</span>values[<span class="number">0</span>])<span class="question-mark">?</span>))
-                            }
-                            DataType::LargeList(<span class="kw">_</span>) =&gt; DataType::LargeList(Arc::new(
-                                field_from_json(<span class="kw-2">&amp;</span>values[<span class="number">0</span>])<span class="question-mark">?</span>,
-                            )),
-                            DataType::FixedSizeList(<span class="kw">_</span>, int) =&gt; DataType::FixedSizeList(
-                                Arc::new(field_from_json(<span class="kw-2">&amp;</span>values[<span class="number">0</span>])<span class="question-mark">?</span>),
-                                int,
-                            ),
-                            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(
-                                <span class="string">&quot;Data type should be a list, largelist or fixedsizelist&quot;
-                            </span>),
-                        }
                     }
-                    <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
-                        <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::ParseError(
-                            <span class="string">&quot;Field &#39;children&#39; must be an array&quot;</span>.to_string(),
-                        ))
-                    }
-                    <span class="prelude-val">None </span>=&gt; {
-                        <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::ParseError(
-                            <span class="string">&quot;Field missing &#39;children&#39; attribute&quot;</span>.to_string(),
-                        ));
-                    }
-                },
+                }
                 DataType::Struct(<span class="kw">_</span>) =&gt; <span class="kw">match </span>map.get(<span class="string">&quot;children&quot;</span>) {
-                    <span class="prelude-val">Some</span>(Value::Array(values)) =&gt; DataType::Struct(
-                        values.iter().map(field_from_json).collect::&lt;<span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>,
-                    ),
+                    <span class="prelude-val">Some</span>(Value::Array(values)) =&gt; {
+                        DataType::Struct(values.iter().map(field_from_json).collect::&lt;<span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>)
+                    }
                     <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
                         <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::ParseError(
                             <span class="string">&quot;Field &#39;children&#39; must be an array&quot;</span>.to_string(),
@@ -749,17 +743,16 @@
                                 DataType::Struct(map_fields) <span class="kw">if </span>map_fields.len() == <span class="number">2 </span>=&gt; {
                                     DataType::Map(Arc::new(child), keys_sorted)
                                 }
-                                t  =&gt; {
-                                    <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::ParseError(
-                                        <span class="macro">format!</span>(<span class="string">&quot;Map children should be a struct with 2 fields, found {t:?}&quot;</span>)
-                                    ))
+                                t =&gt; {
+                                    <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::ParseError(<span class="macro">format!</span>(
+                                    <span class="string">&quot;Map children should be a struct with 2 fields, found {t:?}&quot;
+                                </span>)))
                                 }
                             }
                         }
                         <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
                             <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::ParseError(
-                                <span class="string">&quot;Field &#39;children&#39; must be an array with 1 element&quot;
-                                    </span>.to_string(),
+                                <span class="string">&quot;Field &#39;children&#39; must be an array with 1 element&quot;</span>.to_string(),
                             ))
                         }
                         <span class="prelude-val">None </span>=&gt; {
@@ -774,9 +767,7 @@
                         <span class="kw">let </span>fields = fields
                             .iter()
                             .zip(values)
-                            .map(|((id, <span class="kw">_</span>), value)| {
-                                <span class="prelude-val">Ok</span>((id, Arc::new(field_from_json(value)<span class="question-mark">?</span>)))
-                            })
+                            .map(|((id, <span class="kw">_</span>), value)| <span class="prelude-val">Ok</span>((id, Arc::new(field_from_json(value)<span class="question-mark">?</span>))))
                             .collect::&lt;<span class="prelude-ty">Result</span>&lt;<span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
 
                         DataType::Union(fields, mode)
@@ -829,8 +820,7 @@
                 <span class="kw">_ </span>=&gt; data_type,
             };
 
-            <span class="kw">let </span><span class="kw-2">mut </span>field =
-                Field::new_dict(name, data_type, nullable, dict_id, dict_is_ordered);
+            <span class="kw">let </span><span class="kw-2">mut </span>field = Field::new_dict(name, data_type, nullable, dict_id, dict_is_ordered);
             field.set_metadata(metadata);
             <span class="prelude-val">Ok</span>(field)
         }
@@ -843,9 +833,7 @@
 <span class="doccomment">/// Generate a JSON representation of the `Field`.
 </span><span class="kw">pub fn </span>field_to_json(field: <span class="kw-2">&amp;</span>Field) -&gt; serde_json::Value {
     <span class="kw">let </span>children: Vec&lt;serde_json::Value&gt; = <span class="kw">match </span>field.data_type() {
-        DataType::Struct(fields) =&gt; {
-            fields.iter().map(|x| field_to_json(x.as_ref())).collect()
-        }
+        DataType::Struct(fields) =&gt; fields.iter().map(|x| field_to_json(x.as_ref())).collect(),
         DataType::List(field)
         | DataType::LargeList(field)
         | DataType::FixedSizeList(field, <span class="kw">_</span>)

@@ -97,12 +97,6 @@
 <a href="#97" id="97">97</a>
 <a href="#98" id="98">98</a>
 <a href="#99" id="99">99</a>
-<a href="#100" id="100">100</a>
-<a href="#101" id="101">101</a>
-<a href="#102" id="102">102</a>
-<a href="#103" id="103">103</a>
-<a href="#104" id="104">104</a>
-<a href="#105" id="105">105</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -180,20 +174,15 @@
             })
         } <span class="kw">else </span>{
             <span class="kw">let </span>lhs_nulls = lhs.nulls().unwrap();
-            <span class="kw">let </span>lhs_slices_iter = BitSliceIterator::new(
-                lhs_nulls.validity(),
-                lhs_start + lhs_nulls.offset(),
-                len,
-            );
+            <span class="kw">let </span>lhs_slices_iter =
+                BitSliceIterator::new(lhs_nulls.validity(), lhs_start + lhs_nulls.offset(), len);
             <span class="kw">let </span>rhs_nulls = rhs.nulls().unwrap();
-            <span class="kw">let </span>rhs_slices_iter = BitSliceIterator::new(
-                rhs_nulls.validity(),
-                rhs_start + rhs_nulls.offset(),
-                len,
-            );
+            <span class="kw">let </span>rhs_slices_iter =
+                BitSliceIterator::new(rhs_nulls.validity(), rhs_start + rhs_nulls.offset(), len);
 
-            lhs_slices_iter.zip(rhs_slices_iter).all(
-                |((l_start, l_end), (r_start, r_end))| {
+            lhs_slices_iter
+                .zip(rhs_slices_iter)
+                .all(|((l_start, l_end), (r_start, r_end))| {
                     l_start == r_start
                         &amp;&amp; l_end == r_end
                         &amp;&amp; equal_len(
@@ -203,8 +192,7 @@
                             (rhs_start + r_start) * size,
                             (l_end - l_start) * size,
                         )
-                },
-            )
+                })
         }
     }
 }

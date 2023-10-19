@@ -52,15 +52,6 @@
 <a href="#52" id="52">52</a>
 <a href="#53" id="53">53</a>
 <a href="#54" id="54">54</a>
-<a href="#55" id="55">55</a>
-<a href="#56" id="56">56</a>
-<a href="#57" id="57">57</a>
-<a href="#58" id="58">58</a>
-<a href="#59" id="59">59</a>
-<a href="#60" id="60">60</a>
-<a href="#61" id="61">61</a>
-<a href="#62" id="62">62</a>
-<a href="#63" id="63">63</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -86,9 +77,7 @@
 <span class="kw">use </span>arrow_buffer::ArrowNativeType;
 <span class="kw">use </span>num::{CheckedAdd, Integer};
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>build_extend&lt;T: ArrowNativeType + Integer + CheckedAdd&gt;(
-    array: <span class="kw-2">&amp;</span>ArrayData,
-) -&gt; Extend {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>build_extend&lt;T: ArrowNativeType + Integer + CheckedAdd&gt;(array: <span class="kw-2">&amp;</span>ArrayData) -&gt; Extend {
     <span class="kw">let </span>offsets = array.buffer::&lt;T&gt;(<span class="number">0</span>);
     Box::new(
         <span class="kw">move </span>|mutable: <span class="kw-2">&amp;mut </span>_MutableArrayData, index: usize, start: usize, len: usize| {
@@ -98,11 +87,7 @@
             </span><span class="kw">let </span>last_offset: T = <span class="kw">unsafe </span>{ get_last_offset(offset_buffer) };
 
             <span class="comment">// offsets
-            </span>extend_offsets::&lt;T&gt;(
-                offset_buffer,
-                last_offset,
-                <span class="kw-2">&amp;</span>offsets[start..start + len + <span class="number">1</span>],
-            );
+            </span>extend_offsets::&lt;T&gt;(offset_buffer, last_offset, <span class="kw-2">&amp;</span>offsets[start..start + len + <span class="number">1</span>]);
 
             mutable.child_data[<span class="number">0</span>].extend(
                 index,
@@ -113,10 +98,7 @@
     )
 }
 
-<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>extend_nulls&lt;T: ArrowNativeType&gt;(
-    mutable: <span class="kw-2">&amp;mut </span>_MutableArrayData,
-    len: usize,
-) {
+<span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>extend_nulls&lt;T: ArrowNativeType&gt;(mutable: <span class="kw-2">&amp;mut </span>_MutableArrayData, len: usize) {
     <span class="kw">let </span>offset_buffer = <span class="kw-2">&amp;mut </span>mutable.buffer1;
 
     <span class="comment">// this is safe due to how offset is built. See details on `get_last_offset`

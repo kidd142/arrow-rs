@@ -68,7 +68,6 @@
 <a href="#68" id="68">68</a>
 <a href="#69" id="69">69</a>
 <a href="#70" id="70">70</a>
-<a href="#71" id="71">71</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -133,8 +132,7 @@
         </span>}
         <span class="prelude-val">None </span>=&gt; {
             <span class="kw">let </span>path = args.path.expect(<span class="string">&quot;No path is given&quot;</span>);
-            flight_client_scenarios::integration_test::run_scenario(<span class="kw-2">&amp;</span>host, port, <span class="kw-2">&amp;</span>path)
-                .<span class="kw">await</span><span class="question-mark">?</span>;
+            flight_client_scenarios::integration_test::run_scenario(<span class="kw-2">&amp;</span>host, port, <span class="kw-2">&amp;</span>path).<span class="kw">await</span><span class="question-mark">?</span>;
         }
     }
 

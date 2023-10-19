@@ -432,6 +432,9 @@
 <a href="#432" id="432">432</a>
 <a href="#433" id="433">433</a>
 <a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -475,8 +478,7 @@
 ) -&gt; <span class="prelude-ty">Result</span>&lt;BooleanArray, ArrowError&gt; {
     <span class="kw">if </span>array.len() != regex_array.len() {
         <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::ComputeError(
-            <span class="string">&quot;Cannot perform comparison operation on arrays of different length&quot;
-                </span>.to_string(),
+            <span class="string">&quot;Cannot perform comparison operation on arrays of different length&quot;</span>.to_string(),
         ));
     }
     <span class="kw">let </span>nulls = NullBuffer::union(array.nulls(), regex_array.nulls());
@@ -485,14 +487,17 @@
     <span class="kw">let </span><span class="kw-2">mut </span>result = BooleanBufferBuilder::new(array.len());
 
     <span class="kw">let </span>complete_pattern = <span class="kw">match </span>flags_array {
-        <span class="prelude-val">Some</span>(flags) =&gt; Box::new(regex_array.iter().zip(flags.iter()).map(
-            |(pattern, flags)| {
-                pattern.map(|pattern| <span class="kw">match </span>flags {
-                    <span class="prelude-val">Some</span>(flag) =&gt; <span class="macro">format!</span>(<span class="string">&quot;(?{flag}){pattern}&quot;</span>),
-                    <span class="prelude-val">None </span>=&gt; pattern.to_string(),
-                })
-            },
-        )) <span class="kw">as </span>Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = <span class="prelude-ty">Option</span>&lt;String&gt;&gt;&gt;,
+        <span class="prelude-val">Some</span>(flags) =&gt; Box::new(
+            regex_array
+                .iter()
+                .zip(flags.iter())
+                .map(|(pattern, flags)| {
+                    pattern.map(|pattern| <span class="kw">match </span>flags {
+                        <span class="prelude-val">Some</span>(flag) =&gt; <span class="macro">format!</span>(<span class="string">&quot;(?{flag}){pattern}&quot;</span>),
+                        <span class="prelude-val">None </span>=&gt; pattern.to_string(),
+                    })
+                }),
+        ) <span class="kw">as </span>Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = <span class="prelude-ty">Option</span>&lt;String&gt;&gt;&gt;,
         <span class="prelude-val">None </span>=&gt; Box::new(
             regex_array
                 .iter()
@@ -612,19 +617,21 @@
     flags_array: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>GenericStringArray&lt;OffsetSize&gt;&gt;,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;ArrayRef, ArrowError&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>patterns: HashMap&lt;String, Regex&gt; = HashMap::new();
-    <span class="kw">let </span>builder: GenericStringBuilder&lt;OffsetSize&gt; =
-        GenericStringBuilder::with_capacity(<span class="number">0</span>, <span class="number">0</span>);
+    <span class="kw">let </span>builder: GenericStringBuilder&lt;OffsetSize&gt; = GenericStringBuilder::with_capacity(<span class="number">0</span>, <span class="number">0</span>);
     <span class="kw">let </span><span class="kw-2">mut </span>list_builder = ListBuilder::new(builder);
 
     <span class="kw">let </span>complete_pattern = <span class="kw">match </span>flags_array {
-        <span class="prelude-val">Some</span>(flags) =&gt; Box::new(regex_array.iter().zip(flags.iter()).map(
-            |(pattern, flags)| {
-                pattern.map(|pattern| <span class="kw">match </span>flags {
-                    <span class="prelude-val">Some</span>(value) =&gt; <span class="macro">format!</span>(<span class="string">&quot;(?{value}){pattern}&quot;</span>),
-                    <span class="prelude-val">None </span>=&gt; pattern.to_string(),
-                })
-            },
-        )) <span class="kw">as </span>Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = <span class="prelude-ty">Option</span>&lt;String&gt;&gt;&gt;,
+        <span class="prelude-val">Some</span>(flags) =&gt; Box::new(
+            regex_array
+                .iter()
+                .zip(flags.iter())
+                .map(|(pattern, flags)| {
+                    pattern.map(|pattern| <span class="kw">match </span>flags {
+                        <span class="prelude-val">Some</span>(value) =&gt; <span class="macro">format!</span>(<span class="string">&quot;(?{value}){pattern}&quot;</span>),
+                        <span class="prelude-val">None </span>=&gt; pattern.to_string(),
+                    })
+                }),
+        ) <span class="kw">as </span>Box&lt;<span class="kw">dyn </span>Iterator&lt;Item = <span class="prelude-ty">Option</span>&lt;String&gt;&gt;&gt;,
         <span class="prelude-val">None </span>=&gt; Box::new(
             regex_array
                 .iter()
@@ -724,8 +731,7 @@
         <span class="kw">let </span>pattern = StringArray::from(<span class="macro">vec!</span>[<span class="string">r&quot;x.*-(\d*)-.*&quot;</span>; <span class="number">4</span>]);
         <span class="kw">let </span>flags = StringArray::from(<span class="macro">vec!</span>[<span class="string">&quot;i&quot;</span>; <span class="number">4</span>]);
         <span class="kw">let </span>actual = regexp_match(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>pattern, <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>flags)).unwrap();
-        <span class="kw">let </span>elem_builder: GenericStringBuilder&lt;i32&gt; =
-            GenericStringBuilder::with_capacity(<span class="number">0</span>, <span class="number">0</span>);
+        <span class="kw">let </span>elem_builder: GenericStringBuilder&lt;i32&gt; = GenericStringBuilder::with_capacity(<span class="number">0</span>, <span class="number">0</span>);
         <span class="kw">let </span><span class="kw-2">mut </span>expected_builder = ListBuilder::new(elem_builder);
         expected_builder.append(<span class="bool-val">false</span>);
         expected_builder.values().append_value(<span class="string">&quot;7&quot;</span>);

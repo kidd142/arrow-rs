@@ -310,6 +310,7 @@
 <a href="#310" id="310">310</a>
 <a href="#311" id="311">311</a>
 <a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -377,11 +378,7 @@
 
 <span class="kw">impl </span>FieldData {
     <span class="doccomment">/// Creates a new `FieldData`.
-    </span><span class="kw">fn </span>new&lt;T: ArrowPrimitiveType&gt;(
-        type_id: i8,
-        data_type: DataType,
-        capacity: usize,
-    ) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">fn </span>new&lt;T: ArrowPrimitiveType&gt;(type_id: i8, data_type: DataType, capacity: usize) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             type_id,
             data_type,
@@ -534,7 +531,12 @@
         <span class="kw">let </span><span class="kw-2">mut </span>field_data = <span class="kw">match </span><span class="self">self</span>.fields.remove(<span class="kw-2">&amp;</span>type_name) {
             <span class="prelude-val">Some</span>(data) =&gt; {
                 <span class="kw">if </span>data.data_type != T::DATA_TYPE {
-                    <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::InvalidArgumentError(<span class="macro">format!</span>(<span class="string">&quot;Attempt to write col \&quot;{}\&quot; with type {} doesn&#39;t match existing type {}&quot;</span>, type_name, T::DATA_TYPE, data.data_type)));
+                    <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::InvalidArgumentError(<span class="macro">format!</span>(
+                        <span class="string">&quot;Attempt to write col \&quot;{}\&quot; with type {} doesn&#39;t match existing type {}&quot;</span>,
+                        type_name,
+                        T::DATA_TYPE,
+                        data.data_type
+                    )));
                 }
                 data
             }

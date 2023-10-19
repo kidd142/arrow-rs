@@ -2230,16 +2230,6 @@
 <a href="#2230" id="2230">2230</a>
 <a href="#2231" id="2231">2231</a>
 <a href="#2232" id="2232">2232</a>
-<a href="#2233" id="2233">2233</a>
-<a href="#2234" id="2234">2234</a>
-<a href="#2235" id="2235">2235</a>
-<a href="#2236" id="2236">2236</a>
-<a href="#2237" id="2237">2237</a>
-<a href="#2238" id="2238">2238</a>
-<a href="#2239" id="2239">2239</a>
-<a href="#2240" id="2240">2240</a>
-<a href="#2241" id="2241">2241</a>
-<a href="#2242" id="2242">2242</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -2384,9 +2374,7 @@
 <span class="kw">use </span>arrow_array::timezone::Tz;
 <span class="kw">use </span>arrow_array::types::Float32Type;
 <span class="kw">use </span>arrow_array::types::<span class="kw-2">*</span>;
-<span class="kw">use </span>arrow_array::{
-    downcast_integer, make_array, RecordBatch, RecordBatchReader, StructArray,
-};
+<span class="kw">use </span>arrow_array::{downcast_integer, make_array, RecordBatch, RecordBatchReader, StructArray};
 <span class="kw">use </span>arrow_data::ArrayData;
 <span class="kw">use </span>arrow_schema::{ArrowError, DataType, FieldRef, Schema, SchemaRef, TimeUnit};
 <span class="kw">pub use </span>schema::<span class="kw-2">*</span>;
@@ -2532,8 +2520,7 @@
             }
         };
 
-        <span class="kw">let </span>decoder =
-            make_decoder(data_type, <span class="self">self</span>.coerce_primitive, <span class="self">self</span>.strict_mode, nullable)<span class="question-mark">?</span>;
+        <span class="kw">let </span>decoder = make_decoder(data_type, <span class="self">self</span>.coerce_primitive, <span class="self">self</span>.strict_mode, nullable)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>num_fields = <span class="self">self</span>.schema.all_fields().len();
 
@@ -2871,8 +2858,9 @@
 
         <span class="kw">let </span>batch = <span class="kw">match </span><span class="self">self</span>.is_field {
             <span class="bool-val">true </span>=&gt; RecordBatch::try_new(<span class="self">self</span>.schema.clone(), <span class="macro">vec!</span>[make_array(decoded)])<span class="question-mark">?</span>,
-            <span class="bool-val">false </span>=&gt; RecordBatch::from(StructArray::from(decoded))
-                .with_schema(<span class="self">self</span>.schema.clone())<span class="question-mark">?</span>,
+            <span class="bool-val">false </span>=&gt; {
+                RecordBatch::from(StructArray::from(decoded)).with_schema(<span class="self">self</span>.schema.clone())<span class="question-mark">?
+            </span>}
         };
 
         <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(batch))
@@ -2961,9 +2949,7 @@
 
     <span class="kw">use </span>arrow_array::cast::AsArray;
     <span class="kw">use </span>arrow_array::types::Int32Type;
-    <span class="kw">use </span>arrow_array::{
-        make_array, Array, BooleanArray, ListArray, StringArray, StructArray,
-    };
+    <span class="kw">use </span>arrow_array::{make_array, Array, BooleanArray, ListArray, StringArray, StructArray};
     <span class="kw">use </span>arrow_buffer::{ArrowNativeType, Buffer};
     <span class="kw">use </span>arrow_cast::display::{ArrayFormatter, FormatOptions};
     <span class="kw">use </span>arrow_data::ArrayDataBuilder;
@@ -3787,11 +3773,7 @@
         <span class="kw">let </span>schema = Arc::new(Schema::new(<span class="macro">vec!</span>[
             Field::new(<span class="string">&quot;a&quot;</span>, DataType::Int16, <span class="bool-val">false</span>),
             Field::new(<span class="string">&quot;b&quot;</span>, DataType::Utf8, <span class="bool-val">false</span>),
-            Field::new_struct(
-                <span class="string">&quot;c&quot;</span>,
-                <span class="macro">vec!</span>[Field::new(<span class="string">&quot;a&quot;</span>, DataType::Boolean, <span class="bool-val">false</span>)],
-                <span class="bool-val">false</span>,
-            ),
+            Field::new_struct(<span class="string">&quot;c&quot;</span>, <span class="macro">vec!</span>[Field::new(<span class="string">&quot;a&quot;</span>, DataType::Boolean, <span class="bool-val">false</span>)], <span class="bool-val">false</span>),
         ]));
 
         <span class="kw">let </span>err = ReaderBuilder::new(schema)
@@ -4074,15 +4056,13 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_nested_list_json_arrays() {
-        <span class="kw">let </span>c_field =
-            Field::new_struct(<span class="string">&quot;c&quot;</span>, <span class="macro">vec!</span>[Field::new(<span class="string">&quot;d&quot;</span>, DataType::Utf8, <span class="bool-val">true</span>)], <span class="bool-val">true</span>);
+        <span class="kw">let </span>c_field = Field::new_struct(<span class="string">&quot;c&quot;</span>, <span class="macro">vec!</span>[Field::new(<span class="string">&quot;d&quot;</span>, DataType::Utf8, <span class="bool-val">true</span>)], <span class="bool-val">true</span>);
         <span class="kw">let </span>a_struct_field = Field::new_struct(
             <span class="string">&quot;a&quot;</span>,
             <span class="macro">vec!</span>[Field::new(<span class="string">&quot;b&quot;</span>, DataType::Boolean, <span class="bool-val">true</span>), c_field.clone()],
             <span class="bool-val">true</span>,
         );
-        <span class="kw">let </span>a_field =
-            Field::new(<span class="string">&quot;a&quot;</span>, DataType::List(Arc::new(a_struct_field.clone())), <span class="bool-val">true</span>);
+        <span class="kw">let </span>a_field = Field::new(<span class="string">&quot;a&quot;</span>, DataType::List(Arc::new(a_struct_field.clone())), <span class="bool-val">true</span>);
         <span class="kw">let </span>schema = Arc::new(Schema::new(<span class="macro">vec!</span>[a_field.clone()]));
         <span class="kw">let </span>builder = ReaderBuilder::new(schema).with_batch_size(<span class="number">64</span>);
         <span class="kw">let </span>json_content = <span class="string">r#&quot;

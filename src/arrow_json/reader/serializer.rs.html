@@ -422,16 +422,6 @@
 <a href="#422" id="422">422</a>
 <a href="#423" id="423">423</a>
 <a href="#424" id="424">424</a>
-<a href="#425" id="425">425</a>
-<a href="#426" id="426">426</a>
-<a href="#427" id="427">427</a>
-<a href="#428" id="428">428</a>
-<a href="#429" id="429">429</a>
-<a href="#430" id="430">430</a>
-<a href="#431" id="431">431</a>
-<a href="#432" id="432">432</a>
-<a href="#433" id="433">433</a>
-<a href="#434" id="434">434</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -452,8 +442,7 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::reader::tape::TapeElement;
 <span class="kw">use </span>lexical_core::FormattedSize;
 <span class="kw">use </span>serde::ser::{
-    Impossible, SerializeMap, SerializeSeq, SerializeStruct, SerializeTuple,
-    SerializeTupleStruct,
+    Impossible, SerializeMap, SerializeSeq, SerializeStruct, SerializeTuple, SerializeTupleStruct,
 };
 <span class="kw">use </span>serde::{Serialize, Serializer};
 
@@ -665,17 +654,11 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn </span>serialize_seq(
-        <span class="self">self</span>,
-        _len: <span class="prelude-ty">Option</span>&lt;usize&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeSeq, SerializerError&gt; {
+    <span class="kw">fn </span>serialize_seq(<span class="self">self</span>, _len: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeSeq, SerializerError&gt; {
         <span class="prelude-val">Ok</span>(ListSerializer::new(<span class="self">self</span>))
     }
 
-    <span class="kw">fn </span>serialize_tuple(
-        <span class="self">self</span>,
-        len: usize,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeTuple, SerializerError&gt; {
+    <span class="kw">fn </span>serialize_tuple(<span class="self">self</span>, len: usize) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeTuple, SerializerError&gt; {
         <span class="self">self</span>.serialize_seq(<span class="prelude-val">Some</span>(len))
     }
 
@@ -700,10 +683,7 @@
     }
 
     <span class="comment">// Maps are represented in JSON as `{ K: V, K: V, ... }`.
-    </span><span class="kw">fn </span>serialize_map(
-        <span class="self">self</span>,
-        _len: <span class="prelude-ty">Option</span>&lt;usize&gt;,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeMap, SerializerError&gt; {
+    </span><span class="kw">fn </span>serialize_map(<span class="self">self</span>, _len: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>::SerializeMap, SerializerError&gt; {
         <span class="prelude-val">Ok</span>(ObjectSerializer::new(<span class="self">self</span>))
     }
 

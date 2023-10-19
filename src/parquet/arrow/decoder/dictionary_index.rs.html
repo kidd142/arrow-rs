@@ -114,15 +114,6 @@
 <a href="#114" id="114">114</a>
 <a href="#115" id="115">115</a>
 <a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
-<a href="#121" id="121">121</a>
-<a href="#122" id="122">122</a>
-<a href="#123" id="123">123</a>
-<a href="#124" id="124">124</a>
-<a href="#125" id="125">125</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -166,11 +157,7 @@
 <span class="kw">impl </span>DictIndexDecoder {
     <span class="doccomment">/// Create a new [`DictIndexDecoder`] with the provided data page, the number of levels
     /// associated with this data page, and the number of non-null values (if known)
-    </span><span class="kw">pub fn </span>new(
-        data: ByteBufferPtr,
-        num_levels: usize,
-        num_values: <span class="prelude-ty">Option</span>&lt;usize&gt;,
-    ) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new(data: ByteBufferPtr, num_levels: usize, num_values: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>bit_width = data[<span class="number">0</span>];
         <span class="kw">let </span><span class="kw-2">mut </span>decoder = RleDecoder::new(bit_width);
         decoder.set_data(data.start_from(<span class="number">1</span>));
@@ -188,11 +175,7 @@
     /// and calling `f` with each decoded dictionary index
     ///
     /// Will short-circuit and return on error
-    </span><span class="kw">pub fn </span>read&lt;F: FnMut(<span class="kw-2">&amp;</span>[i32]) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;&gt;(
-        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
-        len: usize,
-        <span class="kw-2">mut </span>f: F,
-    ) -&gt; <span class="prelude-ty">Result</span>&lt;usize&gt; {
+    </span><span class="kw">pub fn </span>read&lt;F: FnMut(<span class="kw-2">&amp;</span>[i32]) -&gt; <span class="prelude-ty">Result</span>&lt;()&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, len: usize, <span class="kw-2">mut </span>f: F) -&gt; <span class="prelude-ty">Result</span>&lt;usize&gt; {
         <span class="kw">let </span><span class="kw-2">mut </span>values_read = <span class="number">0</span>;
 
         <span class="kw">while </span>values_read != len &amp;&amp; <span class="self">self</span>.max_remaining_values != <span class="number">0 </span>{
@@ -237,8 +220,7 @@
                 values_skip += skip;
             } <span class="kw">else </span>{
                 <span class="comment">// We still have indices buffered, so skip within the buffer
-                </span><span class="kw">let </span>skip =
-                    (to_skip - values_skip).min(<span class="self">self</span>.index_buf_len - <span class="self">self</span>.index_offset);
+                </span><span class="kw">let </span>skip = (to_skip - values_skip).min(<span class="self">self</span>.index_buf_len - <span class="self">self</span>.index_offset);
 
                 <span class="self">self</span>.index_offset += skip;
                 <span class="self">self</span>.max_remaining_values -= skip;

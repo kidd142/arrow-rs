@@ -346,11 +346,6 @@
 <a href="#346" id="346">346</a>
 <a href="#347" id="347">347</a>
 <a href="#348" id="348">348</a>
-<a href="#349" id="349">349</a>
-<a href="#350" id="350">350</a>
-<a href="#351" id="351">351</a>
-<a href="#352" id="352">352</a>
-<a href="#353" id="353">353</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -438,8 +433,7 @@
         Float64 =&gt; Arc::new(create_primitive_array::&lt;Float64Type&gt;(size, null_density)),
         Timestamp(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
             <span class="kw">let </span>int64_array =
-                Arc::new(create_primitive_array::&lt;Int64Type&gt;(size, null_density))
-                    <span class="kw">as </span>ArrayRef;
+                Arc::new(create_primitive_array::&lt;Int64Type&gt;(size, null_density)) <span class="kw">as </span>ArrayRef;
             <span class="kw">return </span><span class="kw">crate</span>::compute::cast(<span class="kw-2">&amp;</span>int64_array, field.data_type());
         }
         Date32 =&gt; Arc::new(create_primitive_array::&lt;Date32Type&gt;(size, null_density)),
@@ -449,9 +443,10 @@
                 size,
                 null_density,
             )) <span class="kw">as </span>ArrayRef,
-            TimeUnit::Millisecond =&gt; Arc::new(create_primitive_array::&lt;
-                Time32MillisecondType,
-            &gt;(size, null_density)),
+            TimeUnit::Millisecond =&gt; Arc::new(create_primitive_array::&lt;Time32MillisecondType&gt;(
+                size,
+                null_density,
+            )),
             <span class="kw">_ </span>=&gt; {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::InvalidArgumentError(<span class="macro">format!</span>(
                     <span class="string">&quot;Unsupported unit {unit:?} for Time32&quot;
@@ -459,12 +454,14 @@
             }
         },
         Time64(unit) =&gt; <span class="kw">match </span>unit {
-            TimeUnit::Microsecond =&gt; Arc::new(create_primitive_array::&lt;
-                Time64MicrosecondType,
-            &gt;(size, null_density)) <span class="kw">as </span>ArrayRef,
-            TimeUnit::Nanosecond =&gt; Arc::new(create_primitive_array::&lt;
-                Time64NanosecondType,
-            &gt;(size, null_density)),
+            TimeUnit::Microsecond =&gt; Arc::new(create_primitive_array::&lt;Time64MicrosecondType&gt;(
+                size,
+                null_density,
+            )) <span class="kw">as </span>ArrayRef,
+            TimeUnit::Nanosecond =&gt; Arc::new(create_primitive_array::&lt;Time64NanosecondType&gt;(
+                size,
+                null_density,
+            )),
             <span class="kw">_ </span>=&gt; {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::InvalidArgumentError(<span class="macro">format!</span>(
                     <span class="string">&quot;Unsupported unit {unit:?} for Time64&quot;
@@ -475,13 +472,9 @@
         LargeUtf8 =&gt; Arc::new(create_string_array::&lt;i64&gt;(size, null_density)),
         Binary =&gt; Arc::new(create_binary_array::&lt;i32&gt;(size, null_density)),
         LargeBinary =&gt; Arc::new(create_binary_array::&lt;i64&gt;(size, null_density)),
-        FixedSizeBinary(len) =&gt; {
-            Arc::new(create_fsb_array(size, null_density, <span class="kw-2">*</span>len <span class="kw">as </span>usize))
-        }
+        FixedSizeBinary(len) =&gt; Arc::new(create_fsb_array(size, null_density, <span class="kw-2">*</span>len <span class="kw">as </span>usize)),
         List(<span class="kw">_</span>) =&gt; create_random_list_array(field, size, null_density, true_density)<span class="question-mark">?</span>,
-        LargeList(<span class="kw">_</span>) =&gt; {
-            create_random_list_array(field, size, null_density, true_density)<span class="question-mark">?
-        </span>}
+        LargeList(<span class="kw">_</span>) =&gt; create_random_list_array(field, size, null_density, true_density)<span class="question-mark">?</span>,
         Struct(fields) =&gt; Arc::new(StructArray::try_from(
             fields
                 .iter()
@@ -491,9 +484,7 @@
                 })
                 .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;(<span class="kw-2">&amp;</span>str, ArrayRef)&gt;&gt;&gt;()<span class="question-mark">?</span>,
         )<span class="question-mark">?</span>),
-        d @ Dictionary(<span class="kw">_</span>, value_type)
-            <span class="kw">if </span><span class="kw">crate</span>::compute::can_cast_types(value_type, d) =&gt;
-        {
+        d @ Dictionary(<span class="kw">_</span>, value_type) <span class="kw">if </span><span class="kw">crate</span>::compute::can_cast_types(value_type, d) =&gt; {
             <span class="kw">let </span>f = Field::new(
                 field.name(),
                 value_type.as_ref().clone(),
@@ -542,8 +533,7 @@
     };
 
     <span class="comment">// Create list&#39;s child data
-    </span><span class="kw">let </span>child_array =
-        create_random_array(list_field, child_len, null_density, true_density)<span class="question-mark">?</span>;
+    </span><span class="kw">let </span>child_array = create_random_array(list_field, child_len, null_density, true_density)<span class="question-mark">?</span>;
     <span class="kw">let </span>child_data = child_array.to_data();
     <span class="comment">// Create list&#39;s null buffers, if it is nullable
     </span><span class="kw">let </span>null_buffer = <span class="kw">match </span>field.is_nullable() {

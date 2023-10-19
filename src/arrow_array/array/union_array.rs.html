@@ -1197,6 +1197,10 @@
 <a href="#1197" id="1197">1197</a>
 <a href="#1198" id="1198">1198</a>
 <a href="#1199" id="1199">1199</a>
+<a href="#1200" id="1200">1200</a>
+<a href="#1201" id="1201">1201</a>
+<a href="#1202" id="1202">1202</a>
+<a href="#1203" id="1203">1203</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -1378,8 +1382,7 @@
         <span class="kw">if let </span><span class="prelude-val">Some</span>(b) = <span class="kw-2">&amp;</span>value_offsets {
             <span class="kw">if </span>((type_ids.len()) * <span class="number">4</span>) != b.len() {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::InvalidArgumentError(
-                    <span class="string">&quot;Type Ids and Offsets represent a different number of array slots.&quot;
-                        </span>.to_string(),
+                    <span class="string">&quot;Type Ids and Offsets represent a different number of array slots.&quot;</span>.to_string(),
                 ));
             }
         }
@@ -1415,9 +1418,8 @@
 
         <span class="comment">// Unsafe Justification: arguments were validated above (and
         // re-revalidated as part of data().validate() below)
-        </span><span class="kw">let </span>new_self = <span class="kw">unsafe </span>{
-            <span class="self">Self</span>::new_unchecked(field_type_ids, type_ids, value_offsets, child_arrays)
-        };
+        </span><span class="kw">let </span>new_self =
+            <span class="kw">unsafe </span>{ <span class="self">Self</span>::new_unchecked(field_type_ids, type_ids, value_offsets, child_arrays) };
         new_self.to_data().validate()<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(new_self)
@@ -2258,7 +2260,13 @@
         <span class="kw">let </span><span class="kw-2">mut </span>builder = UnionBuilder::new_sparse();
         builder.append::&lt;Float32Type&gt;(<span class="string">&quot;a&quot;</span>, <span class="number">1.0</span>).unwrap();
         <span class="kw">let </span>err = builder.append::&lt;Int32Type&gt;(<span class="string">&quot;a&quot;</span>, <span class="number">1</span>).unwrap_err().to_string();
-        <span class="macro">assert!</span>(err.contains(<span class="string">&quot;Attempt to write col \&quot;a\&quot; with type Int32 doesn&#39;t match existing type Float32&quot;</span>), <span class="string">&quot;{}&quot;</span>, err);
+        <span class="macro">assert!</span>(
+            err.contains(
+                <span class="string">&quot;Attempt to write col \&quot;a\&quot; with type Int32 doesn&#39;t match existing type Float32&quot;
+            </span>),
+            <span class="string">&quot;{}&quot;</span>,
+            err
+        );
     }
 
     <span class="attr">#[test]

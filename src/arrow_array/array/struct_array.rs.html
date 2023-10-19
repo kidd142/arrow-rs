@@ -733,16 +733,6 @@
 <a href="#733" id="733">733</a>
 <a href="#734" id="734">734</a>
 <a href="#735" id="735">735</a>
-<a href="#736" id="736">736</a>
-<a href="#737" id="737">737</a>
-<a href="#738" id="738">738</a>
-<a href="#739" id="739">739</a>
-<a href="#740" id="740">740</a>
-<a href="#741" id="741">741</a>
-<a href="#742" id="742">742</a>
-<a href="#743" id="743">743</a>
-<a href="#744" id="744">744</a>
-<a href="#745" id="745">745</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -1207,9 +1197,7 @@
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">use crate</span>::{
-        BooleanArray, Float32Array, Float64Array, Int32Array, Int64Array, StringArray,
-    };
+    <span class="kw">use crate</span>::{BooleanArray, Float32Array, Float64Array, Int32Array, Int64Array, StringArray};
     <span class="kw">use </span>arrow_buffer::ToByteSlice;
     <span class="kw">use </span>std::sync::Arc;
 
@@ -1285,12 +1273,10 @@
             <span class="prelude-val">None</span>,
             <span class="prelude-val">Some</span>(<span class="string">&quot;mark&quot;</span>),
         ]));
-        <span class="kw">let </span>ints: ArrayRef =
-            Arc::new(Int32Array::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="number">4</span>)]));
+        <span class="kw">let </span>ints: ArrayRef = Arc::new(Int32Array::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="number">4</span>)]));
 
         <span class="kw">let </span>arr =
-            StructArray::try_from(<span class="macro">vec!</span>[(<span class="string">&quot;f1&quot;</span>, strings.clone()), (<span class="string">&quot;f2&quot;</span>, ints.clone())])
-                .unwrap();
+            StructArray::try_from(<span class="macro">vec!</span>[(<span class="string">&quot;f1&quot;</span>, strings.clone()), (<span class="string">&quot;f2&quot;</span>, ints.clone())]).unwrap();
 
         <span class="kw">let </span>struct_data = arr.into_data();
         <span class="macro">assert_eq!</span>(<span class="number">4</span>, struct_data.len());
@@ -1323,13 +1309,11 @@
             <span class="prelude-val">None</span>,
             <span class="comment">// 3 elements, not 4
         </span>]));
-        <span class="kw">let </span>ints: ArrayRef =
-            Arc::new(Int32Array::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="number">4</span>)]));
+        <span class="kw">let </span>ints: ArrayRef = Arc::new(Int32Array::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="number">4</span>)]));
 
-        <span class="kw">let </span>err =
-            StructArray::try_from(<span class="macro">vec!</span>[(<span class="string">&quot;f1&quot;</span>, strings.clone()), (<span class="string">&quot;f2&quot;</span>, ints.clone())])
-                .unwrap_err()
-                .to_string();
+        <span class="kw">let </span>err = StructArray::try_from(<span class="macro">vec!</span>[(<span class="string">&quot;f1&quot;</span>, strings.clone()), (<span class="string">&quot;f2&quot;</span>, ints.clone())])
+            .unwrap_err()
+            .to_string();
 
         <span class="macro">assert_eq!</span>(
             err,
@@ -1344,8 +1328,7 @@
     </span><span class="kw">fn </span>test_struct_array_from_mismatched_types_single() {
         drop(StructArray::from(<span class="macro">vec!</span>[(
             Arc::new(Field::new(<span class="string">&quot;b&quot;</span>, DataType::Int16, <span class="bool-val">false</span>)),
-            Arc::new(BooleanArray::from(<span class="macro">vec!</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>]))
-                <span class="kw">as </span>Arc&lt;<span class="kw">dyn </span>Array&gt;,
+            Arc::new(BooleanArray::from(<span class="macro">vec!</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>])) <span class="kw">as </span>Arc&lt;<span class="kw">dyn </span>Array&gt;,
         )]));
     }
 
@@ -1357,8 +1340,7 @@
         drop(StructArray::from(<span class="macro">vec!</span>[
             (
                 Arc::new(Field::new(<span class="string">&quot;b&quot;</span>, DataType::Int16, <span class="bool-val">false</span>)),
-                Arc::new(BooleanArray::from(<span class="macro">vec!</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>]))
-                    <span class="kw">as </span>Arc&lt;<span class="kw">dyn </span>Array&gt;,
+                Arc::new(BooleanArray::from(<span class="macro">vec!</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>])) <span class="kw">as </span>Arc&lt;<span class="kw">dyn </span>Array&gt;,
             ),
             (
                 Arc::new(Field::new(<span class="string">&quot;c&quot;</span>, DataType::Utf8, <span class="bool-val">false</span>)),
@@ -1478,9 +1460,7 @@
     }
 
     <span class="attr">#[test]
-    #[should_panic(
-        expected = <span class="string">&quot;Found unmasked nulls for non-nullable StructArray field \\\&quot;c\\\&quot;&quot;
-    </span>)]
+    #[should_panic(expected = <span class="string">&quot;Found unmasked nulls for non-nullable StructArray field \\\&quot;c\\\&quot;&quot;</span>)]
     </span><span class="kw">fn </span>test_struct_array_from_mismatched_nullability() {
         drop(StructArray::from(<span class="macro">vec!</span>[(
             Arc::new(Field::new(<span class="string">&quot;c&quot;</span>, DataType::Int32, <span class="bool-val">false</span>)),

@@ -347,12 +347,6 @@
 <a href="#347" id="347">347</a>
 <a href="#348" id="348">348</a>
 <a href="#349" id="349">349</a>
-<a href="#350" id="350">350</a>
-<a href="#351" id="351">351</a>
-<a href="#352" id="352">352</a>
-<a href="#353" id="353">353</a>
-<a href="#354" id="354">354</a>
-<a href="#355" id="355">355</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -426,9 +420,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::error::ArrowError;
 <span class="kw">use </span><span class="kw">crate</span>::ffi;
 <span class="kw">use </span><span class="kw">crate</span>::ffi::{FFI_ArrowArray, FFI_ArrowSchema};
-<span class="kw">use </span><span class="kw">crate</span>::ffi_stream::{
-    export_reader_into_raw, ArrowArrayStreamReader, FFI_ArrowArrayStream,
-};
+<span class="kw">use </span><span class="kw">crate</span>::ffi_stream::{export_reader_into_raw, ArrowArrayStreamReader, FFI_ArrowArrayStream};
 <span class="kw">use </span><span class="kw">crate</span>::record_batch::RecordBatch;
 
 <span class="macro">import_exception!</span>(pyarrow, ArrowException);
@@ -493,8 +485,7 @@
         <span class="kw">let </span>c_schema_ptr = <span class="kw-2">&amp;</span>c_schema <span class="kw">as </span><span class="kw-2">*const </span>FFI_ArrowSchema;
         <span class="kw">let </span>module = py.import(<span class="string">&quot;pyarrow&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>class = module.getattr(<span class="string">&quot;DataType&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let </span>dtype =
-            class.call_method1(<span class="string">&quot;_import_from_c&quot;</span>, (c_schema_ptr <span class="kw">as </span>Py_uintptr_t,))<span class="question-mark">?</span>;
+        <span class="kw">let </span>dtype = class.call_method1(<span class="string">&quot;_import_from_c&quot;</span>, (c_schema_ptr <span class="kw">as </span>Py_uintptr_t,))<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(dtype.into())
     }
 }
@@ -517,8 +508,7 @@
         <span class="kw">let </span>c_schema_ptr = <span class="kw-2">&amp;</span>c_schema <span class="kw">as </span><span class="kw-2">*const </span>FFI_ArrowSchema;
         <span class="kw">let </span>module = py.import(<span class="string">&quot;pyarrow&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>class = module.getattr(<span class="string">&quot;Field&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let </span>dtype =
-            class.call_method1(<span class="string">&quot;_import_from_c&quot;</span>, (c_schema_ptr <span class="kw">as </span>Py_uintptr_t,))<span class="question-mark">?</span>;
+        <span class="kw">let </span>dtype = class.call_method1(<span class="string">&quot;_import_from_c&quot;</span>, (c_schema_ptr <span class="kw">as </span>Py_uintptr_t,))<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(dtype.into())
     }
 }
@@ -541,8 +531,7 @@
         <span class="kw">let </span>c_schema_ptr = <span class="kw-2">&amp;</span>c_schema <span class="kw">as </span><span class="kw-2">*const </span>FFI_ArrowSchema;
         <span class="kw">let </span>module = py.import(<span class="string">&quot;pyarrow&quot;</span>)<span class="question-mark">?</span>;
         <span class="kw">let </span>class = module.getattr(<span class="string">&quot;Schema&quot;</span>)<span class="question-mark">?</span>;
-        <span class="kw">let </span>schema =
-            class.call_method1(<span class="string">&quot;_import_from_c&quot;</span>, (c_schema_ptr <span class="kw">as </span>Py_uintptr_t,))<span class="question-mark">?</span>;
+        <span class="kw">let </span>schema = class.call_method1(<span class="string">&quot;_import_from_c&quot;</span>, (c_schema_ptr <span class="kw">as </span>Py_uintptr_t,))<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(schema.into())
     }
 }
@@ -626,8 +615,7 @@
 <span class="kw">impl </span>ToPyArrow <span class="kw">for </span>RecordBatch {
     <span class="kw">fn </span>to_pyarrow(<span class="kw-2">&amp;</span><span class="self">self</span>, py: Python) -&gt; PyResult&lt;PyObject&gt; {
         <span class="comment">// Workaround apache/arrow#37669 by returning RecordBatchIterator
-        </span><span class="kw">let </span>reader =
-            RecordBatchIterator::new(<span class="macro">vec!</span>[<span class="prelude-val">Ok</span>(<span class="self">self</span>.clone())], <span class="self">self</span>.schema().clone());
+        </span><span class="kw">let </span>reader = RecordBatchIterator::new(<span class="macro">vec!</span>[<span class="prelude-val">Ok</span>(<span class="self">self</span>.clone())], <span class="self">self</span>.schema().clone());
         <span class="kw">let </span>reader: Box&lt;<span class="kw">dyn </span>RecordBatchReader + Send&gt; = Box::new(reader);
         <span class="kw">let </span>py_reader = reader.into_pyarrow(py)<span class="question-mark">?</span>;
         py_reader.call_method0(py, <span class="string">&quot;read_next_batch&quot;</span>)

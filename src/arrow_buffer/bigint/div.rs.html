@@ -300,16 +300,6 @@
 <a href="#300" id="300">300</a>
 <a href="#301" id="301">301</a>
 <a href="#302" id="302">302</a>
-<a href="#303" id="303">303</a>
-<a href="#304" id="304">304</a>
-<a href="#305" id="305">305</a>
-<a href="#306" id="306">306</a>
-<a href="#307" id="307">307</a>
-<a href="#308" id="308">308</a>
-<a href="#309" id="309">309</a>
-<a href="#310" id="310">310</a>
-<a href="#311" id="311">311</a>
-<a href="#312" id="312">312</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -338,10 +328,7 @@
 /// # Panics
 ///
 /// Panics if divisor is zero
-</span><span class="kw">pub fn </span>div_rem&lt;<span class="kw">const </span>N: usize&gt;(
-    numerator: <span class="kw-2">&amp;</span>[u64; N],
-    divisor: <span class="kw-2">&amp;</span>[u64; N],
-) -&gt; ([u64; N], [u64; N]) {
+</span><span class="kw">pub fn </span>div_rem&lt;<span class="kw">const </span>N: usize&gt;(numerator: <span class="kw-2">&amp;</span>[u64; N], divisor: <span class="kw-2">&amp;</span>[u64; N]) -&gt; ([u64; N], [u64; N]) {
     <span class="kw">let </span>numerator_bits = bits(numerator);
     <span class="kw">let </span>divisor_bits = bits(divisor);
     <span class="macro">assert_ne!</span>(divisor_bits, <span class="number">0</span>, <span class="string">&quot;division by zero&quot;</span>);
@@ -373,10 +360,7 @@
 </span>}
 
 <span class="doccomment">/// Division of numerator by a u64 divisor
-</span><span class="kw">fn </span>div_rem_small&lt;<span class="kw">const </span>N: usize&gt;(
-    numerator: <span class="kw-2">&amp;</span>[u64; N],
-    divisor: u64,
-) -&gt; ([u64; N], [u64; N]) {
+</span><span class="kw">fn </span>div_rem_small&lt;<span class="kw">const </span>N: usize&gt;(numerator: <span class="kw-2">&amp;</span>[u64; N], divisor: u64) -&gt; ([u64; N], [u64; N]) {
     <span class="kw">let </span><span class="kw-2">mut </span>rem = <span class="number">0u64</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>numerator = <span class="kw-2">*</span>numerator;
     numerator.iter_mut().rev().for_each(|d| {
@@ -539,11 +523,7 @@
 }
 
 <span class="doccomment">/// Converts an overflowing binary operation on scalars to one on slices
-</span><span class="kw">fn </span>binop_slice(
-    a: <span class="kw-2">&amp;mut </span>[u64],
-    b: <span class="kw-2">&amp;</span>[u64],
-    binop: <span class="kw">impl </span>Fn(u64, u64) -&gt; (u64, bool) + Copy,
-) -&gt; bool {
+</span><span class="kw">fn </span>binop_slice(a: <span class="kw-2">&amp;mut </span>[u64], b: <span class="kw-2">&amp;</span>[u64], binop: <span class="kw">impl </span>Fn(u64, u64) -&gt; (u64, bool) + Copy) -&gt; bool {
     <span class="kw">let </span><span class="kw-2">mut </span>c = <span class="bool-val">false</span>;
     a.iter_mut().zip(b.iter()).for_each(|(x, y)| {
         <span class="kw">let </span>(res1, overflow1) = y.overflowing_add(u64::from(c));

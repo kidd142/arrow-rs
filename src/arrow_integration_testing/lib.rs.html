@@ -158,8 +158,8 @@
             .as_array()
             .expect(<span class="string">&quot;Unable to get dictionaries as array&quot;</span>)
         {
-            <span class="kw">let </span>json_dict: ArrowJsonDictionaryBatch = serde_json::from_value(d.clone())
-                .expect(<span class="string">&quot;Unable to get dictionary from JSON&quot;</span>);
+            <span class="kw">let </span>json_dict: ArrowJsonDictionaryBatch =
+                serde_json::from_value(d.clone()).expect(<span class="string">&quot;Unable to get dictionary from JSON&quot;</span>);
             <span class="comment">// TODO: convert to a concrete Arrow type
             </span>dictionaries.insert(json_dict.id, json_dict);
         }

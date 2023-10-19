@@ -210,12 +210,6 @@
 <a href="#210" id="210">210</a>
 <a href="#211" id="211">211</a>
 <a href="#212" id="212">212</a>
-<a href="#213" id="213">213</a>
-<a href="#214" id="214">214</a>
-<a href="#215" id="215">215</a>
-<a href="#216" id="216">216</a>
-<a href="#217" id="217">217</a>
-<a href="#218" id="218">218</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -393,10 +387,7 @@
     /// Note: repeated or out of order indices will not impact the final mask
     ///
     /// i.e. `[0, 1, 2]` will construct the same mask as `[1, 0, 0, 2]`
-    </span><span class="kw">pub fn </span>leaves(
-        schema: <span class="kw-2">&amp;</span>SchemaDescriptor,
-        indices: <span class="kw">impl </span>IntoIterator&lt;Item = usize&gt;,
-    ) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>leaves(schema: <span class="kw-2">&amp;</span>SchemaDescriptor, indices: <span class="kw">impl </span>IntoIterator&lt;Item = usize&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span><span class="kw-2">mut </span>mask = <span class="macro">vec!</span>[<span class="bool-val">false</span>; schema.num_columns()];
         <span class="kw">for </span>leaf_idx <span class="kw">in </span>indices {
             mask[leaf_idx] = <span class="bool-val">true</span>;
@@ -409,10 +400,7 @@
     /// Note: repeated or out of order indices will not impact the final mask
     ///
     /// i.e. `[0, 1, 2]` will construct the same mask as `[1, 0, 0, 2]`
-    </span><span class="kw">pub fn </span>roots(
-        schema: <span class="kw-2">&amp;</span>SchemaDescriptor,
-        indices: <span class="kw">impl </span>IntoIterator&lt;Item = usize&gt;,
-    ) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>roots(schema: <span class="kw-2">&amp;</span>SchemaDescriptor, indices: <span class="kw">impl </span>IntoIterator&lt;Item = usize&gt;) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>num_root_columns = schema.root_schema().get_fields().len();
         <span class="kw">let </span><span class="kw-2">mut </span>root_mask = <span class="macro">vec!</span>[<span class="bool-val">false</span>; num_root_columns];
         <span class="kw">for </span>root_idx <span class="kw">in </span>indices {

@@ -305,16 +305,6 @@
 <a href="#305" id="305">305</a>
 <a href="#306" id="306">306</a>
 <a href="#307" id="307">307</a>
-<a href="#308" id="308">308</a>
-<a href="#309" id="309">309</a>
-<a href="#310" id="310">310</a>
-<a href="#311" id="311">311</a>
-<a href="#312" id="312">312</a>
-<a href="#313" id="313">313</a>
-<a href="#314" id="314">314</a>
-<a href="#315" id="315">315</a>
-<a href="#316" id="316">316</a>
-<a href="#317" id="317">317</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -390,11 +380,7 @@
 }
 
 <span class="doccomment">/// Creates an random (but fixed-seeded) array of a given size and null density
-</span><span class="kw">pub fn </span>create_boolean_array(
-    size: usize,
-    null_density: f32,
-    true_density: f32,
-) -&gt; BooleanArray
+</span><span class="kw">pub fn </span>create_boolean_array(size: usize, null_density: f32, true_density: f32) -&gt; BooleanArray
 <span class="kw">where
     </span>Standard: Distribution&lt;bool&gt;,
 {
@@ -555,11 +541,7 @@
 }
 
 <span class="doccomment">/// Creates an random (but fixed-seeded) array of a given size and null density
-</span><span class="kw">pub fn </span>create_fsb_array(
-    size: usize,
-    null_density: f32,
-    value_len: usize,
-) -&gt; FixedSizeBinaryArray {
+</span><span class="kw">pub fn </span>create_fsb_array(size: usize, null_density: f32, value_len: usize) -&gt; FixedSizeBinaryArray {
     <span class="kw">let </span>rng = <span class="kw-2">&amp;mut </span>seedable_rng();
 
     FixedSizeBinaryArray::try_from_sparse_iter_with_size(
@@ -610,17 +592,15 @@
     K::Native: SampleUniform,
 {
     <span class="kw">let </span><span class="kw-2">mut </span>rng = seedable_rng();
-    <span class="kw">let </span>data_type = DataType::Dictionary(
-        Box::new(K::DATA_TYPE),
-        Box::new(values.data_type().clone()),
-    );
+    <span class="kw">let </span>data_type =
+        DataType::Dictionary(Box::new(K::DATA_TYPE), Box::new(values.data_type().clone()));
 
     <span class="kw">let </span>keys: Buffer = (<span class="number">0</span>..size)
         .map(|<span class="kw">_</span>| rng.gen_range(key_range.clone()))
         .collect();
 
-    <span class="kw">let </span>nulls: <span class="prelude-ty">Option</span>&lt;Buffer&gt; = (null_density != <span class="number">0.</span>)
-        .then(|| (<span class="number">0</span>..size).map(|<span class="kw">_</span>| rng.gen_bool(null_density <span class="kw">as _</span>)).collect());
+    <span class="kw">let </span>nulls: <span class="prelude-ty">Option</span>&lt;Buffer&gt; =
+        (null_density != <span class="number">0.</span>).then(|| (<span class="number">0</span>..size).map(|<span class="kw">_</span>| rng.gen_bool(null_density <span class="kw">as _</span>)).collect());
 
     <span class="kw">let </span>data = ArrayDataBuilder::new(data_type)
         .len(size)

@@ -508,10 +508,6 @@
 <a href="#508" id="508">508</a>
 <a href="#509" id="509">509</a>
 <a href="#510" id="510">510</a>
-<a href="#511" id="511">511</a>
-<a href="#512" id="512">512</a>
-<a href="#513" id="513">513</a>
-<a href="#514" id="514">514</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -543,8 +539,7 @@
 
     <span class="kw">if </span>left_data.len() != right.len() {
         <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::ComputeError(
-            <span class="string">&quot;Cannot perform comparison operation on arrays of different length&quot;
-                </span>.to_string(),
+            <span class="string">&quot;Cannot perform comparison operation on arrays of different length&quot;</span>.to_string(),
         ));
     }
     <span class="kw">let </span>len = left_data.len();
@@ -589,12 +584,11 @@
         }
         <span class="prelude-val">None </span>=&gt; {
             <span class="kw">let </span><span class="kw-2">mut </span>null_count = <span class="number">0</span>;
-            <span class="kw">let </span>buffer =
-                bitwise_unary_op_helper(right.inner(), right.offset(), len, |b| {
-                    <span class="kw">let </span>t = !b;
-                    null_count += t.count_zeros() <span class="kw">as </span>usize;
-                    t
-                });
+            <span class="kw">let </span>buffer = bitwise_unary_op_helper(right.inner(), right.offset(), len, |b| {
+                <span class="kw">let </span>t = !b;
+                null_count += t.count_zeros() <span class="kw">as </span>usize;
+                t
+            });
             (buffer, null_count)
         }
     };
@@ -624,8 +618,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_nullif_int_array() {
         <span class="kw">let </span>a = Int32Array::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">15</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="number">8</span>), <span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">9</span>)]);
-        <span class="kw">let </span>comp =
-            BooleanArray::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="bool-val">false</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>), <span class="prelude-val">Some</span>(<span class="bool-val">false</span>), <span class="prelude-val">None</span>]);
+        <span class="kw">let </span>comp = BooleanArray::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="bool-val">false</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>), <span class="prelude-val">Some</span>(<span class="bool-val">false</span>), <span class="prelude-val">None</span>]);
         <span class="kw">let </span>res = nullif(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>comp).unwrap();
 
         <span class="kw">let </span>expected = Int32Array::from(<span class="macro">vec!</span>[
@@ -962,8 +955,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_nullif_no_nulls() {
         <span class="kw">let </span>a = Int32Array::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">15</span>), <span class="prelude-val">Some</span>(<span class="number">7</span>), <span class="prelude-val">Some</span>(<span class="number">8</span>), <span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">9</span>)]);
-        <span class="kw">let </span>comp =
-            BooleanArray::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="bool-val">false</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>), <span class="prelude-val">Some</span>(<span class="bool-val">false</span>), <span class="prelude-val">None</span>]);
+        <span class="kw">let </span>comp = BooleanArray::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="bool-val">false</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>), <span class="prelude-val">Some</span>(<span class="bool-val">false</span>), <span class="prelude-val">None</span>]);
         <span class="kw">let </span>res = nullif(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>comp).unwrap();
         <span class="kw">let </span>res = res.as_primitive::&lt;Int32Type&gt;();
 

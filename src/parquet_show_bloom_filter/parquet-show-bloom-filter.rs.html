@@ -114,6 +114,8 @@
 <a href="#114" id="114">114</a>
 <a href="#115" id="115">115</a>
 <a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -165,7 +167,9 @@
     <span class="attr">#[clap(help(<span class="string">&quot;Check the bloom filter indexes for the given column&quot;</span>))]
     </span>column: String,
     <span class="attr">#[clap(
-        help(<span class="string">&quot;Check if the given values match bloom filter, the values will be evaluated as strings&quot;</span>),
+        help(
+            <span class="string">&quot;Check if the given values match bloom filter, the values will be evaluated as strings&quot;
+        </span>),
         required = <span class="bool-val">true
     </span>)]
     </span>values: Vec&lt;String&gt;,

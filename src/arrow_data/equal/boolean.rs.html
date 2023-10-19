@@ -85,7 +85,6 @@
 <a href="#85" id="85">85</a>
 <a href="#86" id="86">86</a>
 <a href="#87" id="87">87</a>
-<a href="#88" id="88">88</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -166,12 +165,11 @@
         <span class="comment">// get a ref of the null buffer bytes, to use in testing for nullness
         </span><span class="kw">let </span>lhs_nulls = lhs.nulls().unwrap();
 
-        BitIndexIterator::new(lhs_nulls.validity(), lhs_start + lhs_nulls.offset(), len)
-            .all(|i| {
-                <span class="kw">let </span>lhs_pos = lhs_start + lhs.offset() + i;
-                <span class="kw">let </span>rhs_pos = rhs_start + rhs.offset() + i;
-                get_bit(lhs_values, lhs_pos) == get_bit(rhs_values, rhs_pos)
-            })
+        BitIndexIterator::new(lhs_nulls.validity(), lhs_start + lhs_nulls.offset(), len).all(|i| {
+            <span class="kw">let </span>lhs_pos = lhs_start + lhs.offset() + i;
+            <span class="kw">let </span>rhs_pos = rhs_start + rhs.offset() + i;
+            get_bit(lhs_values, lhs_pos) == get_bit(rhs_values, rhs_pos)
+        })
     }
 }
 </code></pre></div></section></main></body></html>

@@ -1897,19 +1897,6 @@
 <a href="#1897" id="1897">1897</a>
 <a href="#1898" id="1898">1898</a>
 <a href="#1899" id="1899">1899</a>
-<a href="#1900" id="1900">1900</a>
-<a href="#1901" id="1901">1901</a>
-<a href="#1902" id="1902">1902</a>
-<a href="#1903" id="1903">1903</a>
-<a href="#1904" id="1904">1904</a>
-<a href="#1905" id="1905">1905</a>
-<a href="#1906" id="1906">1906</a>
-<a href="#1907" id="1907">1907</a>
-<a href="#1908" id="1908">1908</a>
-<a href="#1909" id="1909">1909</a>
-<a href="#1910" id="1910">1910</a>
-<a href="#1911" id="1911">1911</a>
-<a href="#1912" id="1912">1912</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -2555,13 +2542,13 @@
         <span class="kw">let </span>field = <span class="kw">match </span>descr.physical_type() {
             PhysicalType::BYTE_ARRAY =&gt; <span class="kw">match </span>descr.converted_type() {
                 ConvertedType::UTF8 | ConvertedType::ENUM | ConvertedType::JSON =&gt; {
-                    <span class="kw">let </span>value =
-                        String::from_utf8(value.data().to_vec()).map_err(|e| {
-                            <span class="macro">general_err!</span>(
-                                <span class="string">&quot;Error reading BYTE_ARRAY as String. Bytes: {:?} Error: {:?}&quot;</span>,
-                                value.data(), e
-                            )
-                        })<span class="question-mark">?</span>;
+                    <span class="kw">let </span>value = String::from_utf8(value.data().to_vec()).map_err(|e| {
+                        <span class="macro">general_err!</span>(
+                            <span class="string">&quot;Error reading BYTE_ARRAY as String. Bytes: {:?} Error: {:?}&quot;</span>,
+                            value.data(),
+                            e
+                        )
+                    })<span class="question-mark">?</span>;
                     Field::Str(value)
                 }
                 ConvertedType::BSON | ConvertedType::NONE =&gt; Field::Bytes(value),
@@ -2612,12 +2599,8 @@
             Field::Str(s) =&gt; Value::String(s.to_owned()),
             Field::Bytes(b) =&gt; Value::String(BASE64_STANDARD.encode(b.data())),
             Field::Date(d) =&gt; Value::String(convert_date_to_string(<span class="kw-2">*</span>d)),
-            Field::TimestampMillis(ts) =&gt; {
-                Value::String(convert_timestamp_millis_to_string(<span class="kw-2">*</span>ts))
-            }
-            Field::TimestampMicros(ts) =&gt; {
-                Value::String(convert_timestamp_micros_to_string(<span class="kw-2">*</span>ts))
-            }
+            Field::TimestampMillis(ts) =&gt; Value::String(convert_timestamp_millis_to_string(<span class="kw-2">*</span>ts)),
+            Field::TimestampMicros(ts) =&gt; Value::String(convert_timestamp_micros_to_string(<span class="kw-2">*</span>ts)),
             Field::Group(row) =&gt; row.to_json_value(),
             Field::ListInternal(fields) =&gt; {
                 Value::Array(fields.elements.iter().map(|f| f.to_json_value()).collect())
@@ -2867,8 +2850,7 @@
         <span class="kw">let </span>row = Field::convert_int32(<span class="kw-2">&amp;</span>descr, <span class="number">14611</span>);
         <span class="macro">assert_eq!</span>(row, Field::Date(<span class="number">14611</span>));
 
-        <span class="kw">let </span>descr =
-            <span class="macro">make_column_descr!</span>[PhysicalType::INT32, ConvertedType::DECIMAL, <span class="number">0</span>, <span class="number">8</span>, <span class="number">2</span>];
+        <span class="kw">let </span>descr = <span class="macro">make_column_descr!</span>[PhysicalType::INT32, ConvertedType::DECIMAL, <span class="number">0</span>, <span class="number">8</span>, <span class="number">2</span>];
         <span class="kw">let </span>row = Field::convert_int32(<span class="kw-2">&amp;</span>descr, <span class="number">444</span>);
         <span class="macro">assert_eq!</span>(row, Field::Decimal(Decimal::from_i32(<span class="number">444</span>, <span class="number">8</span>, <span class="number">2</span>)));
     }
@@ -2883,13 +2865,11 @@
         <span class="kw">let </span>row = Field::convert_int64(<span class="kw-2">&amp;</span>descr, <span class="number">78239823</span>);
         <span class="macro">assert_eq!</span>(row, Field::ULong(<span class="number">78239823</span>));
 
-        <span class="kw">let </span>descr =
-            <span class="macro">make_column_descr!</span>[PhysicalType::INT64, ConvertedType::TIMESTAMP_MILLIS];
+        <span class="kw">let </span>descr = <span class="macro">make_column_descr!</span>[PhysicalType::INT64, ConvertedType::TIMESTAMP_MILLIS];
         <span class="kw">let </span>row = Field::convert_int64(<span class="kw-2">&amp;</span>descr, <span class="number">1541186529153</span>);
         <span class="macro">assert_eq!</span>(row, Field::TimestampMillis(<span class="number">1541186529153</span>));
 
-        <span class="kw">let </span>descr =
-            <span class="macro">make_column_descr!</span>[PhysicalType::INT64, ConvertedType::TIMESTAMP_MICROS];
+        <span class="kw">let </span>descr = <span class="macro">make_column_descr!</span>[PhysicalType::INT64, ConvertedType::TIMESTAMP_MICROS];
         <span class="kw">let </span>row = Field::convert_int64(<span class="kw-2">&amp;</span>descr, <span class="number">1541186529153123</span>);
         <span class="macro">assert_eq!</span>(row, Field::TimestampMicros(<span class="number">1541186529153123</span>));
 
@@ -2897,8 +2877,7 @@
         <span class="kw">let </span>row = Field::convert_int64(<span class="kw-2">&amp;</span>descr, <span class="number">2222</span>);
         <span class="macro">assert_eq!</span>(row, Field::Long(<span class="number">2222</span>));
 
-        <span class="kw">let </span>descr =
-            <span class="macro">make_column_descr!</span>[PhysicalType::INT64, ConvertedType::DECIMAL, <span class="number">0</span>, <span class="number">8</span>, <span class="number">2</span>];
+        <span class="kw">let </span>descr = <span class="macro">make_column_descr!</span>[PhysicalType::INT64, ConvertedType::DECIMAL, <span class="number">0</span>, <span class="number">8</span>, <span class="number">2</span>];
         <span class="kw">let </span>row = Field::convert_int64(<span class="kw-2">&amp;</span>descr, <span class="number">3333</span>);
         <span class="macro">assert_eq!</span>(row, Field::Decimal(Decimal::from_i64(<span class="number">3333</span>, <span class="number">8</span>, <span class="number">2</span>)));
     }
@@ -2966,8 +2945,7 @@
         <span class="macro">assert_eq!</span>(row.unwrap(), Field::Bytes(value));
 
         <span class="comment">// DECIMAL
-        </span><span class="kw">let </span>descr =
-            <span class="macro">make_column_descr!</span>[PhysicalType::BYTE_ARRAY, ConvertedType::DECIMAL, <span class="number">0</span>, <span class="number">8</span>, <span class="number">2</span>];
+        </span><span class="kw">let </span>descr = <span class="macro">make_column_descr!</span>[PhysicalType::BYTE_ARRAY, ConvertedType::DECIMAL, <span class="number">0</span>, <span class="number">8</span>, <span class="number">2</span>];
         <span class="kw">let </span>value = ByteArray::from(<span class="macro">vec!</span>[<span class="number">207</span>, <span class="number">200</span>]);
         <span class="kw">let </span>row = Field::convert_byte_array(<span class="kw-2">&amp;</span>descr, value.clone());
         <span class="macro">assert_eq!</span>(
@@ -3737,11 +3715,7 @@
             <span class="macro">serde_json::json!</span>({<span class="string">&quot;X&quot;</span>: <span class="number">1</span>, <span class="string">&quot;Y&quot;</span>: <span class="number">2.2</span>, <span class="string">&quot;Z&quot;</span>: <span class="string">&quot;abc&quot;</span>})
         );
 
-        <span class="kw">let </span>row = Field::ListInternal(make_list(<span class="macro">vec!</span>[
-            Field::Int(<span class="number">1</span>),
-            Field::Int(<span class="number">12</span>),
-            Field::Null,
-        ]));
+        <span class="kw">let </span>row = Field::ListInternal(make_list(<span class="macro">vec!</span>[Field::Int(<span class="number">1</span>), Field::Int(<span class="number">12</span>), Field::Null]));
         <span class="kw">let </span>array = <span class="macro">vec!</span>[
             Value::Number(serde_json::Number::from(<span class="number">1</span>)),
             Value::Number(serde_json::Number::from(<span class="number">12</span>)),

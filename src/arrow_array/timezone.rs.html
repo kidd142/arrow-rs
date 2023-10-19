@@ -337,12 +337,6 @@
 <a href="#337" id="337">337</a>
 <a href="#338" id="338">338</a>
 <a href="#339" id="339">339</a>
-<a href="#340" id="340">340</a>
-<a href="#341" id="341">341</a>
-<a href="#342" id="342">342</a>
-<a href="#343" id="343">343</a>
-<a href="#344" id="344">344</a>
-<a href="#345" id="345">345</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -383,8 +377,8 @@
     <span class="kw">if </span>values.iter().any(|x| <span class="kw-2">*</span>x &gt; <span class="number">9</span>) {
         <span class="kw">return </span><span class="prelude-val">None</span>;
     }
-    <span class="kw">let </span>secs = (values[<span class="number">0</span>] * <span class="number">10 </span>+ values[<span class="number">1</span>]) <span class="kw">as </span>i32 * <span class="number">60 </span>* <span class="number">60
-        </span>+ (values[<span class="number">2</span>] * <span class="number">10 </span>+ values[<span class="number">3</span>]) <span class="kw">as </span>i32 * <span class="number">60</span>;
+    <span class="kw">let </span>secs =
+        (values[<span class="number">0</span>] * <span class="number">10 </span>+ values[<span class="number">1</span>]) <span class="kw">as </span>i32 * <span class="number">60 </span>* <span class="number">60 </span>+ (values[<span class="number">2</span>] * <span class="number">10 </span>+ values[<span class="number">3</span>]) <span class="kw">as </span>i32 * <span class="number">60</span>;
 
     <span class="kw">match </span>bytes[<span class="number">0</span>] {
         <span class="string">b&#39;+&#39; </span>=&gt; FixedOffset::east_opt(secs),
@@ -467,10 +461,7 @@
             })
         }
 
-        <span class="kw">fn </span>offset_from_local_datetime(
-            <span class="kw-2">&amp;</span><span class="self">self</span>,
-            local: <span class="kw-2">&amp;</span>NaiveDateTime,
-        ) -&gt; LocalResult&lt;<span class="self">Self</span>::Offset&gt; {
+        <span class="kw">fn </span>offset_from_local_datetime(<span class="kw-2">&amp;</span><span class="self">self</span>, local: <span class="kw-2">&amp;</span>NaiveDateTime) -&gt; LocalResult&lt;<span class="self">Self</span>::Offset&gt; {
             <span class="macro">tz!</span>(<span class="self">self</span>, tz, {
                 tz.offset_from_local_datetime(local).map(|x| TzOffset {
                     tz: <span class="kw-2">*</span><span class="self">self</span>,
@@ -630,10 +621,7 @@
             <span class="self">self</span>.<span class="number">0</span>.offset_from_local_date(local).map(TzOffset)
         }
 
-        <span class="kw">fn </span>offset_from_local_datetime(
-            <span class="kw-2">&amp;</span><span class="self">self</span>,
-            local: <span class="kw-2">&amp;</span>NaiveDateTime,
-        ) -&gt; LocalResult&lt;<span class="self">Self</span>::Offset&gt; {
+        <span class="kw">fn </span>offset_from_local_datetime(<span class="kw-2">&amp;</span><span class="self">self</span>, local: <span class="kw-2">&amp;</span>NaiveDateTime) -&gt; LocalResult&lt;<span class="self">Self</span>::Offset&gt; {
             <span class="self">self</span>.<span class="number">0</span>.offset_from_local_datetime(local).map(TzOffset)
         }
 

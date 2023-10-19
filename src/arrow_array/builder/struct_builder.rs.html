@@ -603,23 +603,6 @@
 <a href="#603" id="603">603</a>
 <a href="#604" id="604">604</a>
 <a href="#605" id="605">605</a>
-<a href="#606" id="606">606</a>
-<a href="#607" id="607">607</a>
-<a href="#608" id="608">608</a>
-<a href="#609" id="609">609</a>
-<a href="#610" id="610">610</a>
-<a href="#611" id="611">611</a>
-<a href="#612" id="612">612</a>
-<a href="#613" id="613">613</a>
-<a href="#614" id="614">614</a>
-<a href="#615" id="615">615</a>
-<a href="#616" id="616">616</a>
-<a href="#617" id="617">617</a>
-<a href="#618" id="618">618</a>
-<a href="#619" id="619">619</a>
-<a href="#620" id="620">620</a>
-<a href="#621" id="621">621</a>
-<a href="#622" id="622">622</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -728,24 +711,18 @@
         DataType::Float32 =&gt; Box::new(Float32Builder::with_capacity(capacity)),
         DataType::Float64 =&gt; Box::new(Float64Builder::with_capacity(capacity)),
         DataType::Binary =&gt; Box::new(BinaryBuilder::with_capacity(capacity, <span class="number">1024</span>)),
-        DataType::LargeBinary =&gt; {
-            Box::new(LargeBinaryBuilder::with_capacity(capacity, <span class="number">1024</span>))
-        }
+        DataType::LargeBinary =&gt; Box::new(LargeBinaryBuilder::with_capacity(capacity, <span class="number">1024</span>)),
         DataType::FixedSizeBinary(len) =&gt; {
             Box::new(FixedSizeBinaryBuilder::with_capacity(capacity, <span class="kw-2">*</span>len))
         }
         DataType::Decimal128(p, s) =&gt; Box::new(
-            Decimal128Builder::with_capacity(capacity)
-                .with_data_type(DataType::Decimal128(<span class="kw-2">*</span>p, <span class="kw-2">*</span>s)),
+            Decimal128Builder::with_capacity(capacity).with_data_type(DataType::Decimal128(<span class="kw-2">*</span>p, <span class="kw-2">*</span>s)),
         ),
         DataType::Decimal256(p, s) =&gt; Box::new(
-            Decimal256Builder::with_capacity(capacity)
-                .with_data_type(DataType::Decimal256(<span class="kw-2">*</span>p, <span class="kw-2">*</span>s)),
+            Decimal256Builder::with_capacity(capacity).with_data_type(DataType::Decimal256(<span class="kw-2">*</span>p, <span class="kw-2">*</span>s)),
         ),
         DataType::Utf8 =&gt; Box::new(StringBuilder::with_capacity(capacity, <span class="number">1024</span>)),
-        DataType::LargeUtf8 =&gt; {
-            Box::new(LargeStringBuilder::with_capacity(capacity, <span class="number">1024</span>))
-        }
+        DataType::LargeUtf8 =&gt; Box::new(LargeStringBuilder::with_capacity(capacity, <span class="number">1024</span>)),
         DataType::Date32 =&gt; Box::new(Date32Builder::with_capacity(capacity)),
         DataType::Date64 =&gt; Box::new(Date64Builder::with_capacity(capacity)),
         DataType::Time32(TimeUnit::Second) =&gt; {
@@ -797,19 +774,14 @@
         DataType::Duration(TimeUnit::Nanosecond) =&gt; {
             Box::new(DurationNanosecondBuilder::with_capacity(capacity))
         }
-        DataType::Struct(fields) =&gt; {
-            Box::new(StructBuilder::from_fields(fields.clone(), capacity))
-        }
+        DataType::Struct(fields) =&gt; Box::new(StructBuilder::from_fields(fields.clone(), capacity)),
         t =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Data type {t:?} is not currently supported&quot;</span>),
     }
 }
 
 <span class="kw">impl </span>StructBuilder {
     <span class="doccomment">/// Creates a new `StructBuilder`
-    </span><span class="kw">pub fn </span>new(
-        fields: <span class="kw">impl </span>Into&lt;Fields&gt;,
-        field_builders: Vec&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;,
-    ) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>new(fields: <span class="kw">impl </span>Into&lt;Fields&gt;, field_builders: Vec&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             field_builders,
             fields: fields.into(),
@@ -856,10 +828,7 @@
     </span><span class="kw">pub fn </span>finish(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; StructArray {
         <span class="self">self</span>.validate_content();
         <span class="kw">if </span><span class="self">self</span>.fields.is_empty() {
-            <span class="kw">return </span>StructArray::new_empty_fields(
-                <span class="self">self</span>.len(),
-                <span class="self">self</span>.null_buffer_builder.finish(),
-            );
+            <span class="kw">return </span>StructArray::new_empty_fields(<span class="self">self</span>.len(), <span class="self">self</span>.null_buffer_builder.finish());
         }
 
         <span class="kw">let </span>arrays = <span class="self">self</span>.field_builders.iter_mut().map(|f| f.finish()).collect();
@@ -1146,8 +1115,7 @@
         expected = <span class="string">&quot;Data type List(Field { name: \&quot;item\&quot;, data_type: Int64, nullable: true, dict_id: 0, dict_is_ordered: false, metadata: {} }) is not currently supported&quot;
     </span>)]
     </span><span class="kw">fn </span>test_struct_array_builder_from_schema_unsupported_type() {
-        <span class="kw">let </span>list_type =
-            DataType::List(Arc::new(Field::new(<span class="string">&quot;item&quot;</span>, DataType::Int64, <span class="bool-val">true</span>)));
+        <span class="kw">let </span>list_type = DataType::List(Arc::new(Field::new(<span class="string">&quot;item&quot;</span>, DataType::Int64, <span class="bool-val">true</span>)));
         <span class="kw">let </span>fields = <span class="macro">vec!</span>[
             Field::new(<span class="string">&quot;f1&quot;</span>, DataType::Int16, <span class="bool-val">false</span>),
             Field::new(<span class="string">&quot;f2&quot;</span>, list_type, <span class="bool-val">false</span>),
@@ -1193,9 +1161,7 @@
     }
 
     <span class="attr">#[test]
-    #[should_panic(
-        expected = <span class="string">&quot;Number of fields is not equal to the number of field_builders.&quot;
-    </span>)]
+    #[should_panic(expected = <span class="string">&quot;Number of fields is not equal to the number of field_builders.&quot;</span>)]
     </span><span class="kw">fn </span>test_struct_array_builder_unequal_field_field_builders() {
         <span class="kw">let </span>int_builder = Int32Builder::with_capacity(<span class="number">10</span>);
 

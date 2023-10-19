@@ -148,7 +148,6 @@
 <a href="#148" id="148">148</a>
 <a href="#149" id="149">149</a>
 <a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -170,9 +169,9 @@
 
 <span class="kw">use </span>arrow_flight::{
     flight_descriptor::DescriptorType, flight_service_server::FlightService,
-    flight_service_server::FlightServiceServer, Action, ActionType, Criteria, Empty,
-    FlightData, FlightDescriptor, FlightInfo, HandshakeRequest, HandshakeResponse,
-    PutResult, SchemaResult, Ticket,
+    flight_service_server::FlightServiceServer, Action, ActionType, Criteria, Empty, FlightData,
+    FlightDescriptor, FlightInfo, HandshakeRequest, HandshakeResponse, PutResult, SchemaResult,
+    Ticket,
 };
 <span class="kw">use </span>futures::Stream;
 <span class="kw">use </span>tonic::{transport::Server, Request, Response, Status, Streaming};
@@ -244,8 +243,7 @@
 
         <span class="kw">let </span>descriptor = request.into_inner();
 
-        <span class="kw">if </span>descriptor.r#type == DescriptorType::Cmd <span class="kw">as </span>i32
-            &amp;&amp; descriptor.cmd.as_ref() == <span class="string">b&quot;success&quot;
+        <span class="kw">if </span>descriptor.r#type == DescriptorType::Cmd <span class="kw">as </span>i32 &amp;&amp; descriptor.cmd.as_ref() == <span class="string">b&quot;success&quot;
         </span>{
             <span class="comment">// Return a fake location - the test doesn&#39;t read it
             </span><span class="kw">let </span>endpoint = <span class="kw">super</span>::endpoint(<span class="string">&quot;foo&quot;</span>, <span class="string">&quot;grpc+tcp://localhost:10010&quot;</span>);

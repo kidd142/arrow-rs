@@ -186,8 +186,6 @@
 <a href="#186" id="186">186</a>
 <a href="#187" id="187">187</a>
 <a href="#188" id="188">188</a>
-<a href="#189" id="189">189</a>
-<a href="#190" id="190">190</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -232,8 +230,7 @@
     </span><span class="kw">let </span>chunks = BitChunks::new(data, offset_read + bits_to_align, len - bits_to_align);
     chunks.iter().for_each(|chunk| {
         null_count += chunk.count_zeros();
-        write_data[write_byte_index..write_byte_index + <span class="number">8</span>]
-            .copy_from_slice(<span class="kw-2">&amp;</span>chunk.to_le_bytes());
+        write_data[write_byte_index..write_byte_index + <span class="number">8</span>].copy_from_slice(<span class="kw-2">&amp;</span>chunk.to_le_bytes());
         write_byte_index += <span class="number">8</span>;
     });
 
@@ -260,8 +257,8 @@
     </span><span class="kw">fn </span>test_set_bits_aligned() {
         <span class="kw">let </span><span class="kw-2">mut </span>destination: Vec&lt;u8&gt; = <span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>];
         <span class="kw">let </span>source: <span class="kw-2">&amp;</span>[u8] = <span class="kw-2">&amp;</span>[
-            <span class="number">0b11100111</span>, <span class="number">0b10100101</span>, <span class="number">0b10011001</span>, <span class="number">0b11011011</span>, <span class="number">0b11101011</span>, <span class="number">0b11000011</span>,
-            <span class="number">0b11100111</span>, <span class="number">0b10100101</span>,
+            <span class="number">0b11100111</span>, <span class="number">0b10100101</span>, <span class="number">0b10011001</span>, <span class="number">0b11011011</span>, <span class="number">0b11101011</span>, <span class="number">0b11000011</span>, <span class="number">0b11100111</span>,
+            <span class="number">0b10100101</span>,
         ];
 
         <span class="kw">let </span>destination_offset = <span class="number">8</span>;
@@ -270,8 +267,8 @@
         <span class="kw">let </span>len = <span class="number">64</span>;
 
         <span class="kw">let </span>expected_data: <span class="kw-2">&amp;</span>[u8] = <span class="kw-2">&amp;</span>[
-            <span class="number">0</span>, <span class="number">0b11100111</span>, <span class="number">0b10100101</span>, <span class="number">0b10011001</span>, <span class="number">0b11011011</span>, <span class="number">0b11101011</span>, <span class="number">0b11000011</span>,
-            <span class="number">0b11100111</span>, <span class="number">0b10100101</span>, <span class="number">0</span>,
+            <span class="number">0</span>, <span class="number">0b11100111</span>, <span class="number">0b10100101</span>, <span class="number">0b10011001</span>, <span class="number">0b11011011</span>, <span class="number">0b11101011</span>, <span class="number">0b11000011</span>, <span class="number">0b11100111</span>,
+            <span class="number">0b10100101</span>, <span class="number">0</span>,
         ];
         <span class="kw">let </span>expected_null_count = <span class="number">24</span>;
         <span class="kw">let </span>result = set_bits(
@@ -290,8 +287,8 @@
     </span><span class="kw">fn </span>test_set_bits_unaligned_destination_start() {
         <span class="kw">let </span><span class="kw-2">mut </span>destination: Vec&lt;u8&gt; = <span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>];
         <span class="kw">let </span>source: <span class="kw-2">&amp;</span>[u8] = <span class="kw-2">&amp;</span>[
-            <span class="number">0b11100111</span>, <span class="number">0b10100101</span>, <span class="number">0b10011001</span>, <span class="number">0b11011011</span>, <span class="number">0b11101011</span>, <span class="number">0b11000011</span>,
-            <span class="number">0b11100111</span>, <span class="number">0b10100101</span>,
+            <span class="number">0b11100111</span>, <span class="number">0b10100101</span>, <span class="number">0b10011001</span>, <span class="number">0b11011011</span>, <span class="number">0b11101011</span>, <span class="number">0b11000011</span>, <span class="number">0b11100111</span>,
+            <span class="number">0b10100101</span>,
         ];
 
         <span class="kw">let </span>destination_offset = <span class="number">3</span>;
@@ -300,8 +297,8 @@
         <span class="kw">let </span>len = <span class="number">64</span>;
 
         <span class="kw">let </span>expected_data: <span class="kw-2">&amp;</span>[u8] = <span class="kw-2">&amp;</span>[
-            <span class="number">0b00111000</span>, <span class="number">0b00101111</span>, <span class="number">0b11001101</span>, <span class="number">0b11011100</span>, <span class="number">0b01011110</span>, <span class="number">0b00011111</span>,
-            <span class="number">0b00111110</span>, <span class="number">0b00101111</span>, <span class="number">0b00000101</span>, <span class="number">0b00000000</span>,
+            <span class="number">0b00111000</span>, <span class="number">0b00101111</span>, <span class="number">0b11001101</span>, <span class="number">0b11011100</span>, <span class="number">0b01011110</span>, <span class="number">0b00011111</span>, <span class="number">0b00111110</span>,
+            <span class="number">0b00101111</span>, <span class="number">0b00000101</span>, <span class="number">0b00000000</span>,
         ];
         <span class="kw">let </span>expected_null_count = <span class="number">24</span>;
         <span class="kw">let </span>result = set_bits(
@@ -320,8 +317,8 @@
     </span><span class="kw">fn </span>test_set_bits_unaligned_destination_end() {
         <span class="kw">let </span><span class="kw-2">mut </span>destination: Vec&lt;u8&gt; = <span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>];
         <span class="kw">let </span>source: <span class="kw-2">&amp;</span>[u8] = <span class="kw-2">&amp;</span>[
-            <span class="number">0b11100111</span>, <span class="number">0b10100101</span>, <span class="number">0b10011001</span>, <span class="number">0b11011011</span>, <span class="number">0b11101011</span>, <span class="number">0b11000011</span>,
-            <span class="number">0b11100111</span>, <span class="number">0b10100101</span>,
+            <span class="number">0b11100111</span>, <span class="number">0b10100101</span>, <span class="number">0b10011001</span>, <span class="number">0b11011011</span>, <span class="number">0b11101011</span>, <span class="number">0b11000011</span>, <span class="number">0b11100111</span>,
+            <span class="number">0b10100101</span>,
         ];
 
         <span class="kw">let </span>destination_offset = <span class="number">8</span>;
@@ -330,8 +327,8 @@
         <span class="kw">let </span>len = <span class="number">62</span>;
 
         <span class="kw">let </span>expected_data: <span class="kw-2">&amp;</span>[u8] = <span class="kw-2">&amp;</span>[
-            <span class="number">0</span>, <span class="number">0b11100111</span>, <span class="number">0b10100101</span>, <span class="number">0b10011001</span>, <span class="number">0b11011011</span>, <span class="number">0b11101011</span>, <span class="number">0b11000011</span>,
-            <span class="number">0b11100111</span>, <span class="number">0b00100101</span>, <span class="number">0</span>,
+            <span class="number">0</span>, <span class="number">0b11100111</span>, <span class="number">0b10100101</span>, <span class="number">0b10011001</span>, <span class="number">0b11011011</span>, <span class="number">0b11101011</span>, <span class="number">0b11000011</span>, <span class="number">0b11100111</span>,
+            <span class="number">0b00100101</span>, <span class="number">0</span>,
         ];
         <span class="kw">let </span>expected_null_count = <span class="number">23</span>;
         <span class="kw">let </span>result = set_bits(
@@ -350,9 +347,9 @@
     </span><span class="kw">fn </span>test_set_bits_unaligned() {
         <span class="kw">let </span><span class="kw-2">mut </span>destination: Vec&lt;u8&gt; = <span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>];
         <span class="kw">let </span>source: <span class="kw-2">&amp;</span>[u8] = <span class="kw-2">&amp;</span>[
-            <span class="number">0b11100111</span>, <span class="number">0b10100101</span>, <span class="number">0b10011001</span>, <span class="number">0b11011011</span>, <span class="number">0b11101011</span>, <span class="number">0b11000011</span>,
-            <span class="number">0b11100111</span>, <span class="number">0b10100101</span>, <span class="number">0b10011001</span>, <span class="number">0b11011011</span>, <span class="number">0b11101011</span>, <span class="number">0b11000011</span>,
-            <span class="number">0b11100111</span>, <span class="number">0b10100101</span>, <span class="number">0b10011001</span>, <span class="number">0b11011011</span>, <span class="number">0b11101011</span>, <span class="number">0b11000011</span>,
+            <span class="number">0b11100111</span>, <span class="number">0b10100101</span>, <span class="number">0b10011001</span>, <span class="number">0b11011011</span>, <span class="number">0b11101011</span>, <span class="number">0b11000011</span>, <span class="number">0b11100111</span>,
+            <span class="number">0b10100101</span>, <span class="number">0b10011001</span>, <span class="number">0b11011011</span>, <span class="number">0b11101011</span>, <span class="number">0b11000011</span>, <span class="number">0b11100111</span>, <span class="number">0b10100101</span>,
+            <span class="number">0b10011001</span>, <span class="number">0b11011011</span>, <span class="number">0b11101011</span>, <span class="number">0b11000011</span>,
         ];
 
         <span class="kw">let </span>destination_offset = <span class="number">3</span>;
@@ -361,9 +358,8 @@
         <span class="kw">let </span>len = <span class="number">95</span>;
 
         <span class="kw">let </span>expected_data: <span class="kw-2">&amp;</span>[u8] = <span class="kw-2">&amp;</span>[
-            <span class="number">0b01111000</span>, <span class="number">0b01101001</span>, <span class="number">0b11100110</span>, <span class="number">0b11110110</span>, <span class="number">0b11111010</span>, <span class="number">0b11110000</span>,
-            <span class="number">0b01111001</span>, <span class="number">0b01101001</span>, <span class="number">0b11100110</span>, <span class="number">0b11110110</span>, <span class="number">0b11111010</span>, <span class="number">0b11110000</span>,
-            <span class="number">0b00000001</span>,
+            <span class="number">0b01111000</span>, <span class="number">0b01101001</span>, <span class="number">0b11100110</span>, <span class="number">0b11110110</span>, <span class="number">0b11111010</span>, <span class="number">0b11110000</span>, <span class="number">0b01111001</span>,
+            <span class="number">0b01101001</span>, <span class="number">0b11100110</span>, <span class="number">0b11110110</span>, <span class="number">0b11111010</span>, <span class="number">0b11110000</span>, <span class="number">0b00000001</span>,
         ];
         <span class="kw">let </span>expected_null_count = <span class="number">35</span>;
         <span class="kw">let </span>result = set_bits(

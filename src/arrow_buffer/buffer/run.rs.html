@@ -228,10 +228,6 @@
 <a href="#228" id="228">228</a>
 <a href="#229" id="229">229</a>
 <a href="#230" id="230">230</a>
-<a href="#231" id="231">231</a>
-<a href="#232" id="232">232</a>
-<a href="#233" id="233">233</a>
-<a href="#234" id="234">234</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -344,11 +340,7 @@
     ///
     /// - `buffer` must contain strictly increasing values greater than zero
     /// - The last value of `buffer` must be greater than or equal to `offset + len`
-    </span><span class="kw">pub unsafe fn </span>new_unchecked(
-        run_ends: ScalarBuffer&lt;E&gt;,
-        offset: usize,
-        len: usize,
-    ) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub unsafe fn </span>new_unchecked(run_ends: ScalarBuffer&lt;E&gt;, offset: usize, len: usize) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             run_ends,
             offset,

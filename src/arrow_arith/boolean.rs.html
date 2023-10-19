@@ -879,23 +879,6 @@
 <a href="#879" id="879">879</a>
 <a href="#880" id="880">880</a>
 <a href="#881" id="881">881</a>
-<a href="#882" id="882">882</a>
-<a href="#883" id="883">883</a>
-<a href="#884" id="884">884</a>
-<a href="#885" id="885">885</a>
-<a href="#886" id="886">886</a>
-<a href="#887" id="887">887</a>
-<a href="#888" id="888">888</a>
-<a href="#889" id="889">889</a>
-<a href="#890" id="890">890</a>
-<a href="#891" id="891">891</a>
-<a href="#892" id="892">892</a>
-<a href="#893" id="893">893</a>
-<a href="#894" id="894">894</a>
-<a href="#895" id="895">895</a>
-<a href="#896" id="896">896</a>
-<a href="#897" id="897">897</a>
-<a href="#898" id="898">898</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -955,10 +938,7 @@
 /// # Fails
 ///
 /// If the operands have different lengths
-</span><span class="kw">pub fn </span>and_kleene(
-    left: <span class="kw-2">&amp;</span>BooleanArray,
-    right: <span class="kw-2">&amp;</span>BooleanArray,
-) -&gt; <span class="prelude-ty">Result</span>&lt;BooleanArray, ArrowError&gt; {
+</span><span class="kw">pub fn </span>and_kleene(left: <span class="kw-2">&amp;</span>BooleanArray, right: <span class="kw-2">&amp;</span>BooleanArray) -&gt; <span class="prelude-ty">Result</span>&lt;BooleanArray, ArrowError&gt; {
     <span class="kw">if </span>left.len() != right.len() {
         <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::ComputeError(
             <span class="string">&quot;Cannot perform bitwise operation on arrays of different length&quot;</span>.to_string(),
@@ -1053,10 +1033,7 @@
 /// # Fails
 ///
 /// If the operands have different lengths
-</span><span class="kw">pub fn </span>or_kleene(
-    left: <span class="kw-2">&amp;</span>BooleanArray,
-    right: <span class="kw-2">&amp;</span>BooleanArray,
-) -&gt; <span class="prelude-ty">Result</span>&lt;BooleanArray, ArrowError&gt; {
+</span><span class="kw">pub fn </span>or_kleene(left: <span class="kw-2">&amp;</span>BooleanArray, right: <span class="kw-2">&amp;</span>BooleanArray) -&gt; <span class="prelude-ty">Result</span>&lt;BooleanArray, ArrowError&gt; {
     <span class="kw">if </span>left.len() != right.len() {
         <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::ComputeError(
             <span class="string">&quot;Cannot perform bitwise operation on arrays of different length&quot;</span>.to_string(),
@@ -1155,10 +1132,7 @@
 /// let and_ab = and(&amp;a, &amp;b).unwrap();
 /// assert_eq!(and_ab, BooleanArray::from(vec![Some(false), Some(true), None]));
 /// ```
-</span><span class="kw">pub fn </span>and(
-    left: <span class="kw-2">&amp;</span>BooleanArray,
-    right: <span class="kw-2">&amp;</span>BooleanArray,
-) -&gt; <span class="prelude-ty">Result</span>&lt;BooleanArray, ArrowError&gt; {
+</span><span class="kw">pub fn </span>and(left: <span class="kw-2">&amp;</span>BooleanArray, right: <span class="kw-2">&amp;</span>BooleanArray) -&gt; <span class="prelude-ty">Result</span>&lt;BooleanArray, ArrowError&gt; {
     binary_boolean_kernel(left, right, |a, b| a &amp; b)
 }
 
@@ -1479,8 +1453,7 @@
         <span class="kw">let </span>a = a.as_any().downcast_ref::&lt;BooleanArray&gt;().unwrap();
         <span class="kw">let </span>c = not(a).unwrap();
 
-        <span class="kw">let </span>expected =
-            BooleanArray::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="bool-val">false</span>), <span class="prelude-val">Some</span>(<span class="bool-val">true</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)]);
+        <span class="kw">let </span>expected = BooleanArray::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="bool-val">false</span>), <span class="prelude-val">Some</span>(<span class="bool-val">true</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)]);
 
         <span class="macro">assert_eq!</span>(c, expected);
     }
@@ -1529,12 +1502,10 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_bool_array_and_sliced_same_offset() {
         <span class="kw">let </span>a = BooleanArray::from(<span class="macro">vec!</span>[
-            <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>,
-            <span class="bool-val">true</span>,
+            <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>,
         ]);
         <span class="kw">let </span>b = BooleanArray::from(<span class="macro">vec!</span>[
-            <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>,
-            <span class="bool-val">true</span>,
+            <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>,
         ]);
 
         <span class="kw">let </span>a = a.slice(<span class="number">8</span>, <span class="number">4</span>);
@@ -1552,12 +1523,10 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_bool_array_and_sliced_same_offset_mod8() {
         <span class="kw">let </span>a = BooleanArray::from(<span class="macro">vec!</span>[
-            <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>,
-            <span class="bool-val">false</span>,
+            <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>,
         ]);
         <span class="kw">let </span>b = BooleanArray::from(<span class="macro">vec!</span>[
-            <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>,
-            <span class="bool-val">true</span>,
+            <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>,
         ]);
 
         <span class="kw">let </span>a = a.slice(<span class="number">0</span>, <span class="number">4</span>);
@@ -1575,8 +1544,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_bool_array_and_sliced_offset1() {
         <span class="kw">let </span>a = BooleanArray::from(<span class="macro">vec!</span>[
-            <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>,
-            <span class="bool-val">true</span>,
+            <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>,
         ]);
         <span class="kw">let </span>b = BooleanArray::from(<span class="macro">vec!</span>[<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>]);
 
@@ -1594,8 +1562,7 @@
     </span><span class="kw">fn </span>test_bool_array_and_sliced_offset2() {
         <span class="kw">let </span>a = BooleanArray::from(<span class="macro">vec!</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>]);
         <span class="kw">let </span>b = BooleanArray::from(<span class="macro">vec!</span>[
-            <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>,
-            <span class="bool-val">true</span>,
+            <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>,
         ]);
 
         <span class="kw">let </span>b = b.slice(<span class="number">8</span>, <span class="number">4</span>);
@@ -1628,8 +1595,7 @@
 
         <span class="kw">let </span>c = and(a, b).unwrap();
 
-        <span class="kw">let </span>expected =
-            BooleanArray::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="bool-val">false</span>), <span class="prelude-val">Some</span>(<span class="bool-val">false</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)]);
+        <span class="kw">let </span>expected = BooleanArray::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="bool-val">false</span>), <span class="prelude-val">Some</span>(<span class="bool-val">false</span>), <span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)]);
 
         <span class="macro">assert_eq!</span>(expected, c);
     }
