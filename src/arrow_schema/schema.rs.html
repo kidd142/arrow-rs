@@ -829,6 +829,15 @@
 <a href="#829" id="829">829</a>
 <a href="#830" id="830">830</a>
 <a href="#831" id="831">831</a>
+<a href="#832" id="832">832</a>
+<a href="#833" id="833">833</a>
+<a href="#834" id="834">834</a>
+<a href="#835" id="835">835</a>
+<a href="#836" id="836">836</a>
+<a href="#837" id="837">837</a>
+<a href="#838" id="838">838</a>
+<a href="#839" id="839">839</a>
+<a href="#840" id="840">840</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -877,6 +886,15 @@
     <span class="doccomment">/// Appends a [`FieldRef`] to this [`SchemaBuilder`] without checking for collision
     </span><span class="kw">pub fn </span>push(<span class="kw-2">&amp;mut </span><span class="self">self</span>, field: <span class="kw">impl </span>Into&lt;FieldRef&gt;) {
         <span class="self">self</span>.fields.push(field.into())
+    }
+
+    <span class="doccomment">/// Removes and returns the [`FieldRef`] as index `idx`
+    ///
+    /// # Panics
+    ///
+    /// Panics if index out of bounds
+    </span><span class="kw">pub fn </span>remove(<span class="kw-2">&amp;mut </span><span class="self">self</span>, idx: usize) -&gt; FieldRef {
+        <span class="self">self</span>.fields.remove(idx)
     }
 
     <span class="doccomment">/// Appends a [`FieldRef`] to this [`SchemaBuilder`] checking for collision
