@@ -10,6 +10,7 @@ fields lined up with the schema.</p>
 <span class="kw">use </span>parquet::file::writer::SerializedFileWriter;
 
 <span class="kw">use </span>std::sync::Arc;
+
 <span class="attr">#[derive(ParquetRecordWriter)]
 </span><span class="kw">struct </span>ACompleteRecord&lt;<span class="lifetime">&#39;a</span>&gt; {
   <span class="kw">pub </span>a_bool: bool,

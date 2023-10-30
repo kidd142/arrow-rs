@@ -29,6 +29,10 @@
 <a href="#29" id="29">29</a>
 <a href="#30" id="30">30</a>
 <a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -51,7 +55,11 @@
 <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::errors::ParquetError;
 <span class="kw">use </span><span class="kw">super</span>::<span class="kw">super</span>::file::writer::SerializedRowGroupWriter;
 
-<span class="kw">pub trait </span>RecordWriter&lt;T&gt; {
+<span class="doccomment">/// `write_to_row_group` writes from `self` into `row_group_writer`
+/// `schema` builds the schema used by `row_group_writer`
+/// The type parameter `T` is used to work around the rust orphan rule
+/// when implementing on types such as `&amp;[T]`.
+</span><span class="kw">pub trait </span>RecordWriter&lt;T&gt; {
     <span class="kw">fn </span>write_to_row_group&lt;W: std::io::Write + Send&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         row_group_writer: <span class="kw-2">&amp;mut </span>SerializedRowGroupWriter&lt;W&gt;,
