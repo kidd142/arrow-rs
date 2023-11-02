@@ -4,7 +4,7 @@ where a partition consists of the set of consecutive rows with equal values</p>
 have the same number of rows.</p>
 <h2 id="example"><a href="#example">Example:</a></h2>
 <p>For example, given columns <code>x</code>, <code>y</code> and <code>z</code>, calling
-<code>lexicographical_partition_ranges(values, (x, y))</code> will divide the
+<a href="fn.partition.html" title="fn arrow_ord::partition::partition"><code>partition</code></a><code>(values, (x, y))</code> will divide the
 rows into ranges where the values of <code>(x, y)</code> are equal:</p>
 <div class="example-wrap"><pre class="language-text"><code>┌ ─ ┬───┬ ─ ─┌───┐─ ─ ┬───┬ ─ ─ ┐
     │ 1 │    │ 1 │    │ A │        Range: 0..1 (x=1, y=1)

@@ -314,6 +314,7 @@
 <a href="#314" id="314">314</a>
 <a href="#315" id="315">315</a>
 <a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -394,7 +395,7 @@
 /// # Example:
 ///
 /// For example, given columns `x`, `y` and `z`, calling
-/// `lexicographical_partition_ranges(values, (x, y))` will divide the
+/// [`partition`]`(values, (x, y))` will divide the
 /// rows into ranges where the values of `(x, y)` are equal:
 ///
 /// ```text
@@ -476,8 +477,9 @@
     <span class="prelude-val">Ok</span>(distinct(<span class="kw-2">&amp;</span>v1, <span class="kw-2">&amp;</span>v2)<span class="question-mark">?</span>.values().clone())
 }
 
-<span class="doccomment">/// Given a list of already sorted columns, find partition ranges that would partition
-/// lexicographically equal values across columns.
+<span class="doccomment">/// Use [`partition`] instead. Given a list of already sorted columns, find
+/// partition ranges that would partition lexicographically equal values across
+/// columns.
 ///
 /// The returned vec would be of size k where k is cardinality of the sorted values; Consecutive
 /// values will be connected: (a, b) and (b, c), where start = 0 and end = n for the first and last
