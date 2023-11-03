@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-cast/src/cast.rs`."><title>cast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_cast" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0-nightly (75b064d26 2023-11-01)" data-channel="nightly" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-cast/src/cast.rs`."><title>cast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_cast" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0-nightly (a2f5f9691 2023-11-02)" data-channel="nightly" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -8759,6 +8759,81 @@
 <a href="#8759" id="8759">8759</a>
 <a href="#8760" id="8760">8760</a>
 <a href="#8761" id="8761">8761</a>
+<a href="#8762" id="8762">8762</a>
+<a href="#8763" id="8763">8763</a>
+<a href="#8764" id="8764">8764</a>
+<a href="#8765" id="8765">8765</a>
+<a href="#8766" id="8766">8766</a>
+<a href="#8767" id="8767">8767</a>
+<a href="#8768" id="8768">8768</a>
+<a href="#8769" id="8769">8769</a>
+<a href="#8770" id="8770">8770</a>
+<a href="#8771" id="8771">8771</a>
+<a href="#8772" id="8772">8772</a>
+<a href="#8773" id="8773">8773</a>
+<a href="#8774" id="8774">8774</a>
+<a href="#8775" id="8775">8775</a>
+<a href="#8776" id="8776">8776</a>
+<a href="#8777" id="8777">8777</a>
+<a href="#8778" id="8778">8778</a>
+<a href="#8779" id="8779">8779</a>
+<a href="#8780" id="8780">8780</a>
+<a href="#8781" id="8781">8781</a>
+<a href="#8782" id="8782">8782</a>
+<a href="#8783" id="8783">8783</a>
+<a href="#8784" id="8784">8784</a>
+<a href="#8785" id="8785">8785</a>
+<a href="#8786" id="8786">8786</a>
+<a href="#8787" id="8787">8787</a>
+<a href="#8788" id="8788">8788</a>
+<a href="#8789" id="8789">8789</a>
+<a href="#8790" id="8790">8790</a>
+<a href="#8791" id="8791">8791</a>
+<a href="#8792" id="8792">8792</a>
+<a href="#8793" id="8793">8793</a>
+<a href="#8794" id="8794">8794</a>
+<a href="#8795" id="8795">8795</a>
+<a href="#8796" id="8796">8796</a>
+<a href="#8797" id="8797">8797</a>
+<a href="#8798" id="8798">8798</a>
+<a href="#8799" id="8799">8799</a>
+<a href="#8800" id="8800">8800</a>
+<a href="#8801" id="8801">8801</a>
+<a href="#8802" id="8802">8802</a>
+<a href="#8803" id="8803">8803</a>
+<a href="#8804" id="8804">8804</a>
+<a href="#8805" id="8805">8805</a>
+<a href="#8806" id="8806">8806</a>
+<a href="#8807" id="8807">8807</a>
+<a href="#8808" id="8808">8808</a>
+<a href="#8809" id="8809">8809</a>
+<a href="#8810" id="8810">8810</a>
+<a href="#8811" id="8811">8811</a>
+<a href="#8812" id="8812">8812</a>
+<a href="#8813" id="8813">8813</a>
+<a href="#8814" id="8814">8814</a>
+<a href="#8815" id="8815">8815</a>
+<a href="#8816" id="8816">8816</a>
+<a href="#8817" id="8817">8817</a>
+<a href="#8818" id="8818">8818</a>
+<a href="#8819" id="8819">8819</a>
+<a href="#8820" id="8820">8820</a>
+<a href="#8821" id="8821">8821</a>
+<a href="#8822" id="8822">8822</a>
+<a href="#8823" id="8823">8823</a>
+<a href="#8824" id="8824">8824</a>
+<a href="#8825" id="8825">8825</a>
+<a href="#8826" id="8826">8826</a>
+<a href="#8827" id="8827">8827</a>
+<a href="#8828" id="8828">8828</a>
+<a href="#8829" id="8829">8829</a>
+<a href="#8830" id="8830">8830</a>
+<a href="#8831" id="8831">8831</a>
+<a href="#8832" id="8832">8832</a>
+<a href="#8833" id="8833">8833</a>
+<a href="#8834" id="8834">8834</a>
+<a href="#8835" id="8835">8835</a>
+<a href="#8836" id="8836">8836</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -8963,6 +9038,8 @@
         ) =&gt; <span class="bool-val">true</span>,
         (Utf8 | LargeUtf8, <span class="kw">_</span>) =&gt; to_type.is_numeric() &amp;&amp; to_type != <span class="kw-2">&amp;</span>Float16,
         (<span class="kw">_</span>, Utf8 | LargeUtf8) =&gt; from_type.is_primitive(),
+
+        (<span class="kw">_</span>, Binary | LargeBinary) =&gt; from_type.is_integer(),
 
         <span class="comment">// start numeric casts
         </span>(
@@ -10129,6 +10206,28 @@
         (from_type, Utf8) <span class="kw">if </span>from_type.is_primitive() =&gt; {
             value_to_string::&lt;i32&gt;(array, cast_options)
         }
+        (from_type, Binary) <span class="kw">if </span>from_type.is_integer() =&gt; <span class="kw">match </span>from_type {
+            UInt8 =&gt; cast_numeric_to_binary::&lt;UInt8Type, i32&gt;(array),
+            UInt16 =&gt; cast_numeric_to_binary::&lt;UInt16Type, i32&gt;(array),
+            UInt32 =&gt; cast_numeric_to_binary::&lt;UInt32Type, i32&gt;(array),
+            UInt64 =&gt; cast_numeric_to_binary::&lt;UInt64Type, i32&gt;(array),
+            Int8 =&gt; cast_numeric_to_binary::&lt;Int8Type, i32&gt;(array),
+            Int16 =&gt; cast_numeric_to_binary::&lt;Int16Type, i32&gt;(array),
+            Int32 =&gt; cast_numeric_to_binary::&lt;Int32Type, i32&gt;(array),
+            Int64 =&gt; cast_numeric_to_binary::&lt;Int64Type, i32&gt;(array),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
+        },
+        (from_type, LargeBinary) <span class="kw">if </span>from_type.is_integer() =&gt; <span class="kw">match </span>from_type {
+            UInt8 =&gt; cast_numeric_to_binary::&lt;UInt8Type, i64&gt;(array),
+            UInt16 =&gt; cast_numeric_to_binary::&lt;UInt16Type, i64&gt;(array),
+            UInt32 =&gt; cast_numeric_to_binary::&lt;UInt32Type, i64&gt;(array),
+            UInt64 =&gt; cast_numeric_to_binary::&lt;UInt64Type, i64&gt;(array),
+            Int8 =&gt; cast_numeric_to_binary::&lt;Int8Type, i64&gt;(array),
+            Int16 =&gt; cast_numeric_to_binary::&lt;Int16Type, i64&gt;(array),
+            Int32 =&gt; cast_numeric_to_binary::&lt;Int32Type, i64&gt;(array),
+            Int64 =&gt; cast_numeric_to_binary::&lt;Int64Type, i64&gt;(array),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
+        },
         <span class="comment">// start numeric casts
         </span>(UInt8, UInt16) =&gt; cast_numeric_arrays::&lt;UInt8Type, UInt16Type&gt;(array, cast_options),
         (UInt8, UInt32) =&gt; cast_numeric_arrays::&lt;UInt8Type, UInt32Type&gt;(array, cast_options),
@@ -11076,6 +11175,19 @@
         }
     }
     <span class="prelude-val">Ok</span>(Arc::new(builder.finish()))
+}
+
+<span class="kw">fn </span>cast_numeric_to_binary&lt;FROM: ArrowPrimitiveType, O: OffsetSizeTrait&gt;(
+    array: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Array,
+) -&gt; <span class="prelude-ty">Result</span>&lt;ArrayRef, ArrowError&gt; {
+    <span class="kw">let </span>array = array.as_primitive::&lt;FROM&gt;();
+    <span class="kw">let </span>size = std::mem::size_of::&lt;FROM::Native&gt;();
+    <span class="kw">let </span>offsets = OffsetBuffer::from_lengths(std::iter::repeat(size).take(array.len()));
+    <span class="prelude-val">Ok</span>(Arc::new(GenericBinaryArray::&lt;O&gt;::new(
+        offsets,
+        array.values().inner().clone(),
+        array.nulls().cloned(),
+    )))
 }
 
 <span class="doccomment">/// Parse UTF-8
@@ -13934,6 +14046,44 @@
         <span class="kw">let </span>down_cast = array_ref.as_binary::&lt;i64&gt;();
         <span class="macro">assert_eq!</span>(bytes_1, down_cast.value(<span class="number">0</span>));
         <span class="macro">assert_eq!</span>(bytes_2, down_cast.value(<span class="number">1</span>));
+        <span class="macro">assert!</span>(down_cast.is_null(<span class="number">2</span>));
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_numeric_to_binary() {
+        <span class="kw">let </span>a = Int16Array::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">511</span>), <span class="prelude-val">None</span>]);
+
+        <span class="kw">let </span>array_ref = cast(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>DataType::Binary).unwrap();
+        <span class="kw">let </span>down_cast = array_ref.as_binary::&lt;i32&gt;();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="number">1_i16</span>.to_le_bytes(), down_cast.value(<span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="number">511_i16</span>.to_le_bytes(), down_cast.value(<span class="number">1</span>));
+        <span class="macro">assert!</span>(down_cast.is_null(<span class="number">2</span>));
+
+        <span class="kw">let </span>a = Int64Array::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(-<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">123456789</span>), <span class="prelude-val">None</span>]);
+
+        <span class="kw">let </span>array_ref = cast(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>DataType::Binary).unwrap();
+        <span class="kw">let </span>down_cast = array_ref.as_binary::&lt;i32&gt;();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>(-<span class="number">1_i64</span>).to_le_bytes(), down_cast.value(<span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="number">123456789_i64</span>.to_le_bytes(), down_cast.value(<span class="number">1</span>));
+        <span class="macro">assert!</span>(down_cast.is_null(<span class="number">2</span>));
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_numeric_to_large_binary() {
+        <span class="kw">let </span>a = Int16Array::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">511</span>), <span class="prelude-val">None</span>]);
+
+        <span class="kw">let </span>array_ref = cast(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>DataType::LargeBinary).unwrap();
+        <span class="kw">let </span>down_cast = array_ref.as_binary::&lt;i64&gt;();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="number">1_i16</span>.to_le_bytes(), down_cast.value(<span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="number">511_i16</span>.to_le_bytes(), down_cast.value(<span class="number">1</span>));
+        <span class="macro">assert!</span>(down_cast.is_null(<span class="number">2</span>));
+
+        <span class="kw">let </span>a = Int64Array::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(-<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">123456789</span>), <span class="prelude-val">None</span>]);
+
+        <span class="kw">let </span>array_ref = cast(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>DataType::LargeBinary).unwrap();
+        <span class="kw">let </span>down_cast = array_ref.as_binary::&lt;i64&gt;();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>(-<span class="number">1_i64</span>).to_le_bytes(), down_cast.value(<span class="number">0</span>));
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="number">123456789_i64</span>.to_le_bytes(), down_cast.value(<span class="number">1</span>));
         <span class="macro">assert!</span>(down_cast.is_null(<span class="number">2</span>));
     }
 
