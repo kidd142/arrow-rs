@@ -1091,7 +1091,7 @@
             TapeElement::Null =&gt; out.push_str(<span class="string">&quot;null&quot;</span>),
             TapeElement::I64(high) =&gt; <span class="kw">match </span><span class="self">self</span>.get(idx + <span class="number">1</span>) {
                 TapeElement::I32(low) =&gt; {
-                    <span class="kw">let </span>val = (high <span class="kw">as </span>i64) &lt;&lt; <span class="number">32 </span>| low <span class="kw">as </span>i64;
+                    <span class="kw">let </span>val = (high <span class="kw">as </span>i64) &lt;&lt; <span class="number">32 </span>| (low <span class="kw">as </span>u32) <span class="kw">as </span>i64;
                     <span class="kw">let _ </span>= <span class="macro">write!</span>(out, <span class="string">&quot;{val}&quot;</span>);
                     <span class="kw">return </span>idx + <span class="number">2</span>;
                 }

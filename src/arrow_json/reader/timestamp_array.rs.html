@@ -106,6 +106,8 @@
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -204,7 +206,9 @@
                 }
                 TapeElement::I32(v) =&gt; builder.append_value(v <span class="kw">as </span>i64),
                 TapeElement::I64(high) =&gt; <span class="kw">match </span>tape.get(p + <span class="number">1</span>) {
-                    TapeElement::I32(low) =&gt; builder.append_value((high <span class="kw">as </span>i64) &lt;&lt; <span class="number">32 </span>| low <span class="kw">as </span>i64),
+                    TapeElement::I32(low) =&gt; {
+                        builder.append_value((high <span class="kw">as </span>i64) &lt;&lt; <span class="number">32 </span>| (low <span class="kw">as </span>u32) <span class="kw">as </span>i64)
+                    }
                     <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
                 },
                 <span class="kw">_ </span>=&gt; <span class="kw">return </span><span class="prelude-val">Err</span>(tape.error(<span class="kw-2">*</span>p, <span class="string">&quot;primitive&quot;</span>)),

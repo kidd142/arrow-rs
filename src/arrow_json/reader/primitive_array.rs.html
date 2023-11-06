@@ -301,7 +301,7 @@
                 },
                 TapeElement::I64(high) =&gt; <span class="kw">match </span>tape.get(p + <span class="number">1</span>) {
                     TapeElement::I32(low) =&gt; {
-                        <span class="kw">let </span>v = (high <span class="kw">as </span>i64) &lt;&lt; <span class="number">32 </span>| low <span class="kw">as </span>i64;
+                        <span class="kw">let </span>v = (high <span class="kw">as </span>i64) &lt;&lt; <span class="number">32 </span>| (low <span class="kw">as </span>u32) <span class="kw">as </span>i64;
                         <span class="kw">let </span>value = NumCast::from(v).ok_or_else(|| {
                             ArrowError::JsonError(<span class="macro">format!</span>(<span class="string">&quot;failed to parse {v} as {d}&quot;</span>,))
                         })<span class="question-mark">?</span>;
