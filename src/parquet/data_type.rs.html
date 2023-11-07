@@ -1914,7 +1914,7 @@
 
         <span class="doccomment">/// Return the value as i64 if possible
         ///
-        /// This is essentially the same as `std::convert::TryInto&lt;i64&gt;` but can
+        /// This is essentially the same as `std::convert::TryInto&lt;i64&gt;` but can&#39;t be
         /// implemented for `f32` and `f64`, types that would fail orphan rules
         </span><span class="kw">fn </span>as_i64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;i64&gt; {
             <span class="prelude-val">Err</span>(<span class="macro">general_err!</span>(<span class="string">&quot;Type cannot be converted to i64&quot;</span>))
@@ -1922,7 +1922,7 @@
 
         <span class="doccomment">/// Return the value as u64 if possible
         ///
-        /// This is essentially the same as `std::convert::TryInto&lt;u64&gt;` but can
+        /// This is essentially the same as `std::convert::TryInto&lt;u64&gt;` but can&#39;t be
         /// implemented for `f32` and `f64`, types that would fail orphan rules
         </span><span class="kw">fn </span>as_u64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span>&lt;u64&gt; {
             <span class="self">self</span>.as_i64()
