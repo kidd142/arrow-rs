@@ -2286,6 +2286,33 @@
 <a href="#2286" id="2286">2286</a>
 <a href="#2287" id="2287">2287</a>
 <a href="#2288" id="2288">2288</a>
+<a href="#2289" id="2289">2289</a>
+<a href="#2290" id="2290">2290</a>
+<a href="#2291" id="2291">2291</a>
+<a href="#2292" id="2292">2292</a>
+<a href="#2293" id="2293">2293</a>
+<a href="#2294" id="2294">2294</a>
+<a href="#2295" id="2295">2295</a>
+<a href="#2296" id="2296">2296</a>
+<a href="#2297" id="2297">2297</a>
+<a href="#2298" id="2298">2298</a>
+<a href="#2299" id="2299">2299</a>
+<a href="#2300" id="2300">2300</a>
+<a href="#2301" id="2301">2301</a>
+<a href="#2302" id="2302">2302</a>
+<a href="#2303" id="2303">2303</a>
+<a href="#2304" id="2304">2304</a>
+<a href="#2305" id="2305">2305</a>
+<a href="#2306" id="2306">2306</a>
+<a href="#2307" id="2307">2307</a>
+<a href="#2308" id="2308">2308</a>
+<a href="#2309" id="2309">2309</a>
+<a href="#2310" id="2310">2310</a>
+<a href="#2311" id="2311">2311</a>
+<a href="#2312" id="2312">2312</a>
+<a href="#2313" id="2313">2313</a>
+<a href="#2314" id="2314">2314</a>
+<a href="#2315" id="2315">2315</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -2503,8 +2530,21 @@
 // Mirrors `parquet::Encoding`
 
 </span><span class="doccomment">/// Encodings supported by Parquet.
+///
 /// Not all encodings are valid for all types. These enums are also used to specify the
 /// encoding of definition and repetition levels.
+///
+/// By default this crate uses [Encoding::PLAIN], [Encoding::RLE], and [Encoding::RLE_DICTIONARY].
+/// These provide very good encode and decode performance, whilst yielding reasonable storage
+/// efficiency and being supported by all major parquet readers.
+///
+/// The delta encodings are also supported and will be used if a newer [WriterVersion] is
+/// configured, however, it should be noted that these sacrifice encode and decode performance for
+/// improved storage efficiency. This performance regression is particularly pronounced in the case
+/// of record skipping as occurs during predicate push-down. It is recommended users assess the
+/// performance impact when evaluating these encodings.
+///
+/// [WriterVersion]: crate::file::properties::WriterVersion
 </span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
 #[allow(non_camel_case_types)]
 </span><span class="kw">pub enum </span>Encoding {
@@ -2591,7 +2631,21 @@
 <span class="comment">// ----------------------------------------------------------------------
 // Mirrors `parquet::CompressionCodec`
 
-</span><span class="doccomment">/// Supported compression algorithms.
+</span><span class="doccomment">/// Supported block compression algorithms.
+///
+/// Block compression can yield non-trivial improvements to storage efficiency at the expense
+/// of potentially significantly worse encode and decode performance. Many applications,
+/// especially those making use of high-throughput and low-cost commodity object storage,
+/// may find storage efficiency less important than decode throughput, and therefore may
+/// wish to not make use of block compression.
+///
+/// The writers in this crate default to no block compression for this reason.
+///
+/// Applications that do still wish to use block compression, will find [`Compression::ZSTD`]
+/// to provide a good balance of compression, performance, and ecosystem support. Alternatively,
+/// [`Compression::LZ4_RAW`] provides much faster decompression speeds, at the cost of typically
+/// worse compression ratios. However, it is not as widely supported by the ecosystem, with the
+/// Hadoop ecosystem historically favoring the non-standard and now deprecated [`Compression::LZ4`].
 </span><span class="attr">#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[allow(non_camel_case_types)]
 </span><span class="kw">pub enum </span>Compression {
