@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-cast/src/cast.rs`."><title>cast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_cast" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0-nightly (fee5518cd 2023-11-05)" data-channel="nightly" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-cast/src/cast.rs`."><title>cast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9ee3a5e31a2afa3e.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_cast" data-themes="" data-resource-suffix="" data-rustdoc-version="1.75.0-nightly (189d6c71f 2023-11-06)" data-channel="nightly" data-search-js="search-8fbf244ebcf71464.js" data-settings-js="settings-74424d7eec62a23e.js" ><script src="../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-9dd44ab47b99a0fb.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -8834,6 +8834,90 @@
 <a href="#8834" id="8834">8834</a>
 <a href="#8835" id="8835">8835</a>
 <a href="#8836" id="8836">8836</a>
+<a href="#8837" id="8837">8837</a>
+<a href="#8838" id="8838">8838</a>
+<a href="#8839" id="8839">8839</a>
+<a href="#8840" id="8840">8840</a>
+<a href="#8841" id="8841">8841</a>
+<a href="#8842" id="8842">8842</a>
+<a href="#8843" id="8843">8843</a>
+<a href="#8844" id="8844">8844</a>
+<a href="#8845" id="8845">8845</a>
+<a href="#8846" id="8846">8846</a>
+<a href="#8847" id="8847">8847</a>
+<a href="#8848" id="8848">8848</a>
+<a href="#8849" id="8849">8849</a>
+<a href="#8850" id="8850">8850</a>
+<a href="#8851" id="8851">8851</a>
+<a href="#8852" id="8852">8852</a>
+<a href="#8853" id="8853">8853</a>
+<a href="#8854" id="8854">8854</a>
+<a href="#8855" id="8855">8855</a>
+<a href="#8856" id="8856">8856</a>
+<a href="#8857" id="8857">8857</a>
+<a href="#8858" id="8858">8858</a>
+<a href="#8859" id="8859">8859</a>
+<a href="#8860" id="8860">8860</a>
+<a href="#8861" id="8861">8861</a>
+<a href="#8862" id="8862">8862</a>
+<a href="#8863" id="8863">8863</a>
+<a href="#8864" id="8864">8864</a>
+<a href="#8865" id="8865">8865</a>
+<a href="#8866" id="8866">8866</a>
+<a href="#8867" id="8867">8867</a>
+<a href="#8868" id="8868">8868</a>
+<a href="#8869" id="8869">8869</a>
+<a href="#8870" id="8870">8870</a>
+<a href="#8871" id="8871">8871</a>
+<a href="#8872" id="8872">8872</a>
+<a href="#8873" id="8873">8873</a>
+<a href="#8874" id="8874">8874</a>
+<a href="#8875" id="8875">8875</a>
+<a href="#8876" id="8876">8876</a>
+<a href="#8877" id="8877">8877</a>
+<a href="#8878" id="8878">8878</a>
+<a href="#8879" id="8879">8879</a>
+<a href="#8880" id="8880">8880</a>
+<a href="#8881" id="8881">8881</a>
+<a href="#8882" id="8882">8882</a>
+<a href="#8883" id="8883">8883</a>
+<a href="#8884" id="8884">8884</a>
+<a href="#8885" id="8885">8885</a>
+<a href="#8886" id="8886">8886</a>
+<a href="#8887" id="8887">8887</a>
+<a href="#8888" id="8888">8888</a>
+<a href="#8889" id="8889">8889</a>
+<a href="#8890" id="8890">8890</a>
+<a href="#8891" id="8891">8891</a>
+<a href="#8892" id="8892">8892</a>
+<a href="#8893" id="8893">8893</a>
+<a href="#8894" id="8894">8894</a>
+<a href="#8895" id="8895">8895</a>
+<a href="#8896" id="8896">8896</a>
+<a href="#8897" id="8897">8897</a>
+<a href="#8898" id="8898">8898</a>
+<a href="#8899" id="8899">8899</a>
+<a href="#8900" id="8900">8900</a>
+<a href="#8901" id="8901">8901</a>
+<a href="#8902" id="8902">8902</a>
+<a href="#8903" id="8903">8903</a>
+<a href="#8904" id="8904">8904</a>
+<a href="#8905" id="8905">8905</a>
+<a href="#8906" id="8906">8906</a>
+<a href="#8907" id="8907">8907</a>
+<a href="#8908" id="8908">8908</a>
+<a href="#8909" id="8909">8909</a>
+<a href="#8910" id="8910">8910</a>
+<a href="#8911" id="8911">8911</a>
+<a href="#8912" id="8912">8912</a>
+<a href="#8913" id="8913">8913</a>
+<a href="#8914" id="8914">8914</a>
+<a href="#8915" id="8915">8915</a>
+<a href="#8916" id="8916">8916</a>
+<a href="#8917" id="8917">8917</a>
+<a href="#8918" id="8918">8918</a>
+<a href="#8919" id="8919">8919</a>
+<a href="#8920" id="8920">8920</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -9063,8 +9147,8 @@
         (Time64(<span class="kw">_</span>), Time32(to_unit)) =&gt; {
             <span class="macro">matches!</span>(to_unit, Second | Millisecond)
         }
-        (Timestamp(<span class="kw">_</span>, <span class="kw">_</span>), Int64) =&gt; <span class="bool-val">true</span>,
-        (Int64, Timestamp(<span class="kw">_</span>, <span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
+        (Timestamp(<span class="kw">_</span>, <span class="kw">_</span>), <span class="kw">_</span>) <span class="kw">if </span>to_type.is_integer() =&gt; <span class="bool-val">true</span>,
+        (<span class="kw">_</span>, Timestamp(<span class="kw">_</span>, <span class="kw">_</span>)) <span class="kw">if </span>from_type.is_integer() =&gt; <span class="bool-val">true</span>,
         (Date64, Timestamp(<span class="kw">_</span>, <span class="prelude-val">None</span>)) =&gt; <span class="bool-val">true</span>,
         (Date32, Timestamp(<span class="kw">_</span>, <span class="prelude-val">None</span>)) =&gt; <span class="bool-val">true</span>,
         (
@@ -10457,24 +10541,31 @@
                 .unary::&lt;<span class="kw">_</span>, Time64MicrosecondType&gt;(|x| x / (NANOSECONDS / MICROSECONDS)),
         )),
 
-        (Timestamp(TimeUnit::Second, <span class="kw">_</span>), Int64) =&gt; {
-            cast_reinterpret_arrays::&lt;TimestampSecondType, Int64Type&gt;(array)
+        (Timestamp(TimeUnit::Second, <span class="kw">_</span>), <span class="kw">_</span>) <span class="kw">if </span>to_type.is_integer() =&gt; {
+            <span class="kw">let </span>array = cast_reinterpret_arrays::&lt;TimestampSecondType, Int64Type&gt;(array)<span class="question-mark">?</span>;
+            cast_with_options(<span class="kw-2">&amp;</span>array, to_type, cast_options)
         }
-        (Timestamp(TimeUnit::Millisecond, <span class="kw">_</span>), Int64) =&gt; {
-            cast_reinterpret_arrays::&lt;TimestampMillisecondType, Int64Type&gt;(array)
+        (Timestamp(TimeUnit::Millisecond, <span class="kw">_</span>), <span class="kw">_</span>) <span class="kw">if </span>to_type.is_integer() =&gt; {
+            <span class="kw">let </span>array = cast_reinterpret_arrays::&lt;TimestampMillisecondType, Int64Type&gt;(array)<span class="question-mark">?</span>;
+            cast_with_options(<span class="kw-2">&amp;</span>array, to_type, cast_options)
         }
-        (Timestamp(TimeUnit::Microsecond, <span class="kw">_</span>), Int64) =&gt; {
-            cast_reinterpret_arrays::&lt;TimestampMicrosecondType, Int64Type&gt;(array)
+        (Timestamp(TimeUnit::Microsecond, <span class="kw">_</span>), <span class="kw">_</span>) <span class="kw">if </span>to_type.is_integer() =&gt; {
+            <span class="kw">let </span>array = cast_reinterpret_arrays::&lt;TimestampMicrosecondType, Int64Type&gt;(array)<span class="question-mark">?</span>;
+            cast_with_options(<span class="kw-2">&amp;</span>array, to_type, cast_options)
         }
-        (Timestamp(TimeUnit::Nanosecond, <span class="kw">_</span>), Int64) =&gt; {
-            cast_reinterpret_arrays::&lt;TimestampNanosecondType, Int64Type&gt;(array)
+        (Timestamp(TimeUnit::Nanosecond, <span class="kw">_</span>), <span class="kw">_</span>) <span class="kw">if </span>to_type.is_integer() =&gt; {
+            <span class="kw">let </span>array = cast_reinterpret_arrays::&lt;TimestampNanosecondType, Int64Type&gt;(array)<span class="question-mark">?</span>;
+            cast_with_options(<span class="kw-2">&amp;</span>array, to_type, cast_options)
         }
 
-        (Int64, Timestamp(unit, tz)) =&gt; <span class="prelude-val">Ok</span>(make_timestamp_array(
-            array.as_primitive(),
-            unit.clone(),
-            tz.clone(),
-        )),
+        (<span class="kw">_</span>, Timestamp(unit, tz)) <span class="kw">if </span>from_type.is_integer() =&gt; {
+            <span class="kw">let </span>array = cast_with_options(array, <span class="kw-2">&amp;</span>Int64, cast_options)<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(make_timestamp_array(
+                array.as_primitive(),
+                unit.clone(),
+                tz.clone(),
+            ))
+        }
 
         (Timestamp(from_unit, from_tz), Timestamp(to_unit, to_tz)) =&gt; {
             <span class="kw">let </span>array = cast_with_options(array, <span class="kw-2">&amp;</span>Int64, cast_options)<span class="question-mark">?</span>;
@@ -13395,10 +13486,72 @@
     }
 
     <span class="attr">#[test]
-    #[should_panic(expected = <span class="string">&quot;Casting from Int32 to Timestamp(Microsecond, None) not supported&quot;</span>)]
-    </span><span class="kw">fn </span>test_cast_int32_to_timestamp() {
+    </span><span class="kw">fn </span>test_cast_integer_to_timestamp() {
+        <span class="kw">let </span>array = Int64Array::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="prelude-val">Some</span>(<span class="number">10</span>), <span class="prelude-val">None</span>]);
+        <span class="kw">let </span>expected = cast(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>DataType::Timestamp(TimeUnit::Microsecond, <span class="prelude-val">None</span>)).unwrap();
+
+        <span class="kw">let </span>array = Int8Array::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="prelude-val">Some</span>(<span class="number">10</span>), <span class="prelude-val">None</span>]);
+        <span class="kw">let </span>actual = cast(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>DataType::Timestamp(TimeUnit::Microsecond, <span class="prelude-val">None</span>)).unwrap();
+
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>actual, <span class="kw-2">&amp;</span>expected);
+
+        <span class="kw">let </span>array = Int16Array::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="prelude-val">Some</span>(<span class="number">10</span>), <span class="prelude-val">None</span>]);
+        <span class="kw">let </span>actual = cast(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>DataType::Timestamp(TimeUnit::Microsecond, <span class="prelude-val">None</span>)).unwrap();
+
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>actual, <span class="kw-2">&amp;</span>expected);
+
         <span class="kw">let </span>array = Int32Array::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="prelude-val">Some</span>(<span class="number">10</span>), <span class="prelude-val">None</span>]);
-        cast(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>DataType::Timestamp(TimeUnit::Microsecond, <span class="prelude-val">None</span>)).unwrap();
+        <span class="kw">let </span>actual = cast(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>DataType::Timestamp(TimeUnit::Microsecond, <span class="prelude-val">None</span>)).unwrap();
+
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>actual, <span class="kw-2">&amp;</span>expected);
+
+        <span class="kw">let </span>array = UInt8Array::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="prelude-val">Some</span>(<span class="number">10</span>), <span class="prelude-val">None</span>]);
+        <span class="kw">let </span>actual = cast(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>DataType::Timestamp(TimeUnit::Microsecond, <span class="prelude-val">None</span>)).unwrap();
+
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>actual, <span class="kw-2">&amp;</span>expected);
+
+        <span class="kw">let </span>array = UInt16Array::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="prelude-val">Some</span>(<span class="number">10</span>), <span class="prelude-val">None</span>]);
+        <span class="kw">let </span>actual = cast(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>DataType::Timestamp(TimeUnit::Microsecond, <span class="prelude-val">None</span>)).unwrap();
+
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>actual, <span class="kw-2">&amp;</span>expected);
+
+        <span class="kw">let </span>array = UInt32Array::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="prelude-val">Some</span>(<span class="number">10</span>), <span class="prelude-val">None</span>]);
+        <span class="kw">let </span>actual = cast(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>DataType::Timestamp(TimeUnit::Microsecond, <span class="prelude-val">None</span>)).unwrap();
+
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>actual, <span class="kw-2">&amp;</span>expected);
+
+        <span class="kw">let </span>array = UInt64Array::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="prelude-val">Some</span>(<span class="number">10</span>), <span class="prelude-val">None</span>]);
+        <span class="kw">let </span>actual = cast(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>DataType::Timestamp(TimeUnit::Microsecond, <span class="prelude-val">None</span>)).unwrap();
+
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>actual, <span class="kw-2">&amp;</span>expected);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_cast_timestamp_to_integer() {
+        <span class="kw">let </span>array = TimestampMillisecondArray::from(<span class="macro">vec!</span>[<span class="prelude-val">Some</span>(<span class="number">5</span>), <span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">None</span>])
+            .with_timezone(<span class="string">&quot;UTC&quot;</span>.to_string());
+        <span class="kw">let </span>expected = cast(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>DataType::Int64).unwrap();
+
+        <span class="kw">let </span>actual = cast(<span class="kw-2">&amp;</span>cast(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>DataType::Int8).unwrap(), <span class="kw-2">&amp;</span>DataType::Int64).unwrap();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>actual, <span class="kw-2">&amp;</span>expected);
+
+        <span class="kw">let </span>actual = cast(<span class="kw-2">&amp;</span>cast(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>DataType::Int16).unwrap(), <span class="kw-2">&amp;</span>DataType::Int64).unwrap();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>actual, <span class="kw-2">&amp;</span>expected);
+
+        <span class="kw">let </span>actual = cast(<span class="kw-2">&amp;</span>cast(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>DataType::Int32).unwrap(), <span class="kw-2">&amp;</span>DataType::Int64).unwrap();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>actual, <span class="kw-2">&amp;</span>expected);
+
+        <span class="kw">let </span>actual = cast(<span class="kw-2">&amp;</span>cast(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>DataType::UInt8).unwrap(), <span class="kw-2">&amp;</span>DataType::Int64).unwrap();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>actual, <span class="kw-2">&amp;</span>expected);
+
+        <span class="kw">let </span>actual = cast(<span class="kw-2">&amp;</span>cast(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>DataType::UInt16).unwrap(), <span class="kw-2">&amp;</span>DataType::Int64).unwrap();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>actual, <span class="kw-2">&amp;</span>expected);
+
+        <span class="kw">let </span>actual = cast(<span class="kw-2">&amp;</span>cast(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>DataType::UInt32).unwrap(), <span class="kw-2">&amp;</span>DataType::Int64).unwrap();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>actual, <span class="kw-2">&amp;</span>expected);
+
+        <span class="kw">let </span>actual = cast(<span class="kw-2">&amp;</span>cast(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>DataType::UInt64).unwrap(), <span class="kw-2">&amp;</span>DataType::Int64).unwrap();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>actual, <span class="kw-2">&amp;</span>expected);
     }
 
     <span class="attr">#[test]
@@ -13453,7 +13606,6 @@
     }
 
     <span class="attr">#[test]
-    #[should_panic(expected = <span class="string">&quot;Casting from Int32 to Timestamp(Microsecond, None) not supported&quot;</span>)]
     </span><span class="kw">fn </span>test_cast_list_i32_to_list_timestamp() {
         <span class="comment">// Construct a value array
         </span><span class="kw">let </span>value_data = Int32Array::from(<span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, -<span class="number">1</span>, -<span class="number">2</span>, -<span class="number">1</span>, <span class="number">2</span>, <span class="number">8</span>, <span class="number">100000000</span>]).into_data();
@@ -13470,7 +13622,7 @@
             .unwrap();
         <span class="kw">let </span>list_array = Arc::new(ListArray::from(list_data)) <span class="kw">as </span>ArrayRef;
 
-        cast(
+        <span class="kw">let </span>actual = cast(
             <span class="kw-2">&amp;</span>list_array,
             <span class="kw-2">&amp;</span>DataType::List(Arc::new(Field::new(
                 <span class="string">&quot;item&quot;</span>,
@@ -13479,6 +13631,22 @@
             ))),
         )
         .unwrap();
+
+        <span class="kw">let </span>expected = cast(
+            <span class="kw-2">&amp;</span>cast(
+                <span class="kw-2">&amp;</span>list_array,
+                <span class="kw-2">&amp;</span>DataType::List(Arc::new(Field::new(<span class="string">&quot;item&quot;</span>, DataType::Int64, <span class="bool-val">true</span>))),
+            )
+            .unwrap(),
+            <span class="kw-2">&amp;</span>DataType::List(Arc::new(Field::new(
+                <span class="string">&quot;item&quot;</span>,
+                DataType::Timestamp(TimeUnit::Microsecond, <span class="prelude-val">None</span>),
+                <span class="bool-val">true</span>,
+            ))),
+        )
+        .unwrap();
+
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>actual, <span class="kw-2">&amp;</span>expected);
     }
 
     <span class="attr">#[test]
