@@ -2313,6 +2313,17 @@
 <a href="#2313" id="2313">2313</a>
 <a href="#2314" id="2314">2314</a>
 <a href="#2315" id="2315">2315</a>
+<a href="#2316" id="2316">2316</a>
+<a href="#2317" id="2317">2317</a>
+<a href="#2318" id="2318">2318</a>
+<a href="#2319" id="2319">2319</a>
+<a href="#2320" id="2320">2320</a>
+<a href="#2321" id="2321">2321</a>
+<a href="#2322" id="2322">2322</a>
+<a href="#2323" id="2323">2323</a>
+<a href="#2324" id="2324">2324</a>
+<a href="#2325" id="2325">2325</a>
+<a href="#2326" id="2326">2326</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -2509,6 +2520,7 @@
     Json,
     Bson,
     Uuid,
+    Float16,
 }
 
 <span class="comment">// ----------------------------------------------------------------------
@@ -2820,6 +2832,7 @@
                 LogicalType::Timestamp { .. } =&gt; SortOrder::SIGNED,
                 LogicalType::Unknown =&gt; SortOrder::UNDEFINED,
                 LogicalType::Uuid =&gt; SortOrder::UNSIGNED,
+                LogicalType::Float16 =&gt; SortOrder::SIGNED,
             },
             <span class="comment">// Fall back to converted type
             </span><span class="prelude-val">None </span>=&gt; <span class="self">Self</span>::get_converted_sort_order(converted_type, physical_type),
@@ -3081,6 +3094,7 @@
             parquet::LogicalType::JSON(<span class="kw">_</span>) =&gt; LogicalType::Json,
             parquet::LogicalType::BSON(<span class="kw">_</span>) =&gt; LogicalType::Bson,
             parquet::LogicalType::UUID(<span class="kw">_</span>) =&gt; LogicalType::Uuid,
+            parquet::LogicalType::FLOAT16(<span class="kw">_</span>) =&gt; LogicalType::Float16,
         }
     }
 }
@@ -3121,6 +3135,7 @@
             LogicalType::Json =&gt; parquet::LogicalType::JSON(Default::default()),
             LogicalType::Bson =&gt; parquet::LogicalType::BSON(Default::default()),
             LogicalType::Uuid =&gt; parquet::LogicalType::UUID(Default::default()),
+            LogicalType::Float16 =&gt; parquet::LogicalType::FLOAT16(Default::default()),
         }
     }
 }
@@ -3168,10 +3183,11 @@
                     (<span class="number">64</span>, <span class="bool-val">false</span>) =&gt; ConvertedType::UINT_64,
                     t =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Integer type {t:?} is not supported&quot;</span>),
                 },
-                LogicalType::Unknown =&gt; ConvertedType::NONE,
                 LogicalType::Json =&gt; ConvertedType::JSON,
                 LogicalType::Bson =&gt; ConvertedType::BSON,
-                LogicalType::Uuid =&gt; ConvertedType::NONE,
+                LogicalType::Uuid | LogicalType::Float16 | LogicalType::Unknown =&gt; {
+                    ConvertedType::NONE
+                }
             },
             <span class="prelude-val">None </span>=&gt; ConvertedType::NONE,
         }
@@ -3417,6 +3433,7 @@
             <span class="string">&quot;INTERVAL&quot; </span>=&gt; <span class="prelude-val">Err</span>(<span class="macro">general_err!</span>(
                 <span class="string">&quot;Interval parquet logical type not yet supported&quot;
             </span>)),
+            <span class="string">&quot;FLOAT16&quot; </span>=&gt; <span class="prelude-val">Ok</span>(LogicalType::Float16),
             other =&gt; <span class="prelude-val">Err</span>(<span class="macro">general_err!</span>(<span class="string">&quot;Invalid parquet logical type {}&quot;</span>, other)),
         }
     }
@@ -4062,6 +4079,10 @@
             ConvertedType::ENUM
         );
         <span class="macro">assert_eq!</span>(
+            ConvertedType::from(<span class="prelude-val">Some</span>(LogicalType::Float16)),
+            ConvertedType::NONE
+        );
+        <span class="macro">assert_eq!</span>(
             ConvertedType::from(<span class="prelude-val">Some</span>(LogicalType::Unknown)),
             ConvertedType::NONE
         );
@@ -4434,6 +4455,7 @@
                 is_adjusted_to_u_t_c: <span class="bool-val">true</span>,
                 unit: TimeUnit::NANOS(Default::default()),
             },
+            LogicalType::Float16,
         ];
         check_sort_order(signed, SortOrder::SIGNED);
 

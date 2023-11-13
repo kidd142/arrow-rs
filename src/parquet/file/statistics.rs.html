@@ -764,6 +764,10 @@
 <a href="#764" id="764">764</a>
 <a href="#765" id="765">765</a>
 <a href="#766" id="766">766</a>
+<a href="#767" id="767">767</a>
+<a href="#768" id="768">768</a>
+<a href="#769" id="769">769</a>
+<a href="#770" id="770">770</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -1009,6 +1013,8 @@
         distinct_count: stats.distinct_count().map(|value| value <span class="kw">as </span>i64),
         max_value: <span class="prelude-val">None</span>,
         min_value: <span class="prelude-val">None</span>,
+        is_max_value_exact: <span class="prelude-val">None</span>,
+        is_min_value_exact: <span class="prelude-val">None</span>,
     };
 
     <span class="comment">// Get min/max if set.
@@ -1373,6 +1379,8 @@
             distinct_count: <span class="prelude-val">None</span>,
             max_value: <span class="prelude-val">None</span>,
             min_value: <span class="prelude-val">None</span>,
+            is_max_value_exact: <span class="prelude-val">None</span>,
+            is_min_value_exact: <span class="prelude-val">None</span>,
         };
 
         from_thrift(Type::INT32, <span class="prelude-val">Some</span>(thrift_stats)).unwrap();

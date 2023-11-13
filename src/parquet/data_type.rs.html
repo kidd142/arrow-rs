@@ -1277,6 +1277,13 @@
 <a href="#1277" id="1277">1277</a>
 <a href="#1278" id="1278">1278</a>
 <a href="#1279" id="1279">1279</a>
+<a href="#1280" id="1280">1280</a>
+<a href="#1281" id="1281">1281</a>
+<a href="#1282" id="1282">1282</a>
+<a href="#1283" id="1283">1283</a>
+<a href="#1284" id="1284">1284</a>
+<a href="#1285" id="1285">1285</a>
+<a href="#1286" id="1286">1286</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -1297,6 +1304,7 @@
 </span><span class="doccomment">//! Data types that connect Parquet physical types with their Rust-specific
 //! representations.
 </span><span class="kw">use </span>bytes::Bytes;
+<span class="kw">use </span>half::f16;
 <span class="kw">use </span>std::cmp::Ordering;
 <span class="kw">use </span>std::fmt;
 <span class="kw">use </span>std::mem;
@@ -1501,6 +1509,12 @@
 <span class="kw">impl </span>From&lt;Bytes&gt; <span class="kw">for </span>ByteArray {
     <span class="kw">fn </span>from(value: Bytes) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{ data: <span class="prelude-val">Some</span>(value) }
+    }
+}
+
+<span class="kw">impl </span>From&lt;f16&gt; <span class="kw">for </span>ByteArray {
+    <span class="kw">fn </span>from(value: f16) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::from(value.to_le_bytes().as_slice())
     }
 }
 

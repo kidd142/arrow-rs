@@ -1115,6 +1115,14 @@
 <a href="#1115" id="1115">1115</a>
 <a href="#1116" id="1116">1116</a>
 <a href="#1117" id="1117">1117</a>
+<a href="#1118" id="1118">1118</a>
+<a href="#1119" id="1119">1119</a>
+<a href="#1120" id="1120">1120</a>
+<a href="#1121" id="1121">1121</a>
+<a href="#1122" id="1122">1122</a>
+<a href="#1123" id="1123">1123</a>
+<a href="#1124" id="1124">1124</a>
+<a href="#1125" id="1125">1125</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -1940,6 +1948,7 @@
             message root {
               optional fixed_len_byte_array(5) f1 (DECIMAL(9, 3));
               optional fixed_len_byte_array (16) f2 (DECIMAL (38, 18));
+              optional fixed_len_byte_array (2) f3 (FLOAT16);
             }
         &quot;</span>;
         <span class="kw">let </span>message = parse(schema).unwrap();
@@ -1969,6 +1978,13 @@
                         .with_length(<span class="number">16</span>)
                         .with_precision(<span class="number">38</span>)
                         .with_scale(<span class="number">18</span>)
+                        .build()
+                        .unwrap(),
+                ),
+                Arc::new(
+                    Type::primitive_type_builder(<span class="string">&quot;f3&quot;</span>, PhysicalType::FIXED_LEN_BYTE_ARRAY)
+                        .with_logical_type(<span class="prelude-val">Some</span>(LogicalType::Float16))
+                        .with_length(<span class="number">2</span>)
                         .build()
                         .unwrap(),
                 ),
