@@ -1147,7 +1147,7 @@ assert_eq!(output, data);
             output_buf: <span class="kw-2">&amp;mut </span>Vec&lt;u8&gt;,
             _uncompress_size: <span class="prelude-ty">Option</span>&lt;usize&gt;,
         ) -&gt; <span class="prelude-ty">Result</span>&lt;usize&gt; {
-            <span class="kw">let </span><span class="kw-2">mut </span>decoder = read::GzDecoder::new(input_buf);
+            <span class="kw">let </span><span class="kw-2">mut </span>decoder = read::MultiGzDecoder::new(input_buf);
             decoder.read_to_end(output_buf).map_err(|e| e.into())
         }
 
