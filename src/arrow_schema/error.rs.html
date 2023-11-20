@@ -145,6 +145,12 @@
 <a href="#145" id="145">145</a>
 <a href="#146" id="146">146</a>
 <a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -202,6 +208,12 @@
 <span class="kw">impl </span>From&lt;std::io::Error&gt; <span class="kw">for </span>ArrowError {
     <span class="kw">fn </span>from(error: std::io::Error) -&gt; <span class="self">Self </span>{
         ArrowError::IoError(error.to_string(), error)
+    }
+}
+
+<span class="kw">impl </span>From&lt;std::str::Utf8Error&gt; <span class="kw">for </span>ArrowError {
+    <span class="kw">fn </span>from(error: std::str::Utf8Error) -&gt; <span class="self">Self </span>{
+        ArrowError::ParseError(error.to_string())
     }
 }
 

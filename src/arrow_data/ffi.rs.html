@@ -321,6 +321,12 @@
 <a href="#321" id="321">321</a>
 <a href="#322" id="322">322</a>
 <a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -491,6 +497,12 @@
             .collect::&lt;Box&lt;<span class="kw">_</span>&gt;&gt;();
         <span class="kw">let </span>n_children = children.len() <span class="kw">as </span>i64;
 
+        <span class="comment">// As in the IPC format, emit null_count = length for Null type
+        </span><span class="kw">let </span>null_count = <span class="kw">match </span>data.data_type() {
+            DataType::Null =&gt; data.len(),
+            <span class="kw">_ </span>=&gt; data.null_count(),
+        };
+
         <span class="comment">// create the private data owning everything.
         // any other data must be added here, e.g. via a struct, to track lifetime.
         </span><span class="kw">let </span><span class="kw-2">mut </span>private_data = Box::new(ArrayPrivateData {
@@ -502,7 +514,7 @@
 
         <span class="self">Self </span>{
             length: data.len() <span class="kw">as </span>i64,
-            null_count: data.null_count() <span class="kw">as </span>i64,
+            null_count: null_count <span class="kw">as </span>i64,
             offset: data.offset() <span class="kw">as </span>i64,
             n_buffers,
             n_children,

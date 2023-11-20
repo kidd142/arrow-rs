@@ -279,13 +279,6 @@
 <a href="#279" id="279">279</a>
 <a href="#280" id="280">280</a>
 <a href="#281" id="281">281</a>
-<a href="#282" id="282">282</a>
-<a href="#283" id="283">283</a>
-<a href="#284" id="284">284</a>
-<a href="#285" id="285">285</a>
-<a href="#286" id="286">286</a>
-<a href="#287" id="287">287</a>
-<a href="#288" id="288">288</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -303,7 +296,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-</span><span class="kw">use crate</span>::{read_json_file, ArrowFile};
+</span><span class="kw">use </span><span class="kw">crate</span>::open_json_file;
 <span class="kw">use </span>std::collections::HashMap;
 
 <span class="kw">use </span>arrow::{
@@ -333,23 +326,16 @@
 
     <span class="kw">let </span>client = FlightServiceClient::connect(url).<span class="kw">await</span><span class="question-mark">?</span>;
 
-    <span class="kw">let </span>ArrowFile {
-        schema, batches, ..
-    } = read_json_file(path)<span class="question-mark">?</span>;
+    <span class="kw">let </span>json_file = open_json_file(path)<span class="question-mark">?</span>;
 
-    <span class="kw">let </span>schema = Arc::new(schema);
+    <span class="kw">let </span>batches = json_file.read_batches()<span class="question-mark">?</span>;
+    <span class="kw">let </span>schema = Arc::new(json_file.schema);
 
     <span class="kw">let </span><span class="kw-2">mut </span>descriptor = FlightDescriptor::default();
     descriptor.set_type(DescriptorType::Path);
     descriptor.path = <span class="macro">vec!</span>[path.to_string()];
 
-    upload_data(
-        client.clone(),
-        schema.clone(),
-        descriptor.clone(),
-        batches.clone(),
-    )
-    .<span class="kw">await</span><span class="question-mark">?</span>;
+    upload_data(client.clone(), schema, descriptor.clone(), batches.clone()).<span class="kw">await</span><span class="question-mark">?</span>;
     verify_data(client, descriptor, <span class="kw-2">&amp;</span>batches).<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())

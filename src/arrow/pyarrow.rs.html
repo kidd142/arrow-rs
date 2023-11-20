@@ -742,7 +742,7 @@
 
             <span class="kw">let </span>schema_ptr = <span class="kw">unsafe </span>{ schema_capsule.reference::&lt;FFI_ArrowSchema&gt;() };
             <span class="kw">let </span>array = <span class="kw">unsafe </span>{ FFI_ArrowArray::from_raw(array_capsule.pointer() <span class="kw">as _</span>) };
-            <span class="kw">return </span>ffi::from_ffi(array, schema_ptr).map_err(to_py_err);
+            <span class="kw">return unsafe </span>{ ffi::from_ffi(array, schema_ptr) }.map_err(to_py_err);
         }
 
         validate_class(<span class="string">&quot;Array&quot;</span>, value)<span class="question-mark">?</span>;
@@ -762,7 +762,7 @@
             ),
         )<span class="question-mark">?</span>;
 
-        ffi::from_ffi(array, <span class="kw-2">&amp;</span>schema).map_err(to_py_err)
+        <span class="kw">unsafe </span>{ ffi::from_ffi(array, <span class="kw-2">&amp;</span>schema) }.map_err(to_py_err)
     }
 }
 
@@ -823,7 +823,7 @@
 
             <span class="kw">let </span>schema_ptr = <span class="kw">unsafe </span>{ schema_capsule.reference::&lt;FFI_ArrowSchema&gt;() };
             <span class="kw">let </span>ffi_array = <span class="kw">unsafe </span>{ FFI_ArrowArray::from_raw(array_capsule.pointer() <span class="kw">as _</span>) };
-            <span class="kw">let </span>array_data = ffi::from_ffi(ffi_array, schema_ptr).map_err(to_py_err)<span class="question-mark">?</span>;
+            <span class="kw">let </span>array_data = <span class="kw">unsafe </span>{ ffi::from_ffi(ffi_array, schema_ptr) }.map_err(to_py_err)<span class="question-mark">?</span>;
             <span class="kw">if </span>!<span class="macro">matches!</span>(array_data.data_type(), DataType::Struct(<span class="kw">_</span>)) {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(PyTypeError::new_err(
                     <span class="string">&quot;Expected Struct type from __arrow_c_array.&quot;</span>,

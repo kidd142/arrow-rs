@@ -546,6 +546,8 @@
 <a href="#546" id="546">546</a>
 <a href="#547" id="547">547</a>
 <a href="#548" id="548">548</a>
+<a href="#549" id="549">549</a>
+<a href="#550" id="550">550</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -905,9 +907,11 @@
             }
 
             <span class="kw">let </span>schema_ref = <span class="self">self</span>.schema();
-            <span class="kw">let </span>schema = FFI_ArrowSchema::try_from(schema_ref.as_ref()).ok()<span class="question-mark">?</span>;
+            <span class="comment">// NOTE: this parses the FFI_ArrowSchema again on each iterator call;
+            // should probably use from_ffi_and_data_type() instead.
+            </span><span class="kw">let </span>schema = FFI_ArrowSchema::try_from(schema_ref.as_ref()).ok()<span class="question-mark">?</span>;
 
-            <span class="kw">let </span>data = from_ffi(array, <span class="kw-2">&amp;</span>schema).ok()<span class="question-mark">?</span>;
+            <span class="kw">let </span>data = <span class="kw">unsafe </span>{ from_ffi(array, <span class="kw-2">&amp;</span>schema) }.ok()<span class="question-mark">?</span>;
 
             <span class="kw">let </span>record_batch = RecordBatch::from(StructArray::from(data));
 
@@ -1012,7 +1016,7 @@
                 <span class="kw">break</span>;
             }
 
-            <span class="kw">let </span>array = from_ffi(ffi_array, <span class="kw-2">&amp;</span>ffi_schema).unwrap();
+            <span class="kw">let </span>array = <span class="kw">unsafe </span>{ from_ffi(ffi_array, <span class="kw-2">&amp;</span>ffi_schema) }.unwrap();
 
             <span class="kw">let </span>record_batch = RecordBatch::from(StructArray::from(array));
             produced_batches.push(record_batch);

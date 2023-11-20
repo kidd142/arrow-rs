@@ -327,7 +327,7 @@
         <span class="kw">let </span>schema = FFI_ArrowSchema::try_from(expected.data_type())<span class="question-mark">?</span>;
 
         <span class="comment">// simulate an external consumer by being the consumer
-        </span><span class="kw">let </span>result = <span class="kw-2">&amp;</span>from_ffi(array, <span class="kw-2">&amp;</span>schema)<span class="question-mark">?</span>;
+        </span><span class="kw">let </span>result = <span class="kw-2">&amp;</span><span class="kw">unsafe </span>{ from_ffi(array, <span class="kw-2">&amp;</span>schema) }<span class="question-mark">?</span>;
 
         <span class="macro">assert_eq!</span>(result, expected);
         <span class="prelude-val">Ok</span>(())
