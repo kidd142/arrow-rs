@@ -603,6 +603,15 @@
 <a href="#603" id="603">603</a>
 <a href="#604" id="604">604</a>
 <a href="#605" id="605">605</a>
+<a href="#606" id="606">606</a>
+<a href="#607" id="607">607</a>
+<a href="#608" id="608">608</a>
+<a href="#609" id="609">609</a>
+<a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
+<a href="#614" id="614">614</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -773,6 +782,10 @@
         }
         DataType::Duration(TimeUnit::Nanosecond) =&gt; {
             Box::new(DurationNanosecondBuilder::with_capacity(capacity))
+        }
+        DataType::List(field) =&gt; {
+            <span class="kw">let </span>builder = make_builder(field.data_type(), capacity);
+            Box::new(ListBuilder::with_capacity(builder, capacity))
         }
         DataType::Struct(fields) =&gt; Box::new(StructBuilder::from_fields(fields.clone(), capacity)),
         t =&gt; <span class="macro">panic!</span>(<span class="string">&quot;Data type {t:?} is not currently supported&quot;</span>),
@@ -1112,13 +1125,18 @@
 
     <span class="attr">#[test]
     #[should_panic(
-        expected = <span class="string">&quot;Data type List(Field { name: \&quot;item\&quot;, data_type: Int64, nullable: true, dict_id: 0, dict_is_ordered: false, metadata: {} }) is not currently supported&quot;
+        expected = <span class="string">&quot;Data type Map(Field { name: \&quot;entries\&quot;, data_type: Struct([Field { name: \&quot;keys\&quot;, data_type: Int32, nullable: false, dict_id: 0, dict_is_ordered: false, metadata: {} }, Field { name: \&quot;values\&quot;, data_type: UInt32, nullable: false, dict_id: 0, dict_is_ordered: false, metadata: {} }]), nullable: false, dict_id: 0, dict_is_ordered: false, metadata: {} }, false) is not currently supported&quot;
     </span>)]
     </span><span class="kw">fn </span>test_struct_array_builder_from_schema_unsupported_type() {
-        <span class="kw">let </span>list_type = DataType::List(Arc::new(Field::new(<span class="string">&quot;item&quot;</span>, DataType::Int64, <span class="bool-val">true</span>)));
+        <span class="kw">let </span>keys = Arc::new(Field::new(<span class="string">&quot;keys&quot;</span>, DataType::Int32, <span class="bool-val">false</span>));
+        <span class="kw">let </span>values = Arc::new(Field::new(<span class="string">&quot;values&quot;</span>, DataType::UInt32, <span class="bool-val">false</span>));
+        <span class="kw">let </span>struct_type = DataType::Struct(Fields::from(<span class="macro">vec!</span>[keys, values]));
+        <span class="kw">let </span>map_data_type =
+            DataType::Map(Arc::new(Field::new(<span class="string">&quot;entries&quot;</span>, struct_type, <span class="bool-val">false</span>)), <span class="bool-val">false</span>);
+
         <span class="kw">let </span>fields = <span class="macro">vec!</span>[
             Field::new(<span class="string">&quot;f1&quot;</span>, DataType::Int16, <span class="bool-val">false</span>),
-            Field::new(<span class="string">&quot;f2&quot;</span>, list_type, <span class="bool-val">false</span>),
+            Field::new(<span class="string">&quot;f2&quot;</span>, map_data_type, <span class="bool-val">false</span>),
         ];
 
         <span class="kw">let _ </span>= StructBuilder::from_fields(fields, <span class="number">5</span>);
