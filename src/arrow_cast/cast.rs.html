@@ -9133,6 +9133,30 @@
 <a href="#9133" id="9133">9133</a>
 <a href="#9134" id="9134">9134</a>
 <a href="#9135" id="9135">9135</a>
+<a href="#9136" id="9136">9136</a>
+<a href="#9137" id="9137">9137</a>
+<a href="#9138" id="9138">9138</a>
+<a href="#9139" id="9139">9139</a>
+<a href="#9140" id="9140">9140</a>
+<a href="#9141" id="9141">9141</a>
+<a href="#9142" id="9142">9142</a>
+<a href="#9143" id="9143">9143</a>
+<a href="#9144" id="9144">9144</a>
+<a href="#9145" id="9145">9145</a>
+<a href="#9146" id="9146">9146</a>
+<a href="#9147" id="9147">9147</a>
+<a href="#9148" id="9148">9148</a>
+<a href="#9149" id="9149">9149</a>
+<a href="#9150" id="9150">9150</a>
+<a href="#9151" id="9151">9151</a>
+<a href="#9152" id="9152">9152</a>
+<a href="#9153" id="9153">9153</a>
+<a href="#9154" id="9154">9154</a>
+<a href="#9155" id="9155">9155</a>
+<a href="#9156" id="9156">9156</a>
+<a href="#9157" id="9157">9157</a>
+<a href="#9158" id="9158">9158</a>
+<a href="#9159" id="9159">9159</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -14012,6 +14036,30 @@
                 <span class="string">&quot;Cast error: Cannot cast string &#39;Not a valid date&#39; to value of Date32 type&quot;
             </span>);
         }
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_cast_string_format_yyyymmdd_to_date32() {
+        <span class="kw">let </span>a = Arc::new(StringArray::from(<span class="macro">vec!</span>[
+            <span class="prelude-val">Some</span>(<span class="string">&quot;2020-12-25&quot;</span>),
+            <span class="prelude-val">Some</span>(<span class="string">&quot;20201117&quot;</span>),
+        ])) <span class="kw">as </span>ArrayRef;
+
+        <span class="kw">let </span>to_type = DataType::Date32;
+        <span class="kw">let </span>options = CastOptions {
+            safe: <span class="bool-val">false</span>,
+            format_options: FormatOptions::default(),
+        };
+        <span class="kw">let </span>result = cast_with_options(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>to_type, <span class="kw-2">&amp;</span>options).unwrap();
+        <span class="kw">let </span>c = result.as_primitive::&lt;Date32Type&gt;();
+        <span class="macro">assert_eq!</span>(
+            chrono::NaiveDate::from_ymd_opt(<span class="number">2020</span>, <span class="number">12</span>, <span class="number">25</span>),
+            c.value_as_date(<span class="number">0</span>)
+        );
+        <span class="macro">assert_eq!</span>(
+            chrono::NaiveDate::from_ymd_opt(<span class="number">2020</span>, <span class="number">11</span>, <span class="number">17</span>),
+            c.value_as_date(<span class="number">1</span>)
+        );
     }
 
     <span class="attr">#[test]
