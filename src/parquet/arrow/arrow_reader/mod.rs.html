@@ -3049,6 +3049,10 @@
 <a href="#3049" id="3049">3049</a>
 <a href="#3050" id="3050">3050</a>
 <a href="#3051" id="3051">3051</a>
+<a href="#3052" id="3052">3052</a>
+<a href="#3053" id="3053">3053</a>
+<a href="#3054" id="3054">3054</a>
+<a href="#3055" id="3055">3055</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -3626,7 +3630,11 @@
 }
 
 <span class="kw">impl </span>RecordBatchReader <span class="kw">for </span>ParquetRecordBatchReader {
-    <span class="kw">fn </span>schema(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SchemaRef {
+    <span class="doccomment">/// Returns the projected [`SchemaRef`] for reading the parquet file.
+    ///
+    /// Note that the schema metadata will be stripped here. See
+    /// [`ParquetRecordBatchReaderBuilder::schema`] if the metadata is desired.
+    </span><span class="kw">fn </span>schema(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; SchemaRef {
         <span class="self">self</span>.schema.clone()
     }
 }
