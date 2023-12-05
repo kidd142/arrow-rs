@@ -1291,7 +1291,7 @@
         <span class="self">self</span>.bit_writer.put_vlq_int(indicator_value <span class="kw">as </span>u64);
         <span class="self">self</span>.bit_writer.put_aligned(
             <span class="self">self</span>.current_value,
-            bit_util::ceil(<span class="self">self</span>.bit_width <span class="kw">as </span>i64, <span class="number">8</span>) <span class="kw">as </span>usize,
+            bit_util::ceil(<span class="self">self</span>.bit_width <span class="kw">as </span>usize, <span class="number">8</span>),
         );
         <span class="self">self</span>.num_buffered_values = <span class="number">0</span>;
         <span class="self">self</span>.repeat_count = <span class="number">0</span>;
@@ -1585,8 +1585,8 @@
                 <span class="self">self</span>.bit_packed_left = ((indicator_value &gt;&gt; <span class="number">1</span>) * <span class="number">8</span>) <span class="kw">as </span>u32;
             } <span class="kw">else </span>{
                 <span class="self">self</span>.rle_left = (indicator_value &gt;&gt; <span class="number">1</span>) <span class="kw">as </span>u32;
-                <span class="kw">let </span>value_width = bit_util::ceil(<span class="self">self</span>.bit_width <span class="kw">as </span>i64, <span class="number">8</span>);
-                <span class="self">self</span>.current_value = bit_reader.get_aligned::&lt;u64&gt;(value_width <span class="kw">as </span>usize);
+                <span class="kw">let </span>value_width = bit_util::ceil(<span class="self">self</span>.bit_width <span class="kw">as </span>usize, <span class="number">8</span>);
+                <span class="self">self</span>.current_value = bit_reader.get_aligned::&lt;u64&gt;(value_width);
                 <span class="macro">assert!</span>(<span class="self">self</span>.current_value.is_some());
             }
             <span class="bool-val">true
