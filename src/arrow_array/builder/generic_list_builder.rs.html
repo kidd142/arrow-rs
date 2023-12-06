@@ -749,6 +749,23 @@
 <a href="#749" id="749">749</a>
 <a href="#750" id="750">750</a>
 <a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
+<a href="#753" id="753">753</a>
+<a href="#754" id="754">754</a>
+<a href="#755" id="755">755</a>
+<a href="#756" id="756">756</a>
+<a href="#757" id="757">757</a>
+<a href="#758" id="758">758</a>
+<a href="#759" id="759">759</a>
+<a href="#760" id="760">760</a>
+<a href="#761" id="761">761</a>
+<a href="#762" id="762">762</a>
+<a href="#763" id="763">763</a>
+<a href="#764" id="764">764</a>
+<a href="#765" id="765">765</a>
+<a href="#766" id="766">766</a>
+<a href="#767" id="767">767</a>
+<a href="#768" id="768">768</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -1335,14 +1352,31 @@
             <span class="kw-2">&amp;</span>DataType::List(Arc::new(Field::new(<span class="string">"item"</span>, DataType::Int32, <span class="bool-val">true</span>))),
             <span class="number">10</span>,
         );
-        <span class="kw">let </span><span class="kw-2">mut </span>builder = ListBuilder::new(values_builder);
+        test_boxed_generic_list_generic_list_array_builder::&lt;i32&gt;(values_builder);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_boxed_large_list_large_list_array_builder() {
+        <span class="comment">// This test is same as `test_list_list_array_builder` but uses boxed builders.
+        </span><span class="kw">let </span>values_builder = make_builder(
+            <span class="kw-2">&amp;</span>DataType::LargeList(Arc::new(Field::new(<span class="string">"item"</span>, DataType::Int32, <span class="bool-val">true</span>))),
+            <span class="number">10</span>,
+        );
+        test_boxed_generic_list_generic_list_array_builder::&lt;i64&gt;(values_builder);
+    }
+
+    <span class="kw">fn </span>test_boxed_generic_list_generic_list_array_builder&lt;O: OffsetSizeTrait + PartialEq&gt;(
+        values_builder: Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;,
+    ) {
+        <span class="kw">let </span><span class="kw-2">mut </span>builder: GenericListBuilder&lt;O, Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt; =
+            GenericListBuilder::&lt;O, Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;::new(values_builder);
 
         <span class="comment">//  [[[1, 2], [3, 4]], [[5, 6, 7], null, [8]], null, [[9, 10]]]
         </span>builder
             .values()
             .as_any_mut()
-            .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">"should be an ListBuilder"</span>)
+            .downcast_mut::&lt;GenericListBuilder&lt;O, Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
+            .expect(<span class="string">"should be an (Large)ListBuilder"</span>)
             .values()
             .as_any_mut()
             .downcast_mut::&lt;Int32Builder&gt;()
@@ -1351,8 +1385,8 @@
         builder
             .values()
             .as_any_mut()
-            .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">"should be an ListBuilder"</span>)
+            .downcast_mut::&lt;GenericListBuilder&lt;O, Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
+            .expect(<span class="string">"should be an (Large)ListBuilder"</span>)
             .values()
             .as_any_mut()
             .downcast_mut::&lt;Int32Builder&gt;()
@@ -1361,14 +1395,14 @@
         builder
             .values()
             .as_any_mut()
-            .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">"should be an ListBuilder"</span>)
+            .downcast_mut::&lt;GenericListBuilder&lt;O, Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
+            .expect(<span class="string">"should be an (Large)ListBuilder"</span>)
             .append(<span class="bool-val">true</span>);
         builder
             .values()
             .as_any_mut()
-            .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">"should be an ListBuilder"</span>)
+            .downcast_mut::&lt;GenericListBuilder&lt;O, Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
+            .expect(<span class="string">"should be an (Large)ListBuilder"</span>)
             .values()
             .as_any_mut()
             .downcast_mut::&lt;Int32Builder&gt;()
@@ -1377,8 +1411,8 @@
         builder
             .values()
             .as_any_mut()
-            .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">"should be an ListBuilder"</span>)
+            .downcast_mut::&lt;GenericListBuilder&lt;O, Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
+            .expect(<span class="string">"should be an (Large)ListBuilder"</span>)
             .values()
             .as_any_mut()
             .downcast_mut::&lt;Int32Builder&gt;()
@@ -1387,16 +1421,16 @@
         builder
             .values()
             .as_any_mut()
-            .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">"should be an ListBuilder"</span>)
+            .downcast_mut::&lt;GenericListBuilder&lt;O, Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
+            .expect(<span class="string">"should be an (Large)ListBuilder"</span>)
             .append(<span class="bool-val">true</span>);
         builder.append(<span class="bool-val">true</span>);
 
         builder
             .values()
             .as_any_mut()
-            .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">"should be an ListBuilder"</span>)
+            .downcast_mut::&lt;GenericListBuilder&lt;O, Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
+            .expect(<span class="string">"should be an (Large)ListBuilder"</span>)
             .values()
             .as_any_mut()
             .downcast_mut::&lt;Int32Builder&gt;()
@@ -1405,8 +1439,8 @@
         builder
             .values()
             .as_any_mut()
-            .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">"should be an ListBuilder"</span>)
+            .downcast_mut::&lt;GenericListBuilder&lt;O, Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
+            .expect(<span class="string">"should be an (Large)ListBuilder"</span>)
             .values()
             .as_any_mut()
             .downcast_mut::&lt;Int32Builder&gt;()
@@ -1415,30 +1449,30 @@
         builder
             .values()
             .as_any_mut()
-            .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">"should be an ListBuilder"</span>)
+            .downcast_mut::&lt;GenericListBuilder&lt;O, Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
+            .expect(<span class="string">"should be an (Large)ListBuilder"</span>)
             .values()
             .as_any_mut()
             .downcast_mut::&lt;Int32Builder&gt;()
-            .expect(<span class="string">"should be an Int32Builder"</span>)
+            .expect(<span class="string">"should be an (Large)ListBuilder"</span>)
             .append_value(<span class="number">7</span>);
         builder
             .values()
             .as_any_mut()
-            .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">"should be an ListBuilder"</span>)
+            .downcast_mut::&lt;GenericListBuilder&lt;O, Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
+            .expect(<span class="string">"should be an (Large)ListBuilder"</span>)
             .append(<span class="bool-val">true</span>);
         builder
             .values()
             .as_any_mut()
-            .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">"should be an ListBuilder"</span>)
+            .downcast_mut::&lt;GenericListBuilder&lt;O, Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
+            .expect(<span class="string">"should be an (Large)ListBuilder"</span>)
             .append(<span class="bool-val">false</span>);
         builder
             .values()
             .as_any_mut()
-            .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">"should be an ListBuilder"</span>)
+            .downcast_mut::&lt;GenericListBuilder&lt;O, Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
+            .expect(<span class="string">"should be an (Large)ListBuilder"</span>)
             .values()
             .as_any_mut()
             .downcast_mut::&lt;Int32Builder&gt;()
@@ -1447,8 +1481,8 @@
         builder
             .values()
             .as_any_mut()
-            .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">"should be an ListBuilder"</span>)
+            .downcast_mut::&lt;GenericListBuilder&lt;O, Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
+            .expect(<span class="string">"should be an (Large)ListBuilder"</span>)
             .append(<span class="bool-val">true</span>);
         builder.append(<span class="bool-val">true</span>);
 
@@ -1457,8 +1491,8 @@
         builder
             .values()
             .as_any_mut()
-            .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">"should be an ListBuilder"</span>)
+            .downcast_mut::&lt;GenericListBuilder&lt;O, Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
+            .expect(<span class="string">"should be an (Large)ListBuilder"</span>)
             .values()
             .as_any_mut()
             .downcast_mut::&lt;Int32Builder&gt;()
@@ -1467,8 +1501,8 @@
         builder
             .values()
             .as_any_mut()
-            .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">"should be an ListBuilder"</span>)
+            .downcast_mut::&lt;GenericListBuilder&lt;O, Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
+            .expect(<span class="string">"should be an (Large)ListBuilder"</span>)
             .values()
             .as_any_mut()
             .downcast_mut::&lt;Int32Builder&gt;()
@@ -1477,8 +1511,8 @@
         builder
             .values()
             .as_any_mut()
-            .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">"should be an ListBuilder"</span>)
+            .downcast_mut::&lt;GenericListBuilder&lt;O, Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
+            .expect(<span class="string">"should be an (Large)ListBuilder"</span>)
             .append(<span class="bool-val">true</span>);
         builder.append(<span class="bool-val">true</span>);
 
@@ -1487,12 +1521,12 @@
         <span class="macro">assert_eq!</span>(<span class="number">4</span>, l1.len());
         <span class="macro">assert_eq!</span>(<span class="number">1</span>, l1.null_count());
 
-        <span class="macro">assert_eq!</span>(l1.value_offsets(), <span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">2</span>, <span class="number">5</span>, <span class="number">5</span>, <span class="number">6</span>]);
-        <span class="kw">let </span>l2 = l1.values().as_list::&lt;i32&gt;();
+        <span class="macro">assert_eq!</span>(l1.value_offsets(), <span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">2</span>, <span class="number">5</span>, <span class="number">5</span>, <span class="number">6</span>].map(O::usize_as));
+        <span class="kw">let </span>l2 = l1.values().as_list::&lt;O&gt;();
 
         <span class="macro">assert_eq!</span>(<span class="number">6</span>, l2.len());
         <span class="macro">assert_eq!</span>(<span class="number">1</span>, l2.null_count());
-        <span class="macro">assert_eq!</span>(l2.value_offsets(), <span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">2</span>, <span class="number">4</span>, <span class="number">7</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">10</span>]);
+        <span class="macro">assert_eq!</span>(l2.value_offsets(), <span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">2</span>, <span class="number">4</span>, <span class="number">7</span>, <span class="number">7</span>, <span class="number">8</span>, <span class="number">10</span>].map(O::usize_as));
 
         <span class="kw">let </span>i1 = l2.values().as_primitive::&lt;Int32Type&gt;();
         <span class="macro">assert_eq!</span>(<span class="number">10</span>, i1.len());

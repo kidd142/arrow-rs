@@ -612,6 +612,10 @@
 <a href="#612" id="612">612</a>
 <a href="#613" id="613">613</a>
 <a href="#614" id="614">614</a>
+<a href="#615" id="615">615</a>
+<a href="#616" id="616">616</a>
+<a href="#617" id="617">617</a>
+<a href="#618" id="618">618</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -786,6 +790,10 @@
         DataType::List(field) =&gt; {
             <span class="kw">let </span>builder = make_builder(field.data_type(), capacity);
             Box::new(ListBuilder::with_capacity(builder, capacity))
+        }
+        DataType::LargeList(field) =&gt; {
+            <span class="kw">let </span>builder = make_builder(field.data_type(), capacity);
+            Box::new(LargeListBuilder::with_capacity(builder, capacity))
         }
         DataType::Struct(fields) =&gt; Box::new(StructBuilder::from_fields(fields.clone(), capacity)),
         t =&gt; <span class="macro">panic!</span>(<span class="string">"Data type {t:?} is not currently supported"</span>),
