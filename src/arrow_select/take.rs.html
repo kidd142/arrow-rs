@@ -2033,6 +2033,28 @@
 <a href="#2033" id="2033">2033</a>
 <a href="#2034" id="2034">2034</a>
 <a href="#2035" id="2035">2035</a>
+<a href="#2036" id="2036">2036</a>
+<a href="#2037" id="2037">2037</a>
+<a href="#2038" id="2038">2038</a>
+<a href="#2039" id="2039">2039</a>
+<a href="#2040" id="2040">2040</a>
+<a href="#2041" id="2041">2041</a>
+<a href="#2042" id="2042">2042</a>
+<a href="#2043" id="2043">2043</a>
+<a href="#2044" id="2044">2044</a>
+<a href="#2045" id="2045">2045</a>
+<a href="#2046" id="2046">2046</a>
+<a href="#2047" id="2047">2047</a>
+<a href="#2048" id="2048">2048</a>
+<a href="#2049" id="2049">2049</a>
+<a href="#2050" id="2050">2050</a>
+<a href="#2051" id="2051">2051</a>
+<a href="#2052" id="2052">2052</a>
+<a href="#2053" id="2053">2053</a>
+<a href="#2054" id="2054">2054</a>
+<a href="#2055" id="2055">2055</a>
+<a href="#2056" id="2056">2056</a>
+<a href="#2057" id="2057">2057</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -2054,7 +2076,7 @@
 
 </span><span class="kw">use </span>std::sync::Arc;
 
-<span class="kw">use </span>arrow_array::builder::BufferBuilder;
+<span class="kw">use </span>arrow_array::builder::{BufferBuilder, UInt32Builder};
 <span class="kw">use </span>arrow_array::cast::AsArray;
 <span class="kw">use </span>arrow_array::types::<span class="kw-2">*</span>;
 <span class="kw">use </span>arrow_array::<span class="kw-2">*</span>;
@@ -2724,7 +2746,7 @@
 <span class="kw">where
     </span>IndexType: ArrowPrimitiveType,
 {
-    <span class="kw">let </span><span class="kw-2">mut </span>values = <span class="macro">vec!</span>[];
+    <span class="kw">let </span><span class="kw-2">mut </span>values = UInt32Builder::with_capacity(length <span class="kw">as </span>usize * indices.len());
 
     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..indices.len() {
         <span class="kw">if </span>indices.is_valid(i) {
@@ -2734,11 +2756,16 @@
                 .ok_or_else(|| ArrowError::ComputeError(<span class="string">&quot;Cast to usize failed&quot;</span>.to_string()))<span class="question-mark">?</span>;
             <span class="kw">let </span>start = list.value_offset(index) <span class="kw">as </span>&lt;UInt32Type <span class="kw">as </span>ArrowPrimitiveType&gt;::Native;
 
-            values.extend(start..start + length);
+            <span class="comment">// Safety: Range always has known length.
+            </span><span class="kw">unsafe </span>{
+                values.append_trusted_len_iter(start..start + length);
+            }
+        } <span class="kw">else </span>{
+            values.append_nulls(length <span class="kw">as </span>usize);
         }
     }
 
-    <span class="prelude-val">Ok</span>(PrimitiveArray::&lt;UInt32Type&gt;::from(values))
+    <span class="prelude-val">Ok</span>(values.finish())
 }
 
 <span class="doccomment">/// To avoid generating take implementations for every index type, instead we
@@ -4018,6 +4045,23 @@
             .into_iter()
             .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
         <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>values, <span class="kw-2">&amp;</span>[<span class="prelude-val">Some</span>(<span class="number">23</span>), <span class="prelude-val">Some</span>(<span class="number">4</span>), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>])
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_take_fixed_size_list_null_indices() {
+        <span class="kw">let </span>indices = Int32Array::from_iter([<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="prelude-val">None</span>]);
+        <span class="kw">let </span>values = Arc::new(Int32Array::from(<span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]));
+        <span class="kw">let </span>arr_field = Arc::new(Field::new(<span class="string">&quot;item&quot;</span>, values.data_type().clone(), <span class="bool-val">true</span>));
+        <span class="kw">let </span>values = FixedSizeListArray::try_new(arr_field, <span class="number">2</span>, values, <span class="prelude-val">None</span>).unwrap();
+
+        <span class="kw">let </span>r = take(<span class="kw-2">&amp;</span>values, <span class="kw-2">&amp;</span>indices, <span class="prelude-val">None</span>).unwrap();
+        <span class="kw">let </span>values = r
+            .as_fixed_size_list()
+            .values()
+            .as_primitive::&lt;Int32Type&gt;()
+            .into_iter()
+            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+        <span class="macro">assert_eq!</span>(values, <span class="kw-2">&amp;</span>[<span class="prelude-val">Some</span>(<span class="number">0</span>), <span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">None</span>, <span class="prelude-val">None</span>])
     }
 
     <span class="attr">#[test]
