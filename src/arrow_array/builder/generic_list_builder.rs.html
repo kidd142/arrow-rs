@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-array/src/builder/generic_list_builder.rs`."><title>generic_list_builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="arrow_array" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (0e2dac837 2023-12-04)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-array/src/builder/generic_list_builder.rs`."><title>generic_list_builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-c67e44d78ab2db17.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="arrow_array" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0-nightly (e9013ac0e 2023-12-05)" data-channel="nightly" data-search-js="search-5a66c239c06b3a66.js" data-settings-js="settings-fe03fdc259827cd2.js" ><script src="../../../static.files/storage-fec3eaa3851e447d.js"></script><script defer src="../../../static.files/src-script-3280b574d94e47b4.js"></script><script defer src="../../../src-files.js"></script><script defer src="../../../static.files/main-77dede896d6ac08e.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-5d8b3c7633ad77ba.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -754,14 +754,14 @@
 // distributed with this work for additional information
 // regarding copyright ownership.  The ASF licenses this file
 // to you under the Apache License, Version 2.0 (the
-// &quot;License&quot;); you may not use this file except in compliance
+// "License"); you may not use this file except in compliance
 // with the License.  You may obtain a copy of the License at
 //
 //   http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing,
 // software distributed under the License is distributed on an
-// &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
@@ -792,38 +792,38 @@
 /// let mut builder = ListBuilder::new(values_builder);
 ///
 /// // [A, B, C]
-/// builder.values().append_value(&quot;A&quot;);
-/// builder.values().append_value(&quot;B&quot;);
-/// builder.values().append_value(&quot;C&quot;);
+/// builder.values().append_value("A");
+/// builder.values().append_value("B");
+/// builder.values().append_value("C");
 /// builder.append(true);
 ///
 /// // [ ] (empty list)
 /// builder.append(true);
 ///
 /// // Null
-/// builder.values().append_value(&quot;?&quot;); // irrelevant
+/// builder.values().append_value("?"); // irrelevant
 /// builder.append(false);
 ///
 /// // [D]
-/// builder.values().append_value(&quot;D&quot;);
+/// builder.values().append_value("D");
 /// builder.append(true);
 ///
 /// // [NULL, F]
 /// builder.values().append_null();
-/// builder.values().append_value(&quot;F&quot;);
+/// builder.values().append_value("F");
 /// builder.append(true);
 ///
 /// // Build the array
 /// let array = builder.finish();
 ///
 /// // Values is a string array
-/// // &quot;A&quot;, &quot;B&quot; &quot;C&quot;, &quot;?&quot;, &quot;D&quot;, NULL, &quot;F&quot;
+/// // "A", "B" "C", "?", "D", NULL, "F"
 /// assert_eq!(
 ///   array.values().as_ref(),
 ///   &amp;StringArray::from(vec![
-///     Some(&quot;A&quot;), Some(&quot;B&quot;), Some(&quot;C&quot;),
-///     Some(&quot;?&quot;), Some(&quot;D&quot;), None,
-///     Some(&quot;F&quot;)
+///     Some("A"), Some("B"), Some("C"),
+///     Some("?"), Some("D"), None,
+///     Some("F")
 ///   ])
 /// );
 ///
@@ -874,7 +874,7 @@
 <span class="kw">impl</span>&lt;OffsetSize: OffsetSizeTrait, T: ArrayBuilder&gt; ArrayBuilder
     <span class="kw">for </span>GenericListBuilder&lt;OffsetSize, T&gt;
 <span class="kw">where
-    </span>T: <span class="lifetime">&#39;static</span>,
+    </span>T: <span class="lifetime">'static</span>,
 {
     <span class="doccomment">/// Returns the builder as a non-mutable `Any` reference.
     </span><span class="kw">fn </span>as_any(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn </span>Any {
@@ -909,7 +909,7 @@
 
 <span class="kw">impl</span>&lt;OffsetSize: OffsetSizeTrait, T: ArrayBuilder&gt; GenericListBuilder&lt;OffsetSize, T&gt;
 <span class="kw">where
-    </span>T: <span class="lifetime">&#39;static</span>,
+    </span>T: <span class="lifetime">'static</span>,
 {
     <span class="doccomment">/// Returns the child array builder as a mutable reference.
     ///
@@ -1034,7 +1034,7 @@
         <span class="kw">let </span>null_bit_buffer = <span class="self">self</span>.null_buffer_builder.finish();
         <span class="self">self</span>.offsets_builder.append(OffsetSize::zero());
         <span class="kw">let </span>field = Arc::new(Field::new(
-            <span class="string">&quot;item&quot;</span>,
+            <span class="string">"item"</span>,
             values_data.data_type().clone(),
             <span class="bool-val">true</span>, <span class="comment">// TODO: find a consistent way of getting this
         </span>));
@@ -1059,7 +1059,7 @@
         <span class="kw">let </span>offset_buffer = Buffer::from_slice_ref(<span class="self">self</span>.offsets_builder.as_slice());
         <span class="kw">let </span>nulls = <span class="self">self</span>.null_buffer_builder.finish_cloned();
         <span class="kw">let </span>field = Arc::new(Field::new(
-            <span class="string">&quot;item&quot;</span>,
+            <span class="string">"item"</span>,
             values_data.data_type().clone(),
             <span class="bool-val">true</span>, <span class="comment">// TODO: find a consistent way of getting this
         </span>));
@@ -1309,7 +1309,7 @@
             .values()
             .as_any_mut()
             .downcast_mut::&lt;Int32Builder&gt;()
-            .expect(<span class="string">&quot;should be an Int32Builder&quot;</span>)
+            .expect(<span class="string">"should be an Int32Builder"</span>)
             .append_slice(<span class="kw-2">&amp;</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]);
         builder.append(<span class="bool-val">true</span>);
 
@@ -1317,7 +1317,7 @@
             .values()
             .as_any_mut()
             .downcast_mut::&lt;Int32Builder&gt;()
-            .expect(<span class="string">&quot;should be an Int32Builder&quot;</span>)
+            .expect(<span class="string">"should be an Int32Builder"</span>)
             .append_slice(<span class="kw-2">&amp;</span>[<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>]);
         builder.append(<span class="bool-val">true</span>);
 
@@ -1332,7 +1332,7 @@
     </span><span class="kw">fn </span>test_boxed_list_list_array_builder() {
         <span class="comment">// This test is same as `test_list_list_array_builder` but uses boxed builders.
         </span><span class="kw">let </span>values_builder = make_builder(
-            <span class="kw-2">&amp;</span>DataType::List(Arc::new(Field::new(<span class="string">&quot;item&quot;</span>, DataType::Int32, <span class="bool-val">true</span>))),
+            <span class="kw-2">&amp;</span>DataType::List(Arc::new(Field::new(<span class="string">"item"</span>, DataType::Int32, <span class="bool-val">true</span>))),
             <span class="number">10</span>,
         );
         <span class="kw">let </span><span class="kw-2">mut </span>builder = ListBuilder::new(values_builder);
@@ -1342,53 +1342,53 @@
             .values()
             .as_any_mut()
             .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">&quot;should be an ListBuilder&quot;</span>)
+            .expect(<span class="string">"should be an ListBuilder"</span>)
             .values()
             .as_any_mut()
             .downcast_mut::&lt;Int32Builder&gt;()
-            .expect(<span class="string">&quot;should be an Int32Builder&quot;</span>)
+            .expect(<span class="string">"should be an Int32Builder"</span>)
             .append_value(<span class="number">1</span>);
         builder
             .values()
             .as_any_mut()
             .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">&quot;should be an ListBuilder&quot;</span>)
+            .expect(<span class="string">"should be an ListBuilder"</span>)
             .values()
             .as_any_mut()
             .downcast_mut::&lt;Int32Builder&gt;()
-            .expect(<span class="string">&quot;should be an Int32Builder&quot;</span>)
+            .expect(<span class="string">"should be an Int32Builder"</span>)
             .append_value(<span class="number">2</span>);
         builder
             .values()
             .as_any_mut()
             .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">&quot;should be an ListBuilder&quot;</span>)
+            .expect(<span class="string">"should be an ListBuilder"</span>)
             .append(<span class="bool-val">true</span>);
         builder
             .values()
             .as_any_mut()
             .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">&quot;should be an ListBuilder&quot;</span>)
+            .expect(<span class="string">"should be an ListBuilder"</span>)
             .values()
             .as_any_mut()
             .downcast_mut::&lt;Int32Builder&gt;()
-            .expect(<span class="string">&quot;should be an Int32Builder&quot;</span>)
+            .expect(<span class="string">"should be an Int32Builder"</span>)
             .append_value(<span class="number">3</span>);
         builder
             .values()
             .as_any_mut()
             .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">&quot;should be an ListBuilder&quot;</span>)
+            .expect(<span class="string">"should be an ListBuilder"</span>)
             .values()
             .as_any_mut()
             .downcast_mut::&lt;Int32Builder&gt;()
-            .expect(<span class="string">&quot;should be an Int32Builder&quot;</span>)
+            .expect(<span class="string">"should be an Int32Builder"</span>)
             .append_value(<span class="number">4</span>);
         builder
             .values()
             .as_any_mut()
             .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">&quot;should be an ListBuilder&quot;</span>)
+            .expect(<span class="string">"should be an ListBuilder"</span>)
             .append(<span class="bool-val">true</span>);
         builder.append(<span class="bool-val">true</span>);
 
@@ -1396,59 +1396,59 @@
             .values()
             .as_any_mut()
             .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">&quot;should be an ListBuilder&quot;</span>)
+            .expect(<span class="string">"should be an ListBuilder"</span>)
             .values()
             .as_any_mut()
             .downcast_mut::&lt;Int32Builder&gt;()
-            .expect(<span class="string">&quot;should be an Int32Builder&quot;</span>)
+            .expect(<span class="string">"should be an Int32Builder"</span>)
             .append_value(<span class="number">5</span>);
         builder
             .values()
             .as_any_mut()
             .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">&quot;should be an ListBuilder&quot;</span>)
+            .expect(<span class="string">"should be an ListBuilder"</span>)
             .values()
             .as_any_mut()
             .downcast_mut::&lt;Int32Builder&gt;()
-            .expect(<span class="string">&quot;should be an Int32Builder&quot;</span>)
+            .expect(<span class="string">"should be an Int32Builder"</span>)
             .append_value(<span class="number">6</span>);
         builder
             .values()
             .as_any_mut()
             .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">&quot;should be an ListBuilder&quot;</span>)
+            .expect(<span class="string">"should be an ListBuilder"</span>)
             .values()
             .as_any_mut()
             .downcast_mut::&lt;Int32Builder&gt;()
-            .expect(<span class="string">&quot;should be an Int32Builder&quot;</span>)
+            .expect(<span class="string">"should be an Int32Builder"</span>)
             .append_value(<span class="number">7</span>);
         builder
             .values()
             .as_any_mut()
             .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">&quot;should be an ListBuilder&quot;</span>)
+            .expect(<span class="string">"should be an ListBuilder"</span>)
             .append(<span class="bool-val">true</span>);
         builder
             .values()
             .as_any_mut()
             .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">&quot;should be an ListBuilder&quot;</span>)
+            .expect(<span class="string">"should be an ListBuilder"</span>)
             .append(<span class="bool-val">false</span>);
         builder
             .values()
             .as_any_mut()
             .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">&quot;should be an ListBuilder&quot;</span>)
+            .expect(<span class="string">"should be an ListBuilder"</span>)
             .values()
             .as_any_mut()
             .downcast_mut::&lt;Int32Builder&gt;()
-            .expect(<span class="string">&quot;should be an Int32Builder&quot;</span>)
+            .expect(<span class="string">"should be an Int32Builder"</span>)
             .append_value(<span class="number">8</span>);
         builder
             .values()
             .as_any_mut()
             .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">&quot;should be an ListBuilder&quot;</span>)
+            .expect(<span class="string">"should be an ListBuilder"</span>)
             .append(<span class="bool-val">true</span>);
         builder.append(<span class="bool-val">true</span>);
 
@@ -1458,27 +1458,27 @@
             .values()
             .as_any_mut()
             .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">&quot;should be an ListBuilder&quot;</span>)
+            .expect(<span class="string">"should be an ListBuilder"</span>)
             .values()
             .as_any_mut()
             .downcast_mut::&lt;Int32Builder&gt;()
-            .expect(<span class="string">&quot;should be an Int32Builder&quot;</span>)
+            .expect(<span class="string">"should be an Int32Builder"</span>)
             .append_value(<span class="number">9</span>);
         builder
             .values()
             .as_any_mut()
             .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">&quot;should be an ListBuilder&quot;</span>)
+            .expect(<span class="string">"should be an ListBuilder"</span>)
             .values()
             .as_any_mut()
             .downcast_mut::&lt;Int32Builder&gt;()
-            .expect(<span class="string">&quot;should be an Int32Builder&quot;</span>)
+            .expect(<span class="string">"should be an Int32Builder"</span>)
             .append_value(<span class="number">10</span>);
         builder
             .values()
             .as_any_mut()
             .downcast_mut::&lt;ListBuilder&lt;Box&lt;<span class="kw">dyn </span>ArrayBuilder&gt;&gt;&gt;()
-            .expect(<span class="string">&quot;should be an ListBuilder&quot;</span>)
+            .expect(<span class="string">"should be an ListBuilder"</span>)
             .append(<span class="bool-val">true</span>);
         builder.append(<span class="bool-val">true</span>);
 
