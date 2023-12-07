@@ -414,6 +414,7 @@
 <a href="#414" id="414">414</a>
 <a href="#415" id="415">415</a>
 <a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -506,6 +507,7 @@
 
     <span class="doccomment">/// Returns a `BitChunks` instance which can be used to iterate over
     /// this buffer's bits in `u64` chunks
+    </span><span class="attr">#[inline]
     </span><span class="kw">pub fn </span>bit_chunks(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BitChunks {
         BitChunks::new(<span class="self">self</span>.values(), <span class="self">self</span>.offset, <span class="self">self</span>.len)
     }
