@@ -820,14 +820,6 @@
 <a href="#820" id="820">820</a>
 <a href="#821" id="821">821</a>
 <a href="#822" id="822">822</a>
-<a href="#823" id="823">823</a>
-<a href="#824" id="824">824</a>
-<a href="#825" id="825">825</a>
-<a href="#826" id="826">826</a>
-<a href="#827" id="827">827</a>
-<a href="#828" id="828">828</a>
-<a href="#829" id="829">829</a>
-<a href="#830" id="830">830</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -848,7 +840,7 @@
 </span><span class="kw">use </span>arrow_buffer::Buffer;
 
 <span class="kw">use </span><span class="kw">crate</span>::arrow::record_reader::{
-    buffer::{BufferQueue, ScalarBuffer, ValuesBuffer},
+    buffer::{BufferQueue, ValuesBuffer},
     definition_levels::{DefinitionLevelBuffer, DefinitionLevelBufferDecoder},
 };
 <span class="kw">use </span><span class="kw">crate</span>::column::reader::decoder::RepetitionLevelDecoderImpl;
@@ -867,8 +859,7 @@
 <span class="kw">mod </span>definition_levels;
 
 <span class="doccomment">/// A `RecordReader` is a stateful column reader that delimits semantic records.
-</span><span class="kw">pub type </span>RecordReader&lt;T&gt; =
-    GenericRecordReader&lt;ScalarBuffer&lt;&lt;T <span class="kw">as </span>DataType&gt;::T&gt;, ColumnValueDecoderImpl&lt;T&gt;&gt;;
+</span><span class="kw">pub type </span>RecordReader&lt;T&gt; = GenericRecordReader&lt;Vec&lt;&lt;T <span class="kw">as </span>DataType&gt;::T&gt;, ColumnValueDecoderImpl&lt;T&gt;&gt;;
 
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">type </span>ColumnReader&lt;CV&gt; =
     GenericColumnReader&lt;RepetitionLevelDecoderImpl, DefinitionLevelBufferDecoder, CV&gt;;
@@ -883,7 +874,7 @@
 
     values: V,
     def_levels: <span class="prelude-ty">Option</span>&lt;DefinitionLevelBuffer&gt;,
-    rep_levels: <span class="prelude-ty">Option</span>&lt;ScalarBuffer&lt;i16&gt;&gt;,
+    rep_levels: <span class="prelude-ty">Option</span>&lt;Vec&lt;i16&gt;&gt;,
     column_reader: <span class="prelude-ty">Option</span>&lt;ColumnReader&lt;CV&gt;&gt;,
     <span class="doccomment">/// Number of buffered levels / null-padded values
     </span>num_values: usize,
@@ -911,7 +902,7 @@
         <span class="kw">let </span>def_levels = (desc.max_def_level() &gt; <span class="number">0</span>)
             .then(|| DefinitionLevelBuffer::new(<span class="kw-2">&amp;</span>desc, packed_null_mask(<span class="kw-2">&amp;</span>desc)));
 
-        <span class="kw">let </span>rep_levels = (desc.max_rep_level() &gt; <span class="number">0</span>).then(ScalarBuffer::new);
+        <span class="kw">let </span>rep_levels = (desc.max_rep_level() &gt; <span class="number">0</span>).then(Vec::new);
 
         <span class="self">Self </span>{
             values: records,
@@ -1004,7 +995,9 @@
     <span class="doccomment">/// Return repetition level data.
     /// The side effect is similar to `consume_def_levels`.
     </span><span class="kw">pub fn </span>consume_rep_levels(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Buffer&gt; {
-        <span class="self">self</span>.rep_levels.as_mut().map(|x| x.consume())
+        <span class="self">self</span>.rep_levels
+            .as_mut()
+            .map(|x| Buffer::from_vec(x.consume()))
     }
 
     <span class="doccomment">/// Returns currently stored buffer data.
@@ -1039,9 +1032,9 @@
         <span class="kw">let </span>rep_levels = <span class="self">self
             </span>.rep_levels
             .as_mut()
-            .map(|levels| levels.spare_capacity_mut(batch_size));
+            .map(|levels| levels.get_output_slice(batch_size));
         <span class="kw">let </span>def_levels = <span class="self">self</span>.def_levels.as_mut();
-        <span class="kw">let </span>values = <span class="self">self</span>.values.spare_capacity_mut(batch_size);
+        <span class="kw">let </span>values = <span class="self">self</span>.values.get_output_slice(batch_size);
 
         <span class="kw">let </span>(records_read, values_read, levels_read) = <span class="self">self
             </span>.column_reader
@@ -1064,9 +1057,9 @@
 
         <span class="self">self</span>.num_records += records_read;
         <span class="self">self</span>.num_values += levels_read;
-        <span class="self">self</span>.values.set_len(<span class="self">self</span>.num_values);
+        <span class="self">self</span>.values.truncate_buffer(<span class="self">self</span>.num_values);
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>buf) = <span class="self">self</span>.rep_levels {
-            buf.set_len(<span class="self">self</span>.num_values)
+            buf.truncate_buffer(<span class="self">self</span>.num_values)
         };
         <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>buf) = <span class="self">self</span>.def_levels {
             buf.set_len(<span class="self">self</span>.num_values)
@@ -1087,7 +1080,7 @@
     <span class="kw">use </span>std::sync::Arc;
 
     <span class="kw">use </span>arrow::buffer::Buffer;
-    <span class="kw">use </span>arrow_array::builder::{Int16BufferBuilder, Int32BufferBuilder};
+    <span class="kw">use </span>arrow_array::builder::Int16BufferBuilder;
 
     <span class="kw">use </span><span class="kw">crate</span>::basic::Encoding;
     <span class="kw">use </span><span class="kw">crate</span>::data_type::Int32Type;
@@ -1164,10 +1157,7 @@
             <span class="macro">assert_eq!</span>(<span class="number">7</span>, record_reader.num_values());
         }
 
-        <span class="kw">let </span><span class="kw-2">mut </span>bb = Int32BufferBuilder::new(<span class="number">7</span>);
-        bb.append_slice(<span class="kw-2">&amp;</span>[<span class="number">4</span>, <span class="number">7</span>, <span class="number">6</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">8</span>, <span class="number">9</span>]);
-        <span class="kw">let </span>expected_buffer = bb.finish();
-        <span class="macro">assert_eq!</span>(expected_buffer, record_reader.consume_record_data());
+        <span class="macro">assert_eq!</span>(record_reader.consume_record_data(), <span class="kw-2">&amp;</span>[<span class="number">4</span>, <span class="number">7</span>, <span class="number">6</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">8</span>, <span class="number">9</span>]);
         <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, record_reader.consume_def_levels());
         <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, record_reader.consume_bitmap());
     }
@@ -1264,13 +1254,12 @@
 
         <span class="comment">// Verify result record data
         </span><span class="kw">let </span>actual = record_reader.consume_record_data();
-        <span class="kw">let </span>actual_values = actual.typed_data::&lt;i32&gt;();
 
         <span class="kw">let </span>expected = <span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">7</span>, <span class="number">0</span>, <span class="number">6</span>, <span class="number">3</span>, <span class="number">0</span>, <span class="number">8</span>];
-        <span class="macro">assert_eq!</span>(actual_values.len(), expected.len());
+        <span class="macro">assert_eq!</span>(actual.len(), expected.len());
 
         <span class="comment">// Only validate valid values are equal
-        </span><span class="kw">let </span>iter = expected_valid.iter().zip(actual_values).zip(expected);
+        </span><span class="kw">let </span>iter = expected_valid.iter().zip(<span class="kw-2">&amp;</span>actual).zip(expected);
         <span class="kw">for </span>((valid, actual), expected) <span class="kw">in </span>iter {
             <span class="kw">if </span><span class="kw-2">*</span>valid {
                 <span class="macro">assert_eq!</span>(actual, expected)
@@ -1374,12 +1363,11 @@
 
         <span class="comment">// Verify result record data
         </span><span class="kw">let </span>actual = record_reader.consume_record_data();
-        <span class="kw">let </span>actual_values = actual.typed_data::&lt;i32&gt;();
         <span class="kw">let </span>expected = <span class="kw-2">&amp;</span>[<span class="number">4</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">7</span>, <span class="number">6</span>, <span class="number">3</span>, <span class="number">2</span>, <span class="number">8</span>, <span class="number">9</span>];
-        <span class="macro">assert_eq!</span>(actual_values.len(), expected.len());
+        <span class="macro">assert_eq!</span>(actual.len(), expected.len());
 
         <span class="comment">// Only validate valid values are equal
-        </span><span class="kw">let </span>iter = expected_valid.iter().zip(actual_values).zip(expected);
+        </span><span class="kw">let </span>iter = expected_valid.iter().zip(<span class="kw-2">&amp;</span>actual).zip(expected);
         <span class="kw">for </span>((valid, actual), expected) <span class="kw">in </span>iter {
             <span class="kw">if </span><span class="kw-2">*</span>valid {
                 <span class="macro">assert_eq!</span>(actual, expected)
@@ -1543,10 +1531,7 @@
             <span class="macro">assert_eq!</span>(<span class="number">0</span>, record_reader.read_records(<span class="number">10</span>).unwrap());
         }
 
-        <span class="kw">let </span><span class="kw-2">mut </span>bb = Int32BufferBuilder::new(<span class="number">3</span>);
-        bb.append_slice(<span class="kw-2">&amp;</span>[<span class="number">6</span>, <span class="number">3</span>, <span class="number">2</span>]);
-        <span class="kw">let </span>expected_buffer = bb.finish();
-        <span class="macro">assert_eq!</span>(expected_buffer, record_reader.consume_record_data());
+        <span class="macro">assert_eq!</span>(record_reader.consume_record_data(), <span class="kw-2">&amp;</span>[<span class="number">6</span>, <span class="number">3</span>, <span class="number">2</span>]);
         <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, record_reader.consume_def_levels());
         <span class="macro">assert_eq!</span>(<span class="prelude-val">None</span>, record_reader.consume_bitmap());
     }
@@ -1644,13 +1629,12 @@
 
         <span class="comment">// Verify result record data
         </span><span class="kw">let </span>actual = record_reader.consume_record_data();
-        <span class="kw">let </span>actual_values = actual.typed_data::&lt;i32&gt;();
 
         <span class="kw">let </span>expected = <span class="kw-2">&amp;</span>[<span class="number">0</span>, <span class="number">6</span>, <span class="number">3</span>];
-        <span class="macro">assert_eq!</span>(actual_values.len(), expected.len());
+        <span class="macro">assert_eq!</span>(actual.len(), expected.len());
 
         <span class="comment">// Only validate valid values are equal
-        </span><span class="kw">let </span>iter = expected_valid.iter().zip(actual_values).zip(expected);
+        </span><span class="kw">let </span>iter = expected_valid.iter().zip(<span class="kw-2">&amp;</span>actual).zip(expected);
         <span class="kw">for </span>((valid, actual), expected) <span class="kw">in </span>iter {
             <span class="kw">if </span><span class="kw-2">*</span>valid {
                 <span class="macro">assert_eq!</span>(actual, expected)

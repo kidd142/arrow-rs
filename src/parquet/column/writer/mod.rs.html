@@ -3580,22 +3580,6 @@
 <a href="#3580" id="3580">3580</a>
 <a href="#3581" id="3581">3581</a>
 <a href="#3582" id="3582">3582</a>
-<a href="#3583" id="3583">3583</a>
-<a href="#3584" id="3584">3584</a>
-<a href="#3585" id="3585">3585</a>
-<a href="#3586" id="3586">3586</a>
-<a href="#3587" id="3587">3587</a>
-<a href="#3588" id="3588">3588</a>
-<a href="#3589" id="3589">3589</a>
-<a href="#3590" id="3590">3590</a>
-<a href="#3591" id="3591">3591</a>
-<a href="#3592" id="3592">3592</a>
-<a href="#3593" id="3593">3593</a>
-<a href="#3594" id="3594">3594</a>
-<a href="#3595" id="3595">3595</a>
-<a href="#3596" id="3596">3596</a>
-<a href="#3597" id="3597">3597</a>
-<a href="#3598" id="3598">3598</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -3927,28 +3911,11 @@
             <span class="prelude-val">None </span>=&gt; values.len(),
         };
 
-        <span class="comment">// If only computing chunk-level statistics compute them here, page-level statistics
-        // are computed in [`Self::write_mini_batch`] and used to update chunk statistics in
-        // [`Self::add_data_page`]
-        </span><span class="kw">if </span><span class="self">self</span>.statistics_enabled == EnabledStatistics::Chunk
-            <span class="comment">// INTERVAL has undefined sort order, so don't write min/max stats for it
-            </span>&amp;&amp; <span class="self">self</span>.descr.converted_type() != ConvertedType::INTERVAL
-        {
-            <span class="kw">match </span>(min, max) {
-                (<span class="prelude-val">Some</span>(min), <span class="prelude-val">Some</span>(max)) =&gt; {
-                    update_min(<span class="kw-2">&amp;</span><span class="self">self</span>.descr, min, <span class="kw-2">&amp;mut </span><span class="self">self</span>.column_metrics.min_column_value);
-                    update_max(<span class="kw-2">&amp;</span><span class="self">self</span>.descr, max, <span class="kw-2">&amp;mut </span><span class="self">self</span>.column_metrics.max_column_value);
-                }
-                (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw">_</span>)) | (<span class="prelude-val">Some</span>(<span class="kw">_</span>), <span class="prelude-val">None</span>) =&gt; {
-                    <span class="macro">panic!</span>(<span class="string">"min/max should be both set or both None"</span>)
-                }
-                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; {
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>((min, max)) = <span class="self">self</span>.encoder.min_max(values, value_indices) {
-                        update_min(<span class="kw-2">&amp;</span><span class="self">self</span>.descr, <span class="kw-2">&amp;</span>min, <span class="kw-2">&amp;mut </span><span class="self">self</span>.column_metrics.min_column_value);
-                        update_max(<span class="kw-2">&amp;</span><span class="self">self</span>.descr, <span class="kw-2">&amp;</span>max, <span class="kw-2">&amp;mut </span><span class="self">self</span>.column_metrics.max_column_value);
-                    }
-                }
-            };
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(min) = min {
+            update_min(<span class="kw-2">&amp;</span><span class="self">self</span>.descr, min, <span class="kw-2">&amp;mut </span><span class="self">self</span>.column_metrics.min_column_value);
+        }
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(max) = max {
+            update_max(<span class="kw-2">&amp;</span><span class="self">self</span>.descr, max, <span class="kw-2">&amp;mut </span><span class="self">self</span>.column_metrics.max_column_value);
         }
 
         <span class="comment">// We can only set the distinct count if there are no other writes
@@ -4362,23 +4329,24 @@
 
         <span class="self">self</span>.column_metrics.num_column_nulls += <span class="self">self</span>.page_metrics.num_page_nulls;
 
-        <span class="kw">let </span>page_statistics = <span class="kw">if let </span>(<span class="prelude-val">Some</span>(min), <span class="prelude-val">Some</span>(max)) =
-            (values_data.min_value, values_data.max_value)
-        {
-            <span class="comment">// Update chunk level statistics
-            </span>update_min(<span class="kw-2">&amp;</span><span class="self">self</span>.descr, <span class="kw-2">&amp;</span>min, <span class="kw-2">&amp;mut </span><span class="self">self</span>.column_metrics.min_column_value);
-            update_max(<span class="kw-2">&amp;</span><span class="self">self</span>.descr, <span class="kw-2">&amp;</span>max, <span class="kw-2">&amp;mut </span><span class="self">self</span>.column_metrics.max_column_value);
+        <span class="kw">let </span>page_statistics = <span class="kw">match </span>(values_data.min_value, values_data.max_value) {
+            (<span class="prelude-val">Some</span>(min), <span class="prelude-val">Some</span>(max)) =&gt; {
+                <span class="comment">// Update chunk level statistics
+                </span>update_min(<span class="kw-2">&amp;</span><span class="self">self</span>.descr, <span class="kw-2">&amp;</span>min, <span class="kw-2">&amp;mut </span><span class="self">self</span>.column_metrics.min_column_value);
+                update_max(<span class="kw-2">&amp;</span><span class="self">self</span>.descr, <span class="kw-2">&amp;</span>max, <span class="kw-2">&amp;mut </span><span class="self">self</span>.column_metrics.max_column_value);
 
-            (<span class="self">self</span>.statistics_enabled == EnabledStatistics::Page).then_some(ValueStatistics::new(
-                <span class="prelude-val">Some</span>(min),
-                <span class="prelude-val">Some</span>(max),
-                <span class="prelude-val">None</span>,
-                <span class="self">self</span>.page_metrics.num_page_nulls,
-                <span class="bool-val">false</span>,
-            ))
-        } <span class="kw">else </span>{
-            <span class="prelude-val">None
-        </span>};
+                (<span class="self">self</span>.statistics_enabled == EnabledStatistics::Page).then_some(
+                    ValueStatistics::new(
+                        <span class="prelude-val">Some</span>(min),
+                        <span class="prelude-val">Some</span>(max),
+                        <span class="prelude-val">None</span>,
+                        <span class="self">self</span>.page_metrics.num_page_nulls,
+                        <span class="bool-val">false</span>,
+                    ),
+                )
+            }
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        };
 
         <span class="comment">// update column and offset index
         </span><span class="self">self</span>.update_column_offset_index(page_statistics.as_ref());

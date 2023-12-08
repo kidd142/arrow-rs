@@ -533,18 +533,6 @@
 <a href="#533" id="533">533</a>
 <a href="#534" id="534">534</a>
 <a href="#535" id="535">535</a>
-<a href="#536" id="536">536</a>
-<a href="#537" id="537">537</a>
-<a href="#538" id="538">538</a>
-<a href="#539" id="539">539</a>
-<a href="#540" id="540">540</a>
-<a href="#541" id="541">541</a>
-<a href="#542" id="542">542</a>
-<a href="#543" id="543">543</a>
-<a href="#544" id="544">544</a>
-<a href="#545" id="545">545</a>
-<a href="#546" id="546">546</a>
-<a href="#547" id="547">547</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -569,7 +557,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::encodings::encoding::{DeltaBitPackEncoder, Encoder};
 <span class="kw">use </span><span class="kw">crate</span>::encodings::rle::RleEncoder;
 <span class="kw">use </span><span class="kw">crate</span>::errors::{ParquetError, <span class="prelude-ty">Result</span>};
-<span class="kw">use </span><span class="kw">crate</span>::file::properties::{WriterProperties, WriterVersion};
+<span class="kw">use </span><span class="kw">crate</span>::file::properties::{EnabledStatistics, WriterProperties, WriterVersion};
 <span class="kw">use </span><span class="kw">crate</span>::schema::types::ColumnDescPtr;
 <span class="kw">use </span><span class="kw">crate</span>::util::bit_util::num_required_bits;
 <span class="kw">use </span><span class="kw">crate</span>::util::interner::{Interner, Storage};
@@ -926,6 +914,7 @@
 <span class="kw">pub struct </span>ByteArrayEncoder {
     fallback: FallbackEncoder,
     dict_encoder: <span class="prelude-ty">Option</span>&lt;DictEncoder&gt;,
+    statistics_enabled: EnabledStatistics,
     min_value: <span class="prelude-ty">Option</span>&lt;ByteArray&gt;,
     max_value: <span class="prelude-ty">Option</span>&lt;ByteArray&gt;,
     bloom_filter: <span class="prelude-ty">Option</span>&lt;Sbbf&gt;,
@@ -934,24 +923,6 @@
 <span class="kw">impl </span>ColumnValueEncoder <span class="kw">for </span>ByteArrayEncoder {
     <span class="kw">type </span>T = ByteArray;
     <span class="kw">type </span>Values = <span class="kw">dyn </span>Array;
-
-    <span class="kw">fn </span>min_max(
-        <span class="kw-2">&amp;</span><span class="self">self</span>,
-        values: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Array,
-        value_indices: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[usize]&gt;,
-    ) -&gt; <span class="prelude-ty">Option</span>&lt;(<span class="self">Self</span>::T, <span class="self">Self</span>::T)&gt; {
-        <span class="kw">match </span>value_indices {
-            <span class="prelude-val">Some</span>(indices) =&gt; {
-                <span class="kw">let </span>iter = indices.iter().cloned();
-                <span class="macro">downcast_op!</span>(values.data_type(), values, compute_min_max, iter)
-            }
-            <span class="prelude-val">None </span>=&gt; {
-                <span class="kw">let </span>len = Array::len(values);
-                <span class="macro">downcast_op!</span>(values.data_type(), values, compute_min_max, <span class="number">0</span>..len)
-            }
-        }
-    }
-
     <span class="kw">fn </span>flush_bloom_filter(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Sbbf&gt; {
         <span class="self">self</span>.bloom_filter.take()
     }
@@ -971,12 +942,15 @@
             .map(|props| Sbbf::new_with_ndv_fpp(props.ndv, props.fpp))
             .transpose()<span class="question-mark">?</span>;
 
+        <span class="kw">let </span>statistics_enabled = props.statistics_enabled(descr.path());
+
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             fallback,
+            statistics_enabled,
+            bloom_filter,
             dict_encoder: dictionary,
             min_value: <span class="prelude-val">None</span>,
             max_value: <span class="prelude-val">None</span>,
-            bloom_filter,
         })
     }
 
@@ -1045,13 +1019,15 @@
     </span>T: ArrayAccessor + Copy,
     T::Item: Copy + Ord + AsRef&lt;[u8]&gt;,
 {
-    <span class="kw">if let </span><span class="prelude-val">Some</span>((min, max)) = compute_min_max(values, indices.iter().cloned()) {
-        <span class="kw">if </span>encoder.min_value.as_ref().map_or(<span class="bool-val">true</span>, |m| m &gt; <span class="kw-2">&amp;</span>min) {
-            encoder.min_value = <span class="prelude-val">Some</span>(min);
-        }
+    <span class="kw">if </span>encoder.statistics_enabled != EnabledStatistics::None {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>((min, max)) = compute_min_max(values, indices.iter().cloned()) {
+            <span class="kw">if </span>encoder.min_value.as_ref().map_or(<span class="bool-val">true</span>, |m| m &gt; <span class="kw-2">&amp;</span>min) {
+                encoder.min_value = <span class="prelude-val">Some</span>(min);
+            }
 
-        <span class="kw">if </span>encoder.max_value.as_ref().map_or(<span class="bool-val">true</span>, |m| m &lt; <span class="kw-2">&amp;</span>max) {
-            encoder.max_value = <span class="prelude-val">Some</span>(max);
+            <span class="kw">if </span>encoder.max_value.as_ref().map_or(<span class="bool-val">true</span>, |m| m &lt; <span class="kw-2">&amp;</span>max) {
+                encoder.max_value = <span class="prelude-val">Some</span>(max);
+            }
         }
     }
 

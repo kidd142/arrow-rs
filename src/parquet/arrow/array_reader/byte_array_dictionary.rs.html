@@ -667,19 +667,6 @@
 <a href="#667" id="667">667</a>
 <a href="#668" id="668">668</a>
 <a href="#669" id="669">669</a>
-<a href="#670" id="670">670</a>
-<a href="#671" id="671">671</a>
-<a href="#672" id="672">672</a>
-<a href="#673" id="673">673</a>
-<a href="#674" id="674">674</a>
-<a href="#675" id="675">675</a>
-<a href="#676" id="676">676</a>
-<a href="#677" id="677">677</a>
-<a href="#678" id="678">678</a>
-<a href="#679" id="679">679</a>
-<a href="#680" id="680">680</a>
-<a href="#681" id="681">681</a>
-<a href="#682" id="682">682</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -709,10 +696,8 @@
 
 <span class="kw">use </span><span class="kw">crate</span>::arrow::array_reader::byte_array::{ByteArrayDecoder, ByteArrayDecoderPlain};
 <span class="kw">use </span><span class="kw">crate</span>::arrow::array_reader::{read_records, skip_records, ArrayReader};
-<span class="kw">use </span><span class="kw">crate</span>::arrow::buffer::{
-    dictionary_buffer::DictionaryBuffer, offset_buffer::OffsetBuffer,
-};
-<span class="kw">use </span><span class="kw">crate</span>::arrow::record_reader::buffer::{BufferQueue, ScalarValue};
+<span class="kw">use </span><span class="kw">crate</span>::arrow::buffer::{dictionary_buffer::DictionaryBuffer, offset_buffer::OffsetBuffer};
+<span class="kw">use </span><span class="kw">crate</span>::arrow::record_reader::buffer::BufferQueue;
 <span class="kw">use </span><span class="kw">crate</span>::arrow::record_reader::GenericRecordReader;
 <span class="kw">use </span><span class="kw">crate</span>::arrow::schema::parquet_to_arrow_field;
 <span class="kw">use </span><span class="kw">crate</span>::basic::{ConvertedType, Encoding};
@@ -805,7 +790,7 @@
 <span class="doccomment">/// An [`ArrayReader`] for dictionary encoded variable length byte arrays
 ///
 /// Will attempt to preserve any dictionary encoding present in the parquet data
-</span><span class="kw">struct </span>ByteArrayDictionaryReader&lt;K: ScalarValue, V: ScalarValue&gt; {
+</span><span class="kw">struct </span>ByteArrayDictionaryReader&lt;K: ArrowNativeType, V: OffsetSizeTrait&gt; {
     data_type: ArrowType,
     pages: Box&lt;<span class="kw">dyn </span>PageIterator&gt;,
     def_levels_buffer: <span class="prelude-ty">Option</span>&lt;Buffer&gt;,
@@ -815,16 +800,13 @@
 
 <span class="kw">impl</span>&lt;K, V&gt; ByteArrayDictionaryReader&lt;K, V&gt;
 <span class="kw">where
-    </span>K: FromBytes + ScalarValue + Ord + ArrowNativeType,
-    V: ScalarValue + OffsetSizeTrait,
+    </span>K: FromBytes + Ord + ArrowNativeType,
+    V: OffsetSizeTrait,
 {
     <span class="kw">fn </span>new(
         pages: Box&lt;<span class="kw">dyn </span>PageIterator&gt;,
         data_type: ArrowType,
-        record_reader: GenericRecordReader&lt;
-            DictionaryBuffer&lt;K, V&gt;,
-            DictionaryDecoder&lt;K, V&gt;,
-        &gt;,
+        record_reader: GenericRecordReader&lt;DictionaryBuffer&lt;K, V&gt;, DictionaryDecoder&lt;K, V&gt;&gt;,
     ) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             data_type,
@@ -838,8 +820,8 @@
 
 <span class="kw">impl</span>&lt;K, V&gt; ArrayReader <span class="kw">for </span>ByteArrayDictionaryReader&lt;K, V&gt;
 <span class="kw">where
-    </span>K: FromBytes + ScalarValue + Ord + ArrowNativeType,
-    V: ScalarValue + OffsetSizeTrait,
+    </span>K: FromBytes + Ord + ArrowNativeType,
+    V: OffsetSizeTrait,
 {
     <span class="kw">fn </span>as_any(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn </span>Any {
         <span class="self">self
@@ -908,16 +890,15 @@
 
 <span class="kw">impl</span>&lt;K, V&gt; ColumnValueDecoder <span class="kw">for </span>DictionaryDecoder&lt;K, V&gt;
 <span class="kw">where
-    </span>K: FromBytes + ScalarValue + Ord + ArrowNativeType,
-    V: ScalarValue + OffsetSizeTrait,
+    </span>K: FromBytes + Ord + ArrowNativeType,
+    V: OffsetSizeTrait,
 {
     <span class="kw">type </span>Slice = DictionaryBuffer&lt;K, V&gt;;
 
     <span class="kw">fn </span>new(col: <span class="kw-2">&amp;</span>ColumnDescPtr) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>validate_utf8 = col.converted_type() == ConvertedType::UTF8;
 
-        <span class="kw">let </span>value_type = <span class="kw">match </span>(V::IS_LARGE, col.converted_type() == ConvertedType::UTF8)
-        {
+        <span class="kw">let </span>value_type = <span class="kw">match </span>(V::IS_LARGE, col.converted_type() == ConvertedType::UTF8) {
             (<span class="bool-val">true</span>, <span class="bool-val">true</span>) =&gt; ArrowType::LargeUtf8,
             (<span class="bool-val">true</span>, <span class="bool-val">false</span>) =&gt; ArrowType::LargeBinary,
             (<span class="bool-val">false</span>, <span class="bool-val">true</span>) =&gt; ArrowType::Utf8,
@@ -956,8 +937,7 @@
 
         <span class="kw">let </span>len = num_values <span class="kw">as </span>usize;
         <span class="kw">let </span><span class="kw-2">mut </span>buffer = OffsetBuffer::&lt;V&gt;::default();
-        <span class="kw">let </span><span class="kw-2">mut </span>decoder =
-            ByteArrayDecoderPlain::new(buf, len, <span class="prelude-val">Some</span>(len), <span class="self">self</span>.validate_utf8);
+        <span class="kw">let </span><span class="kw-2">mut </span>decoder = ByteArrayDecoderPlain::new(buf, len, <span class="prelude-val">Some</span>(len), <span class="self">self</span>.validate_utf8);
         decoder.read(<span class="kw-2">&amp;mut </span>buffer, usize::MAX)<span class="question-mark">?</span>;
 
         <span class="kw">let </span>array = buffer.into_array(<span class="prelude-val">None</span>, <span class="self">self</span>.value_type.clone());
@@ -1021,8 +1001,8 @@
                     <span class="prelude-val">Some</span>(keys) =&gt; {
                         <span class="comment">// Happy path - can just copy keys
                         // Keys will be validated on conversion to arrow
-                        </span><span class="kw">let </span>keys_slice = keys.spare_capacity_mut(range.start + len);
-                        <span class="kw">let </span>len = decoder.get_batch(<span class="kw-2">&amp;mut </span>keys_slice[range.start..])<span class="question-mark">?</span>;
+                        </span><span class="kw">let </span>keys_slice = keys.get_output_slice(len);
+                        <span class="kw">let </span>len = decoder.get_batch(keys_slice)<span class="question-mark">?</span>;
                         <span class="kw-2">*</span>max_remaining_values -= len;
                         <span class="prelude-val">Ok</span>(len)
                     }
@@ -1042,11 +1022,7 @@
                         <span class="kw">let </span>dict_offsets = dict_buffers[<span class="number">0</span>].typed_data::&lt;V&gt;();
                         <span class="kw">let </span>dict_values = dict_buffers[<span class="number">1</span>].as_slice();
 
-                        values.extend_from_dictionary(
-                            <span class="kw-2">&amp;</span>keys[..len],
-                            dict_offsets,
-                            dict_values,
-                        )<span class="question-mark">?</span>;
+                        values.extend_from_dictionary(<span class="kw-2">&amp;</span>keys[..len], dict_offsets, dict_values)<span class="question-mark">?</span>;
                         <span class="kw-2">*</span>max_remaining_values -= len;
                         <span class="prelude-val">Ok</span>(len)
                     }
@@ -1057,9 +1033,7 @@
 
     <span class="kw">fn </span>skip_values(<span class="kw-2">&amp;mut </span><span class="self">self</span>, num_values: usize) -&gt; <span class="prelude-ty">Result</span>&lt;usize&gt; {
         <span class="kw">match </span><span class="self">self</span>.decoder.as_mut().expect(<span class="string">"decoder set"</span>) {
-            MaybeDictionaryDecoder::Fallback(decoder) =&gt; {
-                decoder.skip::&lt;V&gt;(num_values, <span class="prelude-val">None</span>)
-            }
+            MaybeDictionaryDecoder::Fallback(decoder) =&gt; decoder.skip::&lt;V&gt;(num_values, <span class="prelude-val">None</span>),
             MaybeDictionaryDecoder::Dict {
                 decoder,
                 max_remaining_values,

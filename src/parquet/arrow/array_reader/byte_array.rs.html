@@ -715,20 +715,6 @@
 <a href="#715" id="715">715</a>
 <a href="#716" id="716">716</a>
 <a href="#717" id="717">717</a>
-<a href="#718" id="718">718</a>
-<a href="#719" id="719">719</a>
-<a href="#720" id="720">720</a>
-<a href="#721" id="721">721</a>
-<a href="#722" id="722">722</a>
-<a href="#723" id="723">723</a>
-<a href="#724" id="724">724</a>
-<a href="#725" id="725">725</a>
-<a href="#726" id="726">726</a>
-<a href="#727" id="727">727</a>
-<a href="#728" id="728">728</a>
-<a href="#729" id="729">729</a>
-<a href="#730" id="730">730</a>
-<a href="#731" id="731">731</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -750,7 +736,6 @@
 <span class="kw">use </span><span class="kw">crate</span>::arrow::buffer::bit_util::sign_extend_be;
 <span class="kw">use </span><span class="kw">crate</span>::arrow::buffer::offset_buffer::OffsetBuffer;
 <span class="kw">use </span><span class="kw">crate</span>::arrow::decoder::{DeltaByteArrayDecoder, DictIndexDecoder};
-<span class="kw">use </span><span class="kw">crate</span>::arrow::record_reader::buffer::ScalarValue;
 <span class="kw">use </span><span class="kw">crate</span>::arrow::record_reader::GenericRecordReader;
 <span class="kw">use </span><span class="kw">crate</span>::arrow::schema::parquet_to_arrow_field;
 <span class="kw">use </span><span class="kw">crate</span>::basic::{ConvertedType, Encoding};
@@ -808,7 +793,7 @@
 }
 
 <span class="doccomment">/// An [`ArrayReader`] for variable length byte arrays
-</span><span class="kw">struct </span>ByteArrayReader&lt;I: ScalarValue&gt; {
+</span><span class="kw">struct </span>ByteArrayReader&lt;I: OffsetSizeTrait&gt; {
     data_type: ArrowType,
     pages: Box&lt;<span class="kw">dyn </span>PageIterator&gt;,
     def_levels_buffer: <span class="prelude-ty">Option</span>&lt;Buffer&gt;,
@@ -816,14 +801,11 @@
     record_reader: GenericRecordReader&lt;OffsetBuffer&lt;I&gt;, ByteArrayColumnValueDecoder&lt;I&gt;&gt;,
 }
 
-<span class="kw">impl</span>&lt;I: ScalarValue&gt; ByteArrayReader&lt;I&gt; {
+<span class="kw">impl</span>&lt;I: OffsetSizeTrait&gt; ByteArrayReader&lt;I&gt; {
     <span class="kw">fn </span>new(
         pages: Box&lt;<span class="kw">dyn </span>PageIterator&gt;,
         data_type: ArrowType,
-        record_reader: GenericRecordReader&lt;
-            OffsetBuffer&lt;I&gt;,
-            ByteArrayColumnValueDecoder&lt;I&gt;,
-        &gt;,
+        record_reader: GenericRecordReader&lt;OffsetBuffer&lt;I&gt;, ByteArrayColumnValueDecoder&lt;I&gt;&gt;,
     ) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
             data_type,
@@ -835,7 +817,7 @@
     }
 }
 
-<span class="kw">impl</span>&lt;I: OffsetSizeTrait + ScalarValue&gt; ArrayReader <span class="kw">for </span>ByteArrayReader&lt;I&gt; {
+<span class="kw">impl</span>&lt;I: OffsetSizeTrait&gt; ArrayReader <span class="kw">for </span>ByteArrayReader&lt;I&gt; {
     <span class="kw">fn </span>as_any(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn </span>Any {
         <span class="self">self
     </span>}
@@ -898,15 +880,13 @@
 }
 
 <span class="doccomment">/// A [`ColumnValueDecoder`] for variable length byte arrays
-</span><span class="kw">struct </span>ByteArrayColumnValueDecoder&lt;I: ScalarValue&gt; {
+</span><span class="kw">struct </span>ByteArrayColumnValueDecoder&lt;I: OffsetSizeTrait&gt; {
     dict: <span class="prelude-ty">Option</span>&lt;OffsetBuffer&lt;I&gt;&gt;,
     decoder: <span class="prelude-ty">Option</span>&lt;ByteArrayDecoder&gt;,
     validate_utf8: bool,
 }
 
-<span class="kw">impl</span>&lt;I: OffsetSizeTrait + ScalarValue&gt; ColumnValueDecoder
-    <span class="kw">for </span>ByteArrayColumnValueDecoder&lt;I&gt;
-{
+<span class="kw">impl</span>&lt;I: OffsetSizeTrait&gt; ColumnValueDecoder <span class="kw">for </span>ByteArrayColumnValueDecoder&lt;I&gt; {
     <span class="kw">type </span>Slice = OffsetBuffer&lt;I&gt;;
 
     <span class="kw">fn </span>new(desc: <span class="kw-2">&amp;</span>ColumnDescPtr) -&gt; <span class="self">Self </span>{
@@ -1006,17 +986,15 @@
                 num_values,
                 validate_utf8,
             )),
-            Encoding::RLE_DICTIONARY | Encoding::PLAIN_DICTIONARY =&gt; {
-                ByteArrayDecoder::Dictionary(ByteArrayDecoderDictionary::new(
-                    data, num_levels, num_values,
-                ))
-            }
+            Encoding::RLE_DICTIONARY | Encoding::PLAIN_DICTIONARY =&gt; ByteArrayDecoder::Dictionary(
+                ByteArrayDecoderDictionary::new(data, num_levels, num_values),
+            ),
             Encoding::DELTA_LENGTH_BYTE_ARRAY =&gt; ByteArrayDecoder::DeltaLength(
                 ByteArrayDecoderDeltaLength::new(data, validate_utf8)<span class="question-mark">?</span>,
             ),
-            Encoding::DELTA_BYTE_ARRAY =&gt; ByteArrayDecoder::DeltaByteArray(
-                ByteArrayDecoderDelta::new(data, validate_utf8)<span class="question-mark">?</span>,
-            ),
+            Encoding::DELTA_BYTE_ARRAY =&gt; {
+                ByteArrayDecoder::DeltaByteArray(ByteArrayDecoderDelta::new(data, validate_utf8)<span class="question-mark">?</span>)
+            }
             <span class="kw">_ </span>=&gt; {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="macro">general_err!</span>(
                     <span class="string">"unsupported encoding for byte array: {}"</span>,
@@ -1029,7 +1007,7 @@
     }
 
     <span class="doccomment">/// Read up to `len` values to `out` with the optional dictionary
-    </span><span class="kw">pub fn </span>read&lt;I: OffsetSizeTrait + ScalarValue&gt;(
+    </span><span class="kw">pub fn </span>read&lt;I: OffsetSizeTrait&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         out: <span class="kw-2">&amp;mut </span>OffsetBuffer&lt;I&gt;,
         len: usize,
@@ -1038,8 +1016,8 @@
         <span class="kw">match </span><span class="self">self </span>{
             ByteArrayDecoder::Plain(d) =&gt; d.read(out, len),
             ByteArrayDecoder::Dictionary(d) =&gt; {
-                <span class="kw">let </span>dict = dict
-                    .ok_or_else(|| <span class="macro">general_err!</span>(<span class="string">"missing dictionary page for column"</span>))<span class="question-mark">?</span>;
+                <span class="kw">let </span>dict =
+                    dict.ok_or_else(|| <span class="macro">general_err!</span>(<span class="string">"missing dictionary page for column"</span>))<span class="question-mark">?</span>;
 
                 d.read(out, dict, len)
             }
@@ -1049,7 +1027,7 @@
     }
 
     <span class="doccomment">/// Skip `len` values
-    </span><span class="kw">pub fn </span>skip&lt;I: OffsetSizeTrait + ScalarValue&gt;(
+    </span><span class="kw">pub fn </span>skip&lt;I: OffsetSizeTrait&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         len: usize,
         dict: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>OffsetBuffer&lt;I&gt;&gt;,
@@ -1057,8 +1035,8 @@
         <span class="kw">match </span><span class="self">self </span>{
             ByteArrayDecoder::Plain(d) =&gt; d.skip(len),
             ByteArrayDecoder::Dictionary(d) =&gt; {
-                <span class="kw">let </span>dict = dict
-                    .ok_or_else(|| <span class="macro">general_err!</span>(<span class="string">"missing dictionary page for column"</span>))<span class="question-mark">?</span>;
+                <span class="kw">let </span>dict =
+                    dict.ok_or_else(|| <span class="macro">general_err!</span>(<span class="string">"missing dictionary page for column"</span>))<span class="question-mark">?</span>;
 
                 d.skip(dict, len)
             }
@@ -1094,7 +1072,7 @@
         }
     }
 
-    <span class="kw">pub fn </span>read&lt;I: OffsetSizeTrait + ScalarValue&gt;(
+    <span class="kw">pub fn </span>read&lt;I: OffsetSizeTrait&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         output: <span class="kw-2">&amp;mut </span>OffsetBuffer&lt;I&gt;,
         len: usize,
@@ -1123,8 +1101,7 @@
             <span class="kw">if </span><span class="self">self</span>.offset + <span class="number">4 </span>&gt; buf.len() {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(ParquetError::EOF(<span class="string">"eof decoding byte array"</span>.into()));
             }
-            <span class="kw">let </span>len_bytes: [u8; <span class="number">4</span>] =
-                buf[<span class="self">self</span>.offset..<span class="self">self</span>.offset + <span class="number">4</span>].try_into().unwrap();
+            <span class="kw">let </span>len_bytes: [u8; <span class="number">4</span>] = buf[<span class="self">self</span>.offset..<span class="self">self</span>.offset + <span class="number">4</span>].try_into().unwrap();
             <span class="kw">let </span>len = u32::from_le_bytes(len_bytes);
 
             <span class="kw">let </span>start_offset = <span class="self">self</span>.offset + <span class="number">4</span>;
@@ -1155,8 +1132,7 @@
             <span class="kw">if </span><span class="self">self</span>.offset + <span class="number">4 </span>&gt; buf.len() {
                 <span class="kw">return </span><span class="prelude-val">Err</span>(ParquetError::EOF(<span class="string">"eof decoding byte array"</span>.into()));
             }
-            <span class="kw">let </span>len_bytes: [u8; <span class="number">4</span>] =
-                buf[<span class="self">self</span>.offset..<span class="self">self</span>.offset + <span class="number">4</span>].try_into().unwrap();
+            <span class="kw">let </span>len_bytes: [u8; <span class="number">4</span>] = buf[<span class="self">self</span>.offset..<span class="self">self</span>.offset + <span class="number">4</span>].try_into().unwrap();
             <span class="kw">let </span>len = u32::from_le_bytes(len_bytes) <span class="kw">as </span>usize;
             skip += <span class="number">1</span>;
             <span class="self">self</span>.offset = <span class="self">self</span>.offset + <span class="number">4 </span>+ len;
@@ -1193,7 +1169,7 @@
         })
     }
 
-    <span class="kw">fn </span>read&lt;I: OffsetSizeTrait + ScalarValue&gt;(
+    <span class="kw">fn </span>read&lt;I: OffsetSizeTrait&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         output: <span class="kw-2">&amp;mut </span>OffsetBuffer&lt;I&gt;,
         len: usize,
@@ -1260,7 +1236,7 @@
         })
     }
 
-    <span class="kw">fn </span>read&lt;I: OffsetSizeTrait + ScalarValue&gt;(
+    <span class="kw">fn </span>read&lt;I: OffsetSizeTrait&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         output: <span class="kw-2">&amp;mut </span>OffsetBuffer&lt;I&gt;,
         len: usize,
@@ -1295,7 +1271,7 @@
         }
     }
 
-    <span class="kw">fn </span>read&lt;I: OffsetSizeTrait + ScalarValue&gt;(
+    <span class="kw">fn </span>read&lt;I: OffsetSizeTrait&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         output: <span class="kw-2">&amp;mut </span>OffsetBuffer&lt;I&gt;,
         dict: <span class="kw-2">&amp;</span>OffsetBuffer&lt;I&gt;,
@@ -1307,15 +1283,11 @@
         }
 
         <span class="self">self</span>.decoder.read(len, |keys| {
-            output.extend_from_dictionary(
-                keys,
-                dict.offsets.as_slice(),
-                dict.values.as_slice(),
-            )
+            output.extend_from_dictionary(keys, dict.offsets.as_slice(), dict.values.as_slice())
         })
     }
 
-    <span class="kw">fn </span>skip&lt;I: OffsetSizeTrait + ScalarValue&gt;(
+    <span class="kw">fn </span>skip&lt;I: OffsetSizeTrait&gt;(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         dict: <span class="kw-2">&amp;</span>OffsetBuffer&lt;I&gt;,
         to_skip: usize,

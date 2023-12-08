@@ -106,7 +106,6 @@
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
-<a href="#109" id="109">109</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -125,14 +124,13 @@
 // under the License.
 
 </span><span class="kw">use </span><span class="kw">crate</span>::arrow::array_reader::{read_records, skip_records, ArrayReader};
-<span class="kw">use </span><span class="kw">crate</span>::arrow::record_reader::buffer::ScalarValue;
 <span class="kw">use </span><span class="kw">crate</span>::arrow::record_reader::RecordReader;
 <span class="kw">use </span><span class="kw">crate</span>::column::page::PageIterator;
 <span class="kw">use </span><span class="kw">crate</span>::data_type::DataType;
 <span class="kw">use </span><span class="kw">crate</span>::errors::Result;
 <span class="kw">use </span><span class="kw">crate</span>::schema::types::ColumnDescPtr;
 <span class="kw">use </span>arrow_array::ArrayRef;
-<span class="kw">use </span>arrow_buffer::Buffer;
+<span class="kw">use </span>arrow_buffer::{ArrowNativeType, Buffer};
 <span class="kw">use </span>arrow_schema::DataType <span class="kw">as </span>ArrowType;
 <span class="kw">use </span>std::any::Any;
 <span class="kw">use </span>std::sync::Arc;
@@ -142,7 +140,7 @@
 </span><span class="kw">pub struct </span>NullArrayReader&lt;T&gt;
 <span class="kw">where
     </span>T: DataType,
-    T::T: ScalarValue,
+    T::T: ArrowNativeType,
 {
     data_type: ArrowType,
     pages: Box&lt;<span class="kw">dyn </span>PageIterator&gt;,
@@ -154,7 +152,7 @@
 <span class="kw">impl</span>&lt;T&gt; NullArrayReader&lt;T&gt;
 <span class="kw">where
     </span>T: DataType,
-    T::T: ScalarValue,
+    T::T: ArrowNativeType,
 {
     <span class="doccomment">/// Construct null array reader.
     </span><span class="kw">pub fn </span>new(pages: Box&lt;<span class="kw">dyn </span>PageIterator&gt;, column_desc: ColumnDescPtr) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>&gt; {
@@ -174,7 +172,7 @@
 </span><span class="kw">impl</span>&lt;T&gt; ArrayReader <span class="kw">for </span>NullArrayReader&lt;T&gt;
 <span class="kw">where
     </span>T: DataType,
-    T::T: ScalarValue,
+    T::T: ArrowNativeType,
 {
     <span class="kw">fn </span>as_any(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="kw">dyn </span>Any {
         <span class="self">self
