@@ -2498,7 +2498,7 @@
             .ok_or_else(|| err(<span class="string">"error computing timezone offset"</span>));
     }
 
-    <span class="kw">if </span>bytes[tz_offset] == <span class="string">b'z' </span>|| bytes[tz_offset] == <span class="string">b'Z' </span>{
+    <span class="kw">if </span>(bytes[tz_offset] == <span class="string">b'z' </span>|| bytes[tz_offset] == <span class="string">b'Z'</span>) &amp;&amp; tz_offset == bytes.len() - <span class="number">1 </span>{
         <span class="kw">return </span><span class="prelude-val">Ok</span>(timezone.from_utc_datetime(<span class="kw-2">&amp;</span>datetime));
     }
 
