@@ -915,7 +915,7 @@
     ///
     /// This function is unsafe as there is no guarantee that the given pointer is valid for `len`
     /// bytes. If the `ptr` and `capacity` come from a `Buffer`, then this is guaranteed.
-    </span><span class="attr">#[deprecated(note = <span class="string">"Use From&lt;Vec&lt;T&gt;&gt;"</span>)]
+    </span><span class="attr">#[deprecated(note = <span class="string">"Use Buffer::from_vec"</span>)]
     </span><span class="kw">pub unsafe fn </span>from_raw_parts(ptr: NonNull&lt;u8&gt;, len: usize, capacity: usize) -&gt; <span class="self">Self </span>{
         <span class="macro">assert!</span>(len &lt;= capacity);
         <span class="kw">let </span>layout = Layout::from_size_align(capacity, ALIGNMENT).unwrap();

@@ -17,7 +17,7 @@ which causes LLVM to fail to vectorise code correctly</p>
     ptr: <a class="struct" href="https://doc.rust-lang.org/nightly/core/ptr/non_null/struct.NonNull.html" title="struct core::ptr::non_null::NonNull">NonNull</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
     len: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>,
     capacity: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>
-) -&gt; Self</h4></section><span class="item-info"><div class="stab deprecated"><span class="emoji">👎</span><span>Deprecated: Use From&lt;Vec&lt;T&gt;&gt;</span></div></span></summary><div class="docblock"><p>Creates a buffer from an existing aligned memory region (must already be byte-aligned), this
+) -&gt; Self</h4></section><span class="item-info"><div class="stab deprecated"><span class="emoji">👎</span><span>Deprecated: Use Buffer::from_vec</span></div></span></summary><div class="docblock"><p>Creates a buffer from an existing aligned memory region (must already be byte-aligned), this
 <code>Buffer</code> will free this piece of memory when dropped.</p>
 <h5 id="arguments"><a href="#arguments">Arguments</a></h5>
 <ul>
