@@ -270,6 +270,21 @@
 <a href="#270" id="270">270</a>
 <a href="#271" id="271">271</a>
 <a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -290,7 +305,7 @@
 </span><span class="kw">use </span><span class="kw">crate</span>::alloc::Deallocation;
 <span class="kw">use </span><span class="kw">crate</span>::buffer::Buffer;
 <span class="kw">use </span><span class="kw">crate</span>::native::ArrowNativeType;
-<span class="kw">use crate</span>::{MutableBuffer, OffsetBuffer};
+<span class="kw">use crate</span>::{BufferBuilder, MutableBuffer, OffsetBuffer};
 <span class="kw">use </span>std::fmt::Formatter;
 <span class="kw">use </span>std::marker::PhantomData;
 <span class="kw">use </span>std::ops::Deref;
@@ -432,6 +447,13 @@
     }
 }
 
+<span class="kw">impl</span>&lt;T: ArrowNativeType&gt; From&lt;BufferBuilder&lt;T&gt;&gt; <span class="kw">for </span>ScalarBuffer&lt;T&gt; {
+    <span class="kw">fn </span>from(<span class="kw-2">mut </span>value: BufferBuilder&lt;T&gt;) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>len = value.len();
+        <span class="self">Self</span>::new(value.finish(), <span class="number">0</span>, len)
+    }
+}
+
 <span class="kw">impl</span>&lt;T: ArrowNativeType&gt; FromIterator&lt;T&gt; <span class="kw">for </span>ScalarBuffer&lt;T&gt; {
     <span class="kw">fn </span>from_iter&lt;I: IntoIterator&lt;Item = T&gt;&gt;(iter: I) -&gt; <span class="self">Self </span>{
         iter.into_iter().collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;().into()
@@ -540,6 +562,14 @@
     </span><span class="kw">fn </span>test_end_overflow() {
         <span class="kw">let </span>buffer = Buffer::from_iter([<span class="number">0_i32</span>, <span class="number">1</span>, <span class="number">2</span>]);
         ScalarBuffer::&lt;i32&gt;::new(buffer, <span class="number">0</span>, usize::MAX / <span class="number">4 </span>+ <span class="number">1</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>convert_from_buffer_builder() {
+        <span class="kw">let </span>input = <span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>];
+        <span class="kw">let </span>buffer_builder = BufferBuilder::from(input.clone());
+        <span class="kw">let </span>scalar_buffer = ScalarBuffer::from(buffer_builder);
+        <span class="macro">assert_eq!</span>(scalar_buffer.as_ref(), input);
     }
 }
 </code></pre></div></section></main></body></html>
