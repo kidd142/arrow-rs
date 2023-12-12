@@ -9448,33 +9448,6 @@
 <a href="#9448" id="9448">9448</a>
 <a href="#9449" id="9449">9449</a>
 <a href="#9450" id="9450">9450</a>
-<a href="#9451" id="9451">9451</a>
-<a href="#9452" id="9452">9452</a>
-<a href="#9453" id="9453">9453</a>
-<a href="#9454" id="9454">9454</a>
-<a href="#9455" id="9455">9455</a>
-<a href="#9456" id="9456">9456</a>
-<a href="#9457" id="9457">9457</a>
-<a href="#9458" id="9458">9458</a>
-<a href="#9459" id="9459">9459</a>
-<a href="#9460" id="9460">9460</a>
-<a href="#9461" id="9461">9461</a>
-<a href="#9462" id="9462">9462</a>
-<a href="#9463" id="9463">9463</a>
-<a href="#9464" id="9464">9464</a>
-<a href="#9465" id="9465">9465</a>
-<a href="#9466" id="9466">9466</a>
-<a href="#9467" id="9467">9467</a>
-<a href="#9468" id="9468">9468</a>
-<a href="#9469" id="9469">9469</a>
-<a href="#9470" id="9470">9470</a>
-<a href="#9471" id="9471">9471</a>
-<a href="#9472" id="9472">9472</a>
-<a href="#9473" id="9473">9473</a>
-<a href="#9474" id="9474">9474</a>
-<a href="#9475" id="9475">9475</a>
-<a href="#9476" id="9476">9476</a>
-<a href="#9477" id="9477">9477</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -11921,10 +11894,16 @@
     }
 }
 
-<span class="kw">fn </span>cast_string_to_year_month_interval&lt;Offset: OffsetSizeTrait&gt;(
+<span class="kw">fn </span>cast_string_to_interval&lt;Offset, F, ArrowType&gt;(
     array: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Array,
     cast_options: <span class="kw-2">&amp;</span>CastOptions,
-) -&gt; <span class="prelude-ty">Result</span>&lt;ArrayRef, ArrowError&gt; {
+    parse_function: F,
+) -&gt; <span class="prelude-ty">Result</span>&lt;ArrayRef, ArrowError&gt;
+<span class="kw">where
+    </span>Offset: OffsetSizeTrait,
+    ArrowType: ArrowPrimitiveType,
+    F: Fn(<span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;ArrowType::Native, ArrowError&gt; + Copy,
+{
     <span class="kw">let </span>string_array = array
         .as_any()
         .downcast_ref::&lt;GenericStringArray&lt;Offset&gt;&gt;()
@@ -11932,92 +11911,59 @@
     <span class="kw">let </span>interval_array = <span class="kw">if </span>cast_options.safe {
         <span class="kw">let </span>iter = string_array
             .iter()
-            .map(|v| v.and_then(|v| parse_interval_year_month(v).ok()));
+            .map(|v| v.and_then(|v| parse_function(v).ok()));
 
         <span class="comment">// Benefit:
         //     20% performance improvement
         // Soundness:
         //     The iterator is trustedLen because it comes from an `StringArray`.
-        </span><span class="kw">unsafe </span>{ IntervalYearMonthArray::from_trusted_len_iter(iter) }
+        </span><span class="kw">unsafe </span>{ PrimitiveArray::&lt;ArrowType&gt;::from_trusted_len_iter(iter) }
     } <span class="kw">else </span>{
         <span class="kw">let </span>vec = string_array
             .iter()
-            .map(|v| v.map(parse_interval_year_month).transpose())
+            .map(|v| v.map(parse_function).transpose())
             .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;, ArrowError&gt;&gt;()<span class="question-mark">?</span>;
 
         <span class="comment">// Benefit:
         //     20% performance improvement
         // Soundness:
         //     The iterator is trustedLen because it comes from an `StringArray`.
-        </span><span class="kw">unsafe </span>{ IntervalYearMonthArray::from_trusted_len_iter(vec) }
+        </span><span class="kw">unsafe </span>{ PrimitiveArray::&lt;ArrowType&gt;::from_trusted_len_iter(vec) }
     };
     <span class="prelude-val">Ok</span>(Arc::new(interval_array) <span class="kw">as </span>ArrayRef)
+}
+
+<span class="kw">fn </span>cast_string_to_year_month_interval&lt;Offset: OffsetSizeTrait&gt;(
+    array: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Array,
+    cast_options: <span class="kw-2">&amp;</span>CastOptions,
+) -&gt; <span class="prelude-ty">Result</span>&lt;ArrayRef, ArrowError&gt; {
+    cast_string_to_interval::&lt;Offset, <span class="kw">_</span>, IntervalYearMonthType&gt;(
+        array,
+        cast_options,
+        parse_interval_year_month,
+    )
 }
 
 <span class="kw">fn </span>cast_string_to_day_time_interval&lt;Offset: OffsetSizeTrait&gt;(
     array: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Array,
     cast_options: <span class="kw-2">&amp;</span>CastOptions,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;ArrayRef, ArrowError&gt; {
-    <span class="kw">let </span>string_array = array
-        .as_any()
-        .downcast_ref::&lt;GenericStringArray&lt;Offset&gt;&gt;()
-        .unwrap();
-    <span class="kw">let </span>interval_array = <span class="kw">if </span>cast_options.safe {
-        <span class="kw">let </span>iter = string_array
-            .iter()
-            .map(|v| v.and_then(|v| parse_interval_day_time(v).ok()));
-
-        <span class="comment">// Benefit:
-        //     20% performance improvement
-        // Soundness:
-        //     The iterator is trustedLen because it comes from an `StringArray`.
-        </span><span class="kw">unsafe </span>{ IntervalDayTimeArray::from_trusted_len_iter(iter) }
-    } <span class="kw">else </span>{
-        <span class="kw">let </span>vec = string_array
-            .iter()
-            .map(|v| v.map(parse_interval_day_time).transpose())
-            .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;, ArrowError&gt;&gt;()<span class="question-mark">?</span>;
-
-        <span class="comment">// Benefit:
-        //     20% performance improvement
-        // Soundness:
-        //     The iterator is trustedLen because it comes from an `StringArray`.
-        </span><span class="kw">unsafe </span>{ IntervalDayTimeArray::from_trusted_len_iter(vec) }
-    };
-    <span class="prelude-val">Ok</span>(Arc::new(interval_array) <span class="kw">as </span>ArrayRef)
+    cast_string_to_interval::&lt;Offset, <span class="kw">_</span>, IntervalDayTimeType&gt;(
+        array,
+        cast_options,
+        parse_interval_day_time,
+    )
 }
 
 <span class="kw">fn </span>cast_string_to_month_day_nano_interval&lt;Offset: OffsetSizeTrait&gt;(
     array: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Array,
     cast_options: <span class="kw-2">&amp;</span>CastOptions,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;ArrayRef, ArrowError&gt; {
-    <span class="kw">let </span>string_array = array
-        .as_any()
-        .downcast_ref::&lt;GenericStringArray&lt;Offset&gt;&gt;()
-        .unwrap();
-    <span class="kw">let </span>interval_array = <span class="kw">if </span>cast_options.safe {
-        <span class="kw">let </span>iter = string_array
-            .iter()
-            .map(|v| v.and_then(|v| parse_interval_month_day_nano(v).ok()));
-
-        <span class="comment">// Benefit:
-        //     20% performance improvement
-        // Soundness:
-        //     The iterator is trustedLen because it comes from an `StringArray`.
-        </span><span class="kw">unsafe </span>{ IntervalMonthDayNanoArray::from_trusted_len_iter(iter) }
-    } <span class="kw">else </span>{
-        <span class="kw">let </span>vec = string_array
-            .iter()
-            .map(|v| v.map(parse_interval_month_day_nano).transpose())
-            .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;<span class="kw">_</span>&gt;, ArrowError&gt;&gt;()<span class="question-mark">?</span>;
-
-        <span class="comment">// Benefit:
-        //     20% performance improvement
-        // Soundness:
-        //     The iterator is trustedLen because it comes from an `StringArray`.
-        </span><span class="kw">unsafe </span>{ IntervalMonthDayNanoArray::from_trusted_len_iter(vec) }
-    };
-    <span class="prelude-val">Ok</span>(Arc::new(interval_array) <span class="kw">as </span>ArrayRef)
+    cast_string_to_interval::&lt;Offset, <span class="kw">_</span>, IntervalMonthDayNanoType&gt;(
+        array,
+        cast_options,
+        parse_interval_month_day_nano,
+    )
 }
 
 <span class="kw">fn </span>adjust_timestamp_to_timezone&lt;T: ArrowTimestampType&gt;(
