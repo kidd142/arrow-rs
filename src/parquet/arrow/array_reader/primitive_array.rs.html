@@ -865,8 +865,8 @@
 {
     data_type: ArrowType,
     pages: Box&lt;<span class="kw">dyn </span>PageIterator&gt;,
-    def_levels_buffer: <span class="prelude-ty">Option</span>&lt;Buffer&gt;,
-    rep_levels_buffer: <span class="prelude-ty">Option</span>&lt;Buffer&gt;,
+    def_levels_buffer: <span class="prelude-ty">Option</span>&lt;Vec&lt;i16&gt;&gt;,
+    rep_levels_buffer: <span class="prelude-ty">Option</span>&lt;Vec&lt;i16&gt;&gt;,
     record_reader: RecordReader&lt;T&gt;,
 }
 
@@ -1075,11 +1075,11 @@
     }
 
     <span class="kw">fn </span>get_def_levels(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[i16]&gt; {
-        <span class="self">self</span>.def_levels_buffer.as_ref().map(|buf| buf.typed_data())
+        <span class="self">self</span>.def_levels_buffer.as_deref()
     }
 
     <span class="kw">fn </span>get_rep_levels(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[i16]&gt; {
-        <span class="self">self</span>.rep_levels_buffer.as_ref().map(|buf| buf.typed_data())
+        <span class="self">self</span>.rep_levels_buffer.as_deref()
     }
 }
 

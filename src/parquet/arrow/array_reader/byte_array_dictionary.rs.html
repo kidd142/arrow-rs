@@ -667,6 +667,9 @@
 <a href="#667" id="667">667</a>
 <a href="#668" id="668">668</a>
 <a href="#669" id="669">669</a>
+<a href="#670" id="670">670</a>
+<a href="#671" id="671">671</a>
+<a href="#672" id="672">672</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -686,18 +689,16 @@
 
 </span><span class="kw">use </span>std::any::Any;
 <span class="kw">use </span>std::marker::PhantomData;
-<span class="kw">use </span>std::ops::Range;
 <span class="kw">use </span>std::sync::Arc;
 
 <span class="kw">use </span>arrow_array::{Array, ArrayRef, OffsetSizeTrait};
-<span class="kw">use </span>arrow_buffer::{ArrowNativeType, Buffer};
+<span class="kw">use </span>arrow_buffer::ArrowNativeType;
 <span class="kw">use </span>arrow_schema::DataType <span class="kw">as </span>ArrowType;
 <span class="kw">use </span>bytes::Bytes;
 
 <span class="kw">use </span><span class="kw">crate</span>::arrow::array_reader::byte_array::{ByteArrayDecoder, ByteArrayDecoderPlain};
 <span class="kw">use </span><span class="kw">crate</span>::arrow::array_reader::{read_records, skip_records, ArrayReader};
 <span class="kw">use </span><span class="kw">crate</span>::arrow::buffer::{dictionary_buffer::DictionaryBuffer, offset_buffer::OffsetBuffer};
-<span class="kw">use </span><span class="kw">crate</span>::arrow::record_reader::buffer::BufferQueue;
 <span class="kw">use </span><span class="kw">crate</span>::arrow::record_reader::GenericRecordReader;
 <span class="kw">use </span><span class="kw">crate</span>::arrow::schema::parquet_to_arrow_field;
 <span class="kw">use </span><span class="kw">crate</span>::basic::{ConvertedType, Encoding};
@@ -793,8 +794,8 @@
 </span><span class="kw">struct </span>ByteArrayDictionaryReader&lt;K: ArrowNativeType, V: OffsetSizeTrait&gt; {
     data_type: ArrowType,
     pages: Box&lt;<span class="kw">dyn </span>PageIterator&gt;,
-    def_levels_buffer: <span class="prelude-ty">Option</span>&lt;Buffer&gt;,
-    rep_levels_buffer: <span class="prelude-ty">Option</span>&lt;Buffer&gt;,
+    def_levels_buffer: <span class="prelude-ty">Option</span>&lt;Vec&lt;i16&gt;&gt;,
+    rep_levels_buffer: <span class="prelude-ty">Option</span>&lt;Vec&lt;i16&gt;&gt;,
     record_reader: GenericRecordReader&lt;DictionaryBuffer&lt;K, V&gt;, DictionaryDecoder&lt;K, V&gt;&gt;,
 }
 
@@ -852,11 +853,11 @@
     }
 
     <span class="kw">fn </span>get_def_levels(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[i16]&gt; {
-        <span class="self">self</span>.def_levels_buffer.as_ref().map(|buf| buf.typed_data())
+        <span class="self">self</span>.def_levels_buffer.as_deref()
     }
 
     <span class="kw">fn </span>get_rep_levels(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[i16]&gt; {
-        <span class="self">self</span>.rep_levels_buffer.as_ref().map(|buf| buf.typed_data())
+        <span class="self">self</span>.rep_levels_buffer.as_deref()
     }
 }
 
@@ -893,7 +894,7 @@
     </span>K: FromBytes + Ord + ArrowNativeType,
     V: OffsetSizeTrait,
 {
-    <span class="kw">type </span>Slice = DictionaryBuffer&lt;K, V&gt;;
+    <span class="kw">type </span>Buffer = DictionaryBuffer&lt;K, V&gt;;
 
     <span class="kw">fn </span>new(col: <span class="kw-2">&amp;</span>ColumnDescPtr) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>validate_utf8 = col.converted_type() == ConvertedType::UTF8;
@@ -975,16 +976,16 @@
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn </span>read(<span class="kw-2">&amp;mut </span><span class="self">self</span>, out: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Slice, range: Range&lt;usize&gt;) -&gt; <span class="prelude-ty">Result</span>&lt;usize&gt; {
+    <span class="kw">fn </span>read(<span class="kw-2">&amp;mut </span><span class="self">self</span>, out: <span class="kw-2">&amp;mut </span><span class="self">Self</span>::Buffer, num_values: usize) -&gt; <span class="prelude-ty">Result</span>&lt;usize&gt; {
         <span class="kw">match </span><span class="self">self</span>.decoder.as_mut().expect(<span class="string">"decoder set"</span>) {
             MaybeDictionaryDecoder::Fallback(decoder) =&gt; {
-                decoder.read(out.spill_values()<span class="question-mark">?</span>, range.end - range.start, <span class="prelude-val">None</span>)
+                decoder.read(out.spill_values()<span class="question-mark">?</span>, num_values, <span class="prelude-val">None</span>)
             }
             MaybeDictionaryDecoder::Dict {
                 decoder,
                 max_remaining_values,
             } =&gt; {
-                <span class="kw">let </span>len = (range.end - range.start).min(<span class="kw-2">*</span>max_remaining_values);
+                <span class="kw">let </span>len = num_values.min(<span class="kw-2">*</span>max_remaining_values);
 
                 <span class="kw">let </span>dict = <span class="self">self
                     </span>.dict
@@ -1001,8 +1002,12 @@
                     <span class="prelude-val">Some</span>(keys) =&gt; {
                         <span class="comment">// Happy path - can just copy keys
                         // Keys will be validated on conversion to arrow
-                        </span><span class="kw">let </span>keys_slice = keys.get_output_slice(len);
-                        <span class="kw">let </span>len = decoder.get_batch(keys_slice)<span class="question-mark">?</span>;
+
+                        // TODO: Push vec into decoder (#5177)
+                        </span><span class="kw">let </span>start = keys.len();
+                        keys.resize(start + len, K::default());
+                        <span class="kw">let </span>len = decoder.get_batch(<span class="kw-2">&amp;mut </span>keys[start..])<span class="question-mark">?</span>;
+                        keys.truncate(start + len);
                         <span class="kw-2">*</span>max_remaining_values -= len;
                         <span class="prelude-val">Ok</span>(len)
                     }
@@ -1050,6 +1055,7 @@
 </span><span class="kw">mod </span>tests {
     <span class="kw">use </span>arrow::compute::cast;
     <span class="kw">use </span>arrow_array::{Array, StringArray};
+    <span class="kw">use </span>arrow_buffer::Buffer;
 
     <span class="kw">use </span><span class="kw">crate</span>::arrow::array_reader::test_util::{
         byte_array_all_encodings, encode_dictionary, utf8_column,
@@ -1085,7 +1091,7 @@
             .unwrap();
 
         <span class="kw">let </span><span class="kw-2">mut </span>output = DictionaryBuffer::&lt;i32, i32&gt;::default();
-        <span class="macro">assert_eq!</span>(decoder.read(<span class="kw-2">&amp;mut </span>output, <span class="number">0</span>..<span class="number">3</span>).unwrap(), <span class="number">3</span>);
+        <span class="macro">assert_eq!</span>(decoder.read(<span class="kw-2">&amp;mut </span>output, <span class="number">3</span>).unwrap(), <span class="number">3</span>);
 
         <span class="kw">let </span><span class="kw-2">mut </span>valid = <span class="macro">vec!</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>];
         <span class="kw">let </span>valid_buffer = Buffer::from_iter(valid.iter().cloned());
@@ -1093,7 +1099,7 @@
 
         <span class="macro">assert!</span>(<span class="macro">matches!</span>(output, DictionaryBuffer::Dict { .. }));
 
-        <span class="macro">assert_eq!</span>(decoder.read(<span class="kw-2">&amp;mut </span>output, <span class="number">0</span>..<span class="number">4</span>).unwrap(), <span class="number">4</span>);
+        <span class="macro">assert_eq!</span>(decoder.read(<span class="kw-2">&amp;mut </span>output, <span class="number">4</span>).unwrap(), <span class="number">4</span>);
 
         valid.extend_from_slice(<span class="kw-2">&amp;</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>]);
         <span class="kw">let </span>valid_buffer = Buffer::from_iter(valid.iter().cloned());
@@ -1153,17 +1159,17 @@
         <span class="kw">let </span><span class="kw-2">mut </span>output = DictionaryBuffer::&lt;i32, i32&gt;::default();
 
         <span class="comment">// read two skip one
-        </span><span class="macro">assert_eq!</span>(decoder.read(<span class="kw-2">&amp;mut </span>output, <span class="number">0</span>..<span class="number">2</span>).unwrap(), <span class="number">2</span>);
+        </span><span class="macro">assert_eq!</span>(decoder.read(<span class="kw-2">&amp;mut </span>output, <span class="number">2</span>).unwrap(), <span class="number">2</span>);
         <span class="macro">assert_eq!</span>(decoder.skip_values(<span class="number">1</span>).unwrap(), <span class="number">1</span>);
 
         <span class="macro">assert!</span>(<span class="macro">matches!</span>(output, DictionaryBuffer::Dict { .. }));
 
         <span class="comment">// read two skip one
-        </span><span class="macro">assert_eq!</span>(decoder.read(<span class="kw-2">&amp;mut </span>output, <span class="number">2</span>..<span class="number">4</span>).unwrap(), <span class="number">2</span>);
+        </span><span class="macro">assert_eq!</span>(decoder.read(<span class="kw-2">&amp;mut </span>output, <span class="number">2</span>).unwrap(), <span class="number">2</span>);
         <span class="macro">assert_eq!</span>(decoder.skip_values(<span class="number">1</span>).unwrap(), <span class="number">1</span>);
 
         <span class="comment">// read one and test on skip at the end
-        </span><span class="macro">assert_eq!</span>(decoder.read(<span class="kw-2">&amp;mut </span>output, <span class="number">4</span>..<span class="number">5</span>).unwrap(), <span class="number">1</span>);
+        </span><span class="macro">assert_eq!</span>(decoder.read(<span class="kw-2">&amp;mut </span>output, <span class="number">1</span>).unwrap(), <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(decoder.skip_values(<span class="number">4</span>).unwrap(), <span class="number">0</span>);
 
         <span class="kw">let </span>valid = [<span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>];
@@ -1205,7 +1211,7 @@
 
         <span class="kw">for </span>(encoding, page) <span class="kw">in </span>pages {
             decoder.set_data(encoding, page, <span class="number">4</span>, <span class="prelude-val">Some</span>(<span class="number">4</span>)).unwrap();
-            <span class="macro">assert_eq!</span>(decoder.read(<span class="kw-2">&amp;mut </span>output, <span class="number">0</span>..<span class="number">1024</span>).unwrap(), <span class="number">4</span>);
+            <span class="macro">assert_eq!</span>(decoder.read(<span class="kw-2">&amp;mut </span>output, <span class="number">1024</span>).unwrap(), <span class="number">4</span>);
         }
         <span class="kw">let </span>array = output.into_array(<span class="prelude-val">None</span>, <span class="kw-2">&amp;</span>data_type).unwrap();
         <span class="macro">assert_eq!</span>(array.data_type(), <span class="kw-2">&amp;</span>data_type);
@@ -1249,7 +1255,7 @@
         <span class="kw">for </span>(encoding, page) <span class="kw">in </span>pages {
             decoder.set_data(encoding, page, <span class="number">4</span>, <span class="prelude-val">Some</span>(<span class="number">4</span>)).unwrap();
             decoder.skip_values(<span class="number">2</span>).expect(<span class="string">"skipping two values"</span>);
-            <span class="macro">assert_eq!</span>(decoder.read(<span class="kw-2">&amp;mut </span>output, <span class="number">0</span>..<span class="number">1024</span>).unwrap(), <span class="number">2</span>);
+            <span class="macro">assert_eq!</span>(decoder.read(<span class="kw-2">&amp;mut </span>output, <span class="number">1024</span>).unwrap(), <span class="number">2</span>);
         }
         <span class="kw">let </span>array = output.into_array(<span class="prelude-val">None</span>, <span class="kw-2">&amp;</span>data_type).unwrap();
         <span class="macro">assert_eq!</span>(array.data_type(), <span class="kw-2">&amp;</span>data_type);
@@ -1310,7 +1316,7 @@
         <span class="kw">for </span>(encoding, page) <span class="kw">in </span>pages.clone() {
             <span class="kw">let </span><span class="kw-2">mut </span>output = DictionaryBuffer::&lt;i32, i32&gt;::default();
             decoder.set_data(encoding, page, <span class="number">8</span>, <span class="prelude-val">None</span>).unwrap();
-            <span class="macro">assert_eq!</span>(decoder.read(<span class="kw-2">&amp;mut </span>output, <span class="number">0</span>..<span class="number">1024</span>).unwrap(), <span class="number">0</span>);
+            <span class="macro">assert_eq!</span>(decoder.read(<span class="kw-2">&amp;mut </span>output, <span class="number">1024</span>).unwrap(), <span class="number">0</span>);
 
             output.pad_nulls(<span class="number">0</span>, <span class="number">0</span>, <span class="number">8</span>, <span class="kw-2">&amp;</span>[<span class="number">0</span>]);
             <span class="kw">let </span>array = output

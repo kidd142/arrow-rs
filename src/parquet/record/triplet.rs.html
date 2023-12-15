@@ -559,6 +559,9 @@
 <a href="#559" id="559">559</a>
 <a href="#560" id="560">560</a>
 <a href="#561" id="561">561</a>
+<a href="#562" id="562">562</a>
+<a href="#563" id="563">563</a>
+<a href="#564" id="564">564</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -857,17 +860,19 @@
         // and therefore not advance `self.triplets_left`
         </span><span class="kw">while </span><span class="self">self</span>.curr_triplet_index &gt;= <span class="self">self</span>.triplets_left {
             <span class="kw">let </span>(records_read, values_read, levels_read) = {
-                <span class="comment">// Get slice of definition levels, if available
-                </span><span class="kw">let </span>def_levels = <span class="self">self</span>.def_levels.as_mut().map(|vec| <span class="kw-2">&amp;mut </span>vec[..]);
-
-                <span class="comment">// Get slice of repetition levels, if available
-                </span><span class="kw">let </span>rep_levels = <span class="self">self</span>.rep_levels.as_mut().map(|vec| <span class="kw-2">&amp;mut </span>vec[..]);
+                <span class="self">self</span>.values.clear();
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = <span class="kw-2">&amp;mut </span><span class="self">self</span>.def_levels {
+                    x.clear()
+                }
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = <span class="kw-2">&amp;mut </span><span class="self">self</span>.rep_levels {
+                    x.clear()
+                }
 
                 <span class="comment">// Buffer triplets
                 </span><span class="self">self</span>.reader.read_records(
                     <span class="self">self</span>.batch_size,
-                    def_levels,
-                    rep_levels,
+                    <span class="self">self</span>.def_levels.as_mut(),
+                    <span class="self">self</span>.rep_levels.as_mut(),
                     <span class="kw-2">&amp;mut </span><span class="self">self</span>.values,
                 )<span class="question-mark">?
             </span>};
@@ -894,6 +899,7 @@
                 // Note: if values_read == 0, then spacing will not be triggered
                 </span><span class="kw">let </span><span class="kw-2">mut </span>idx = values_read;
                 <span class="kw">let </span>def_levels = <span class="self">self</span>.def_levels.as_ref().unwrap();
+                <span class="self">self</span>.values.resize(levels_read, T::T::default());
                 <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..levels_read {
                     <span class="kw">if </span>def_levels[levels_read - i - <span class="number">1</span>] == <span class="self">self</span>.max_def_level {
                         idx -= <span class="number">1</span>; <span class="comment">// This is done to avoid usize becoming a negative value

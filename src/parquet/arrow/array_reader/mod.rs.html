@@ -316,7 +316,7 @@
 ) -&gt; <span class="prelude-ty">Result</span>&lt;usize&gt;
 <span class="kw">where
     </span>V: ValuesBuffer,
-    CV: ColumnValueDecoder&lt;Slice = V::Slice&gt;,
+    CV: ColumnValueDecoder&lt;Buffer = V&gt;,
 {
     <span class="kw">let </span><span class="kw-2">mut </span>records_read = <span class="number">0usize</span>;
     <span class="kw">while </span>records_read &lt; batch_size {
@@ -350,7 +350,7 @@
 ) -&gt; <span class="prelude-ty">Result</span>&lt;usize&gt;
 <span class="kw">where
     </span>V: ValuesBuffer,
-    CV: ColumnValueDecoder&lt;Slice = V::Slice&gt;,
+    CV: ColumnValueDecoder&lt;Buffer = V&gt;,
 {
     <span class="kw">let </span><span class="kw-2">mut </span>records_skipped = <span class="number">0usize</span>;
     <span class="kw">while </span>records_skipped &lt; batch_size {

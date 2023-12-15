@@ -130,7 +130,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::errors::Result;
 <span class="kw">use </span><span class="kw">crate</span>::schema::types::ColumnDescPtr;
 <span class="kw">use </span>arrow_array::ArrayRef;
-<span class="kw">use </span>arrow_buffer::{ArrowNativeType, Buffer};
+<span class="kw">use </span>arrow_buffer::ArrowNativeType;
 <span class="kw">use </span>arrow_schema::DataType <span class="kw">as </span>ArrowType;
 <span class="kw">use </span>std::any::Any;
 <span class="kw">use </span>std::sync::Arc;
@@ -144,8 +144,8 @@
 {
     data_type: ArrowType,
     pages: Box&lt;<span class="kw">dyn </span>PageIterator&gt;,
-    def_levels_buffer: <span class="prelude-ty">Option</span>&lt;Buffer&gt;,
-    rep_levels_buffer: <span class="prelude-ty">Option</span>&lt;Buffer&gt;,
+    def_levels_buffer: <span class="prelude-ty">Option</span>&lt;Vec&lt;i16&gt;&gt;,
+    rep_levels_buffer: <span class="prelude-ty">Option</span>&lt;Vec&lt;i16&gt;&gt;,
     record_reader: RecordReader&lt;T&gt;,
 }
 
@@ -207,11 +207,11 @@
     }
 
     <span class="kw">fn </span>get_def_levels(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[i16]&gt; {
-        <span class="self">self</span>.def_levels_buffer.as_ref().map(|buf| buf.typed_data())
+        <span class="self">self</span>.def_levels_buffer.as_deref()
     }
 
     <span class="kw">fn </span>get_rep_levels(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>[i16]&gt; {
-        <span class="self">self</span>.rep_levels_buffer.as_ref().map(|buf| buf.typed_data())
+        <span class="self">self</span>.rep_levels_buffer.as_deref()
     }
 }
 </code></pre></div></section></main></body></html>

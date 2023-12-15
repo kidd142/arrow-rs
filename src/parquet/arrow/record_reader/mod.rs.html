@@ -786,40 +786,6 @@
 <a href="#786" id="786">786</a>
 <a href="#787" id="787">787</a>
 <a href="#788" id="788">788</a>
-<a href="#789" id="789">789</a>
-<a href="#790" id="790">790</a>
-<a href="#791" id="791">791</a>
-<a href="#792" id="792">792</a>
-<a href="#793" id="793">793</a>
-<a href="#794" id="794">794</a>
-<a href="#795" id="795">795</a>
-<a href="#796" id="796">796</a>
-<a href="#797" id="797">797</a>
-<a href="#798" id="798">798</a>
-<a href="#799" id="799">799</a>
-<a href="#800" id="800">800</a>
-<a href="#801" id="801">801</a>
-<a href="#802" id="802">802</a>
-<a href="#803" id="803">803</a>
-<a href="#804" id="804">804</a>
-<a href="#805" id="805">805</a>
-<a href="#806" id="806">806</a>
-<a href="#807" id="807">807</a>
-<a href="#808" id="808">808</a>
-<a href="#809" id="809">809</a>
-<a href="#810" id="810">810</a>
-<a href="#811" id="811">811</a>
-<a href="#812" id="812">812</a>
-<a href="#813" id="813">813</a>
-<a href="#814" id="814">814</a>
-<a href="#815" id="815">815</a>
-<a href="#816" id="816">816</a>
-<a href="#817" id="817">817</a>
-<a href="#818" id="818">818</a>
-<a href="#819" id="819">819</a>
-<a href="#820" id="820">820</a>
-<a href="#821" id="821">821</a>
-<a href="#822" id="822">822</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -840,7 +806,7 @@
 </span><span class="kw">use </span>arrow_buffer::Buffer;
 
 <span class="kw">use </span><span class="kw">crate</span>::arrow::record_reader::{
-    buffer::{BufferQueue, ValuesBuffer},
+    buffer::ValuesBuffer,
     definition_levels::{DefinitionLevelBuffer, DefinitionLevelBufferDecoder},
 };
 <span class="kw">use </span><span class="kw">crate</span>::column::reader::decoder::RepetitionLevelDecoderImpl;
@@ -884,28 +850,18 @@
 
 <span class="kw">impl</span>&lt;V, CV&gt; GenericRecordReader&lt;V, CV&gt;
 <span class="kw">where
-    </span>V: ValuesBuffer + Default,
-    CV: ColumnValueDecoder&lt;Slice = V::Slice&gt;,
+    </span>V: ValuesBuffer,
+    CV: ColumnValueDecoder&lt;Buffer = V&gt;,
 {
     <span class="doccomment">/// Create a new [`GenericRecordReader`]
     </span><span class="kw">pub fn </span>new(desc: ColumnDescPtr) -&gt; <span class="self">Self </span>{
-        <span class="self">Self</span>::new_with_records(desc, V::default())
-    }
-}
-
-<span class="kw">impl</span>&lt;V, CV&gt; GenericRecordReader&lt;V, CV&gt;
-<span class="kw">where
-    </span>V: ValuesBuffer,
-    CV: ColumnValueDecoder&lt;Slice = V::Slice&gt;,
-{
-    <span class="kw">pub fn </span>new_with_records(desc: ColumnDescPtr, records: V) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>def_levels = (desc.max_def_level() &gt; <span class="number">0</span>)
             .then(|| DefinitionLevelBuffer::new(<span class="kw-2">&amp;</span>desc, packed_null_mask(<span class="kw-2">&amp;</span>desc)));
 
         <span class="kw">let </span>rep_levels = (desc.max_rep_level() &gt; <span class="number">0</span>).then(Vec::new);
 
         <span class="self">Self </span>{
-            values: records,
+            values: V::default(),
             def_levels,
             rep_levels,
             column_reader: <span class="prelude-val">None</span>,
@@ -988,22 +944,20 @@
     /// The implementation has side effects. It will create a new buffer to hold those
     /// definition level values that have already been read into memory but not counted
     /// as record values, e.g. those from `self.num_values` to `self.values_written`.
-    </span><span class="kw">pub fn </span>consume_def_levels(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Buffer&gt; {
+    </span><span class="kw">pub fn </span>consume_def_levels(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;i16&gt;&gt; {
         <span class="self">self</span>.def_levels.as_mut().and_then(|x| x.consume_levels())
     }
 
     <span class="doccomment">/// Return repetition level data.
     /// The side effect is similar to `consume_def_levels`.
-    </span><span class="kw">pub fn </span>consume_rep_levels(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Buffer&gt; {
-        <span class="self">self</span>.rep_levels
-            .as_mut()
-            .map(|x| Buffer::from_vec(x.consume()))
+    </span><span class="kw">pub fn </span>consume_rep_levels(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Vec&lt;i16&gt;&gt; {
+        <span class="self">self</span>.rep_levels.as_mut().map(std::mem::take)
     }
 
     <span class="doccomment">/// Returns currently stored buffer data.
     /// The side effect is similar to `consume_def_levels`.
-    </span><span class="kw">pub fn </span>consume_record_data(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; V::Output {
-        <span class="self">self</span>.values.consume()
+    </span><span class="kw">pub fn </span>consume_record_data(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; V {
+        std::mem::take(<span class="kw-2">&amp;mut </span><span class="self">self</span>.values)
     }
 
     <span class="doccomment">/// Returns currently stored null bitmap data.
@@ -1029,18 +983,13 @@
 
     <span class="doccomment">/// Try to read one batch of data returning the number of records read
     </span><span class="kw">fn </span>read_one_batch(<span class="kw-2">&amp;mut </span><span class="self">self</span>, batch_size: usize) -&gt; <span class="prelude-ty">Result</span>&lt;usize&gt; {
-        <span class="kw">let </span>rep_levels = <span class="self">self
-            </span>.rep_levels
-            .as_mut()
-            .map(|levels| levels.get_output_slice(batch_size));
-        <span class="kw">let </span>def_levels = <span class="self">self</span>.def_levels.as_mut();
-        <span class="kw">let </span>values = <span class="self">self</span>.values.get_output_slice(batch_size);
-
-        <span class="kw">let </span>(records_read, values_read, levels_read) = <span class="self">self
-            </span>.column_reader
-            .as_mut()
-            .unwrap()
-            .read_records(batch_size, def_levels, rep_levels, values)<span class="question-mark">?</span>;
+        <span class="kw">let </span>(records_read, values_read, levels_read) =
+            <span class="self">self</span>.column_reader.as_mut().unwrap().read_records(
+                batch_size,
+                <span class="self">self</span>.def_levels.as_mut(),
+                <span class="self">self</span>.rep_levels.as_mut(),
+                <span class="kw-2">&amp;mut </span><span class="self">self</span>.values,
+            )<span class="question-mark">?</span>;
 
         <span class="kw">if </span>values_read &lt; levels_read {
             <span class="kw">let </span>def_levels = <span class="self">self</span>.def_levels.as_ref().ok_or_else(|| {
@@ -1057,13 +1006,6 @@
 
         <span class="self">self</span>.num_records += records_read;
         <span class="self">self</span>.num_values += levels_read;
-        <span class="self">self</span>.values.truncate_buffer(<span class="self">self</span>.num_values);
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>buf) = <span class="self">self</span>.rep_levels {
-            buf.truncate_buffer(<span class="self">self</span>.num_values)
-        };
-        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>buf) = <span class="self">self</span>.def_levels {
-            buf.set_len(<span class="self">self</span>.num_values)
-        };
         <span class="prelude-val">Ok</span>(records_read)
     }
 }
@@ -1080,7 +1022,6 @@
     <span class="kw">use </span>std::sync::Arc;
 
     <span class="kw">use </span>arrow::buffer::Buffer;
-    <span class="kw">use </span>arrow_array::builder::Int16BufferBuilder;
 
     <span class="kw">use </span><span class="kw">crate</span>::basic::Encoding;
     <span class="kw">use </span><span class="kw">crate</span>::data_type::Int32Type;
@@ -1239,11 +1180,8 @@
         }
 
         <span class="comment">// Verify result def levels
-        </span><span class="kw">let </span><span class="kw-2">mut </span>bb = Int16BufferBuilder::new(<span class="number">7</span>);
-        bb.append_slice(<span class="kw-2">&amp;</span>[<span class="number">1i16</span>, <span class="number">2i16</span>, <span class="number">0i16</span>, <span class="number">2i16</span>, <span class="number">2i16</span>, <span class="number">0i16</span>, <span class="number">2i16</span>]);
-        <span class="kw">let </span>expected_def_levels = bb.finish();
-        <span class="macro">assert_eq!</span>(
-            <span class="prelude-val">Some</span>(expected_def_levels),
+        </span><span class="macro">assert_eq!</span>(
+            <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">1i16</span>, <span class="number">2i16</span>, <span class="number">0i16</span>, <span class="number">2i16</span>, <span class="number">2i16</span>, <span class="number">0i16</span>, <span class="number">2i16</span>]),
             record_reader.consume_def_levels()
         );
 
@@ -1348,11 +1286,8 @@
         }
 
         <span class="comment">// Verify result def levels
-        </span><span class="kw">let </span><span class="kw-2">mut </span>bb = Int16BufferBuilder::new(<span class="number">9</span>);
-        bb.append_slice(<span class="kw-2">&amp;</span>[<span class="number">2i16</span>, <span class="number">0i16</span>, <span class="number">1i16</span>, <span class="number">2i16</span>, <span class="number">2i16</span>, <span class="number">2i16</span>, <span class="number">2i16</span>, <span class="number">2i16</span>, <span class="number">2i16</span>]);
-        <span class="kw">let </span>expected_def_levels = bb.finish();
-        <span class="macro">assert_eq!</span>(
-            <span class="prelude-val">Some</span>(expected_def_levels),
+        </span><span class="macro">assert_eq!</span>(
+            <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">2i16</span>, <span class="number">0i16</span>, <span class="number">1i16</span>, <span class="number">2i16</span>, <span class="number">2i16</span>, <span class="number">2i16</span>, <span class="number">2i16</span>, <span class="number">2i16</span>, <span class="number">2i16</span>]),
             record_reader.consume_def_levels()
         );
 
@@ -1614,11 +1549,8 @@
         }
 
         <span class="comment">// Verify result def levels
-        </span><span class="kw">let </span><span class="kw-2">mut </span>bb = Int16BufferBuilder::new(<span class="number">7</span>);
-        bb.append_slice(<span class="kw-2">&amp;</span>[<span class="number">0i16</span>, <span class="number">2i16</span>, <span class="number">2i16</span>]);
-        <span class="kw">let </span>expected_def_levels = bb.finish();
-        <span class="macro">assert_eq!</span>(
-            <span class="prelude-val">Some</span>(expected_def_levels),
+        </span><span class="macro">assert_eq!</span>(
+            <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">0i16</span>, <span class="number">2i16</span>, <span class="number">2i16</span>]),
             record_reader.consume_def_levels()
         );
 
