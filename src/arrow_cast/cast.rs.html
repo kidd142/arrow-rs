@@ -9449,6 +9449,84 @@
 <a href="#9448" id="9448">9448</a>
 <a href="#9449" id="9449">9449</a>
 <a href="#9450" id="9450">9450</a>
+<a href="#9451" id="9451">9451</a>
+<a href="#9452" id="9452">9452</a>
+<a href="#9453" id="9453">9453</a>
+<a href="#9454" id="9454">9454</a>
+<a href="#9455" id="9455">9455</a>
+<a href="#9456" id="9456">9456</a>
+<a href="#9457" id="9457">9457</a>
+<a href="#9458" id="9458">9458</a>
+<a href="#9459" id="9459">9459</a>
+<a href="#9460" id="9460">9460</a>
+<a href="#9461" id="9461">9461</a>
+<a href="#9462" id="9462">9462</a>
+<a href="#9463" id="9463">9463</a>
+<a href="#9464" id="9464">9464</a>
+<a href="#9465" id="9465">9465</a>
+<a href="#9466" id="9466">9466</a>
+<a href="#9467" id="9467">9467</a>
+<a href="#9468" id="9468">9468</a>
+<a href="#9469" id="9469">9469</a>
+<a href="#9470" id="9470">9470</a>
+<a href="#9471" id="9471">9471</a>
+<a href="#9472" id="9472">9472</a>
+<a href="#9473" id="9473">9473</a>
+<a href="#9474" id="9474">9474</a>
+<a href="#9475" id="9475">9475</a>
+<a href="#9476" id="9476">9476</a>
+<a href="#9477" id="9477">9477</a>
+<a href="#9478" id="9478">9478</a>
+<a href="#9479" id="9479">9479</a>
+<a href="#9480" id="9480">9480</a>
+<a href="#9481" id="9481">9481</a>
+<a href="#9482" id="9482">9482</a>
+<a href="#9483" id="9483">9483</a>
+<a href="#9484" id="9484">9484</a>
+<a href="#9485" id="9485">9485</a>
+<a href="#9486" id="9486">9486</a>
+<a href="#9487" id="9487">9487</a>
+<a href="#9488" id="9488">9488</a>
+<a href="#9489" id="9489">9489</a>
+<a href="#9490" id="9490">9490</a>
+<a href="#9491" id="9491">9491</a>
+<a href="#9492" id="9492">9492</a>
+<a href="#9493" id="9493">9493</a>
+<a href="#9494" id="9494">9494</a>
+<a href="#9495" id="9495">9495</a>
+<a href="#9496" id="9496">9496</a>
+<a href="#9497" id="9497">9497</a>
+<a href="#9498" id="9498">9498</a>
+<a href="#9499" id="9499">9499</a>
+<a href="#9500" id="9500">9500</a>
+<a href="#9501" id="9501">9501</a>
+<a href="#9502" id="9502">9502</a>
+<a href="#9503" id="9503">9503</a>
+<a href="#9504" id="9504">9504</a>
+<a href="#9505" id="9505">9505</a>
+<a href="#9506" id="9506">9506</a>
+<a href="#9507" id="9507">9507</a>
+<a href="#9508" id="9508">9508</a>
+<a href="#9509" id="9509">9509</a>
+<a href="#9510" id="9510">9510</a>
+<a href="#9511" id="9511">9511</a>
+<a href="#9512" id="9512">9512</a>
+<a href="#9513" id="9513">9513</a>
+<a href="#9514" id="9514">9514</a>
+<a href="#9515" id="9515">9515</a>
+<a href="#9516" id="9516">9516</a>
+<a href="#9517" id="9517">9517</a>
+<a href="#9518" id="9518">9518</a>
+<a href="#9519" id="9519">9519</a>
+<a href="#9520" id="9520">9520</a>
+<a href="#9521" id="9521">9521</a>
+<a href="#9522" id="9522">9522</a>
+<a href="#9523" id="9523">9523</a>
+<a href="#9524" id="9524">9524</a>
+<a href="#9525" id="9525">9525</a>
+<a href="#9526" id="9526">9526</a>
+<a href="#9527" id="9527">9527</a>
+<a href="#9528" id="9528">9528</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -9611,6 +9689,12 @@
         </span>(Decimal128(<span class="kw">_</span>, <span class="kw">_</span>) | Decimal256(<span class="kw">_</span>, <span class="kw">_</span>), Utf8 | LargeUtf8) =&gt; <span class="bool-val">true</span>,
         <span class="comment">// Utf8 to decimal
         </span>(Utf8 | LargeUtf8, Decimal128(<span class="kw">_</span>, <span class="kw">_</span>) | Decimal256(<span class="kw">_</span>, <span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
+		(Struct(from_fields), Struct(to_fields)) =&gt; {
+			from_fields.len() == to_fields.len() &amp;&amp;
+				from_fields.iter().zip(to_fields.iter()).all(|(f1, f2)| {
+					can_cast_types(f1.data_type(), f2.data_type())
+				})
+		}
         (Struct(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
         (<span class="kw">_</span>, Struct(<span class="kw">_</span>)) =&gt; <span class="bool-val">false</span>,
         (<span class="kw">_</span>, Boolean) =&gt; {
@@ -10589,11 +10673,22 @@
                 </span>))),
             }
         }
+        (Struct(<span class="kw">_</span>), Struct(to_fields)) =&gt; {
+            <span class="kw">let </span>array = array.as_struct();
+            <span class="kw">let </span>fields = array
+                .columns()
+                .iter()
+                .zip(to_fields.iter())
+                .map(|(l, field)| cast_with_options(l, field.data_type(), cast_options))
+                .collect::&lt;<span class="prelude-ty">Result</span>&lt;Vec&lt;ArrayRef&gt;, ArrowError&gt;&gt;()<span class="question-mark">?</span>;
+            <span class="kw">let </span>array = StructArray::new(to_fields.clone(), fields, array.nulls().cloned());
+            <span class="prelude-val">Ok</span>(Arc::new(array) <span class="kw">as </span>ArrayRef)
+        }
         (Struct(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; <span class="prelude-val">Err</span>(ArrowError::CastError(
-            <span class="string">"Cannot cast from struct to other types"</span>.to_string(),
+            <span class="string">"Cannot cast from struct to other types except struct"</span>.to_string(),
         )),
         (<span class="kw">_</span>, Struct(<span class="kw">_</span>)) =&gt; <span class="prelude-val">Err</span>(ArrowError::CastError(
-            <span class="string">"Cannot cast to struct from other types"</span>.to_string(),
+            <span class="string">"Cannot cast to struct from other types except struct"</span>.to_string(),
         )),
         (<span class="kw">_</span>, Boolean) =&gt; <span class="kw">match </span>from_type {
             UInt8 =&gt; cast_numeric_to_bool::&lt;UInt8Type&gt;(array),
@@ -18897,6 +18992,67 @@
                 <span class="string">"Parser error: Invalid timezone \"ZZTOP\": only offset based timezones supported without chrono-tz feature"
             </span>);
         }
+    }
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_cast_struct_to_struct() {
+        <span class="kw">let </span>struct_type = DataType::Struct(
+            <span class="macro">vec!</span>[
+                Field::new(<span class="string">"a"</span>, DataType::Boolean, <span class="bool-val">false</span>),
+                Field::new(<span class="string">"b"</span>, DataType::Int32, <span class="bool-val">false</span>),
+            ]
+            .into(),
+        );
+        <span class="kw">let </span>to_type = DataType::Struct(
+            <span class="macro">vec!</span>[
+                Field::new(<span class="string">"a"</span>, DataType::Utf8, <span class="bool-val">false</span>),
+                Field::new(<span class="string">"b"</span>, DataType::Utf8, <span class="bool-val">false</span>),
+            ]
+            .into(),
+        );
+        <span class="kw">let </span>boolean = Arc::new(BooleanArray::from(<span class="macro">vec!</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>]));
+        <span class="kw">let </span>int = Arc::new(Int32Array::from(<span class="macro">vec!</span>[<span class="number">42</span>, <span class="number">28</span>, <span class="number">19</span>, <span class="number">31</span>]));
+        <span class="kw">let </span>struct_array = StructArray::from(<span class="macro">vec!</span>[
+            (
+                Arc::new(Field::new(<span class="string">"b"</span>, DataType::Boolean, <span class="bool-val">false</span>)),
+                boolean.clone() <span class="kw">as </span>ArrayRef,
+            ),
+            (
+                Arc::new(Field::new(<span class="string">"c"</span>, DataType::Int32, <span class="bool-val">false</span>)),
+                int.clone() <span class="kw">as </span>ArrayRef,
+            ),
+        ]);
+        <span class="kw">let </span>casted_array = cast(<span class="kw-2">&amp;</span>struct_array, <span class="kw-2">&amp;</span>to_type).unwrap();
+        <span class="kw">let </span>casted_array = casted_array.as_struct();
+        <span class="macro">assert_eq!</span>(casted_array.data_type(), <span class="kw-2">&amp;</span>to_type);
+        <span class="kw">let </span>casted_boolean_array = casted_array
+            .column(<span class="number">0</span>)
+            .as_string::&lt;i32&gt;()
+            .into_iter()
+            .flatten()
+            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+        <span class="kw">let </span>casted_int_array = casted_array
+            .column(<span class="number">1</span>)
+            .as_string::&lt;i32&gt;()
+            .into_iter()
+            .flatten()
+            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+        <span class="macro">assert_eq!</span>(casted_boolean_array, <span class="macro">vec!</span>[<span class="string">"false"</span>, <span class="string">"false"</span>, <span class="string">"true"</span>, <span class="string">"true"</span>]);
+        <span class="macro">assert_eq!</span>(casted_int_array, <span class="macro">vec!</span>[<span class="string">"42"</span>, <span class="string">"28"</span>, <span class="string">"19"</span>, <span class="string">"31"</span>]);
+
+        <span class="comment">// test for can't cast
+        </span><span class="kw">let </span>to_type = DataType::Struct(
+            <span class="macro">vec!</span>[
+                Field::new(<span class="string">"a"</span>, DataType::Date32, <span class="bool-val">false</span>),
+                Field::new(<span class="string">"b"</span>, DataType::Utf8, <span class="bool-val">false</span>),
+            ]
+            .into(),
+        );
+        <span class="macro">assert!</span>(!can_cast_types(<span class="kw-2">&amp;</span>struct_type, <span class="kw-2">&amp;</span>to_type));
+        <span class="kw">let </span>result = cast(<span class="kw-2">&amp;</span>struct_array, <span class="kw-2">&amp;</span>to_type);
+        <span class="macro">assert_eq!</span>(
+            <span class="string">"Cast error: Casting from Boolean to Date32 not supported"</span>,
+            result.unwrap_err().to_string()
+        );
     }
 }
 </code></pre></div></section></main></body></html>
