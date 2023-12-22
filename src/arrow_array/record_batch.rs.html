@@ -1378,7 +1378,7 @@
     </span><span class="kw">pub fn </span>with_schema(<span class="self">self</span>, schema: SchemaRef) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, ArrowError&gt; {
         <span class="kw">if </span>!schema.contains(<span class="self">self</span>.schema.as_ref()) {
             <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::SchemaError(<span class="macro">format!</span>(
-                <span class="string">"{schema} is not a superset of {}"</span>,
+                <span class="string">"target schema is not superset of current schema target={schema} current={}"</span>,
                 <span class="self">self</span>.schema
             )));
         }
