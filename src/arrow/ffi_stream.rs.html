@@ -544,10 +544,6 @@
 <a href="#543" id="543">543</a>
 <a href="#544" id="544">544</a>
 <a href="#545" id="545">545</a>
-<a href="#546" id="546">546</a>
-<a href="#547" id="547">547</a>
-<a href="#548" id="548">548</a>
-<a href="#549" id="549">549</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -907,14 +903,10 @@
                 <span class="kw">return </span><span class="prelude-val">None</span>;
             }
 
-            <span class="kw">let </span>data = <span class="kw">unsafe </span>{
+            <span class="kw">let </span>result = <span class="kw">unsafe </span>{
                 from_ffi_and_data_type(array, DataType::Struct(<span class="self">self</span>.schema().fields().clone()))
-            }
-            .ok()<span class="question-mark">?</span>;
-
-            <span class="kw">let </span>record_batch = RecordBatch::from(StructArray::from(data));
-
-            <span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>(record_batch))
+            };
+            <span class="prelude-val">Some</span>(result.map(|data| RecordBatch::from(StructArray::from(data))))
         } <span class="kw">else </span>{
             <span class="kw">let </span>last_error = <span class="self">self</span>.get_stream_last_error();
             <span class="kw">let </span>err = ArrowError::CDataInterface(last_error.unwrap());
