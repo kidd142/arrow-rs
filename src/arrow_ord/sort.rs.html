@@ -3943,12 +3943,6 @@
 <a href="#3942" id="3942">3942</a>
 <a href="#3943" id="3943">3943</a>
 <a href="#3944" id="3944">3944</a>
-<a href="#3945" id="3945">3945</a>
-<a href="#3946" id="3946">3946</a>
-<a href="#3947" id="3947">3947</a>
-<a href="#3948" id="3948">3948</a>
-<a href="#3949" id="3949">3949</a>
-<a href="#3950" id="3950">3950</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -4741,7 +4735,6 @@
     <span class="kw">use </span>half::f16;
     <span class="kw">use </span>rand::rngs::StdRng;
     <span class="kw">use </span>rand::{Rng, RngCore, SeedableRng};
-    <span class="kw">use </span>std::convert::TryFrom;
     <span class="kw">use </span>std::sync::Arc;
 
     <span class="kw">fn </span>create_decimal128_array(data: Vec&lt;<span class="prelude-ty">Option</span>&lt;i128&gt;&gt;) -&gt; Decimal128Array {
@@ -4923,19 +4916,14 @@
 
         <span class="macro">assert_eq!</span>(sorted_dict, dict);
 
-        <span class="kw">let </span>sorted_strings = StringArray::try_from(
-            (<span class="number">0</span>..sorted.len())
-                .map(|i| {
-                    <span class="kw">if </span>sorted.is_valid(i) {
-                        <span class="prelude-val">Some</span>(sorted_dict.value(sorted_keys.value(i).as_usize()))
-                    } <span class="kw">else </span>{
-                        <span class="prelude-val">None
-                    </span>}
-                })
-                .collect::&lt;Vec&lt;<span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;&gt;&gt;(),
-        )
-        .expect(<span class="string">"Unable to create string array from dictionary"</span>);
-        <span class="kw">let </span>expected = StringArray::try_from(expected_data).expect(<span class="string">"Unable to create string array"</span>);
+        <span class="kw">let </span>sorted_strings = StringArray::from_iter((<span class="number">0</span>..sorted.len()).map(|i| {
+            <span class="kw">if </span>sorted.is_valid(i) {
+                <span class="prelude-val">Some</span>(sorted_dict.value(sorted_keys.value(i).as_usize()))
+            } <span class="kw">else </span>{
+                <span class="prelude-val">None
+            </span>}
+        }));
+        <span class="kw">let </span>expected = StringArray::from(expected_data);
 
         <span class="macro">assert_eq!</span>(sorted_strings, expected)
     }

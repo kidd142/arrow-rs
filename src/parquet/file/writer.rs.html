@@ -1779,7 +1779,6 @@
 <a href="#1778" id="1778">1778</a>
 <a href="#1779" id="1779">1779</a>
 <a href="#1780" id="1780">1780</a>
-<a href="#1781" id="1781">1781</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -2806,8 +2805,7 @@
         <span class="comment">// ARROW-11803: Test that the converted and logical types have been populated
         </span><span class="kw">let </span>fields = reader.metadata().file_metadata().schema().get_fields();
         <span class="macro">assert_eq!</span>(fields.len(), <span class="number">1</span>);
-        <span class="kw">let </span>read_field = fields.get(<span class="number">0</span>).unwrap();
-        <span class="macro">assert_eq!</span>(read_field, <span class="kw-2">&amp;</span>field);
+        <span class="macro">assert_eq!</span>(fields[<span class="number">0</span>], field);
     }
 
     <span class="attr">#[test]

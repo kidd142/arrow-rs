@@ -1278,10 +1278,6 @@
 <a href="#1277" id="1277">1277</a>
 <a href="#1278" id="1278">1278</a>
 <a href="#1279" id="1279">1279</a>
-<a href="#1280" id="1280">1280</a>
-<a href="#1281" id="1281">1281</a>
-<a href="#1282" id="1282">1282</a>
-<a href="#1283" id="1283">1283</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -1950,8 +1946,7 @@
         DataType::List(child_field) =&gt; {
             <span class="kw">let </span>null_buf = create_null_buf(<span class="kw-2">&amp;</span>json_col);
             <span class="kw">let </span>children = json_col.children.clone().unwrap();
-            <span class="kw">let </span>child_array =
-                array_from_json(child_field, children.get(<span class="number">0</span>).unwrap().clone(), dictionaries)<span class="question-mark">?</span>;
+            <span class="kw">let </span>child_array = array_from_json(child_field, children[<span class="number">0</span>].clone(), dictionaries)<span class="question-mark">?</span>;
             <span class="kw">let </span>offsets: Vec&lt;i32&gt; = json_col
                 .offset
                 .unwrap()
@@ -1971,8 +1966,7 @@
         DataType::LargeList(child_field) =&gt; {
             <span class="kw">let </span>null_buf = create_null_buf(<span class="kw-2">&amp;</span>json_col);
             <span class="kw">let </span>children = json_col.children.clone().unwrap();
-            <span class="kw">let </span>child_array =
-                array_from_json(child_field, children.get(<span class="number">0</span>).unwrap().clone(), dictionaries)<span class="question-mark">?</span>;
+            <span class="kw">let </span>child_array = array_from_json(child_field, children[<span class="number">0</span>].clone(), dictionaries)<span class="question-mark">?</span>;
             <span class="kw">let </span>offsets: Vec&lt;i64&gt; = json_col
                 .offset
                 .unwrap()
@@ -1995,8 +1989,7 @@
         }
         DataType::FixedSizeList(child_field, <span class="kw">_</span>) =&gt; {
             <span class="kw">let </span>children = json_col.children.clone().unwrap();
-            <span class="kw">let </span>child_array =
-                array_from_json(child_field, children.get(<span class="number">0</span>).unwrap().clone(), dictionaries)<span class="question-mark">?</span>;
+            <span class="kw">let </span>child_array = array_from_json(child_field, children[<span class="number">0</span>].clone(), dictionaries)<span class="question-mark">?</span>;
             <span class="kw">let </span>null_buf = create_null_buf(<span class="kw-2">&amp;</span>json_col);
             <span class="kw">let </span>list_data = ArrayData::builder(field.data_type().clone())
                 .len(json_col.count)
@@ -2097,8 +2090,7 @@
         DataType::Map(child_field, <span class="kw">_</span>) =&gt; {
             <span class="kw">let </span>null_buf = create_null_buf(<span class="kw-2">&amp;</span>json_col);
             <span class="kw">let </span>children = json_col.children.clone().unwrap();
-            <span class="kw">let </span>child_array =
-                array_from_json(child_field, children.get(<span class="number">0</span>).unwrap().clone(), dictionaries)<span class="question-mark">?</span>;
+            <span class="kw">let </span>child_array = array_from_json(child_field, children[<span class="number">0</span>].clone(), dictionaries)<span class="question-mark">?</span>;
             <span class="kw">let </span>offsets: Vec&lt;i32&gt; = json_col
                 .offset
                 .unwrap()

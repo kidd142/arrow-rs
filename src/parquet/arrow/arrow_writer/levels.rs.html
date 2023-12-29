@@ -1840,6 +1840,7 @@
 <a href="#1839" id="1839">1839</a>
 <a href="#1840" id="1840">1840</a>
 <a href="#1841" id="1841">1841</a>
+<a href="#1842" id="1842">1842</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -2900,7 +2901,7 @@
 
         <span class="macro">assert_eq!</span>(levels.len(), <span class="number">1</span>);
 
-        <span class="kw">let </span>list_level = levels.get(<span class="number">0</span>).unwrap();
+        <span class="kw">let </span>list_level = <span class="kw-2">&amp;</span>levels[<span class="number">0</span>];
 
         <span class="kw">let </span>expected_level = ArrayLevels {
             def_levels: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">3</span>, <span class="number">3</span>, <span class="number">3</span>]),
@@ -2992,7 +2993,7 @@
         <span class="macro">assert_eq!</span>(levels.len(), <span class="number">5</span>);
 
         <span class="comment">// test "a" levels
-        </span><span class="kw">let </span>list_level = levels.get(<span class="number">0</span>).unwrap();
+        </span><span class="kw">let </span>list_level = <span class="kw-2">&amp;</span>levels[<span class="number">0</span>];
 
         <span class="kw">let </span>expected_level = ArrayLevels {
             def_levels: <span class="prelude-val">None</span>,
@@ -3137,7 +3138,7 @@
         <span class="kw">let </span>map = batch.column(<span class="number">0</span>).as_map();
 
         <span class="comment">// test key levels
-        </span><span class="kw">let </span>list_level = levels.get(<span class="number">0</span>).unwrap();
+        </span><span class="kw">let </span>list_level = <span class="kw-2">&amp;</span>levels[<span class="number">0</span>];
 
         <span class="kw">let </span>expected_level = ArrayLevels {
             def_levels: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">1</span>; <span class="number">7</span>]),
@@ -3319,9 +3320,10 @@
         <span class="kw">let </span>field_a2 = Arc::new(Field::new(<span class="string">"integers"</span>, a2.data_type().clone(), <span class="bool-val">true</span>));
 
         <span class="kw">let </span>nulls = Buffer::from([<span class="number">0b00110111</span>]);
-        <span class="kw">let </span>struct_a =
-            Arc::new(StructArray::try_from((<span class="macro">vec!</span>[(field_a1, a1), (field_a2, a2)], nulls)).unwrap())
-                <span class="kw">as </span>ArrayRef;
+        <span class="kw">let </span>struct_a = Arc::new(StructArray::from((
+            <span class="macro">vec!</span>[(field_a1, a1), (field_a2, a2)],
+            nulls,
+        ))) <span class="kw">as </span>ArrayRef;
 
         <span class="kw">let </span>offsets = Buffer::from_iter([<span class="number">0_i32</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">5</span>, <span class="number">5</span>]);
         <span class="kw">let </span>nulls = Buffer::from([<span class="number">0b00111100</span>]);
@@ -3408,7 +3410,7 @@
 
         <span class="macro">assert_eq!</span>(levels.len(), <span class="number">1</span>);
 
-        <span class="kw">let </span>list_level = levels.get(<span class="number">0</span>).unwrap();
+        <span class="kw">let </span>list_level = <span class="kw-2">&amp;</span>levels[<span class="number">0</span>];
 
         <span class="kw">let </span>expected_level = ArrayLevels {
             def_levels: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">0</span>, <span class="number">0</span>, <span class="number">3</span>, <span class="number">3</span>]),
@@ -3598,7 +3600,7 @@
 
         <span class="macro">assert_eq!</span>(levels.len(), <span class="number">1</span>);
 
-        <span class="kw">let </span>list_level = levels.get(<span class="number">0</span>).unwrap();
+        <span class="kw">let </span>list_level = <span class="kw-2">&amp;</span>levels[<span class="number">0</span>];
 
         <span class="kw">let </span>expected_level = ArrayLevels {
             def_levels: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[<span class="number">1</span>, <span class="number">0</span>, <span class="number">1</span>]),

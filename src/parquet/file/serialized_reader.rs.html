@@ -1754,9 +1754,6 @@
 <a href="#1753" id="1753">1753</a>
 <a href="#1754" id="1754">1754</a>
 <a href="#1755" id="1755">1755</a>
-<a href="#1756" id="1756">1756</a>
-<a href="#1757" id="1757">1757</a>
-<a href="#1758" id="1758">1758</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -2875,16 +2872,13 @@
 
         <span class="macro">assert_eq!</span>(metadata.len(), <span class="number">3</span>);
 
-        <span class="macro">assert_eq!</span>(metadata.get(<span class="number">0</span>).unwrap().key, <span class="string">"parquet.proto.descriptor"</span>);
+        <span class="macro">assert_eq!</span>(metadata[<span class="number">0</span>].key, <span class="string">"parquet.proto.descriptor"</span>);
 
-        <span class="macro">assert_eq!</span>(metadata.get(<span class="number">1</span>).unwrap().key, <span class="string">"writer.model.name"</span>);
-        <span class="macro">assert_eq!</span>(metadata.get(<span class="number">1</span>).unwrap().value, <span class="prelude-val">Some</span>(<span class="string">"protobuf"</span>.to_owned()));
+        <span class="macro">assert_eq!</span>(metadata[<span class="number">1</span>].key, <span class="string">"writer.model.name"</span>);
+        <span class="macro">assert_eq!</span>(metadata[<span class="number">1</span>].value, <span class="prelude-val">Some</span>(<span class="string">"protobuf"</span>.to_owned()));
 
-        <span class="macro">assert_eq!</span>(metadata.get(<span class="number">2</span>).unwrap().key, <span class="string">"parquet.proto.class"</span>);
-        <span class="macro">assert_eq!</span>(
-            metadata.get(<span class="number">2</span>).unwrap().value,
-            <span class="prelude-val">Some</span>(<span class="string">"foo.baz.Foobaz$Event"</span>.to_owned())
-        );
+        <span class="macro">assert_eq!</span>(metadata[<span class="number">2</span>].key, <span class="string">"parquet.proto.class"</span>);
+        <span class="macro">assert_eq!</span>(metadata[<span class="number">2</span>].value, <span class="prelude-val">Some</span>(<span class="string">"foo.baz.Foobaz$Event"</span>.to_owned()));
     }
 
     <span class="attr">#[test]
@@ -2900,7 +2894,7 @@
         </span><span class="macro">assert_eq!</span>(col0_metadata.bloom_filter_offset().unwrap(), <span class="number">192</span>);
 
         <span class="comment">// test page encoding stats
-        </span><span class="kw">let </span>page_encoding_stats = col0_metadata.page_encoding_stats().unwrap().get(<span class="number">0</span>).unwrap();
+        </span><span class="kw">let </span>page_encoding_stats = <span class="kw-2">&amp;</span>col0_metadata.page_encoding_stats().unwrap()[<span class="number">0</span>];
 
         <span class="macro">assert_eq!</span>(page_encoding_stats.page_type, basic::PageType::DATA_PAGE);
         <span class="macro">assert_eq!</span>(page_encoding_stats.encoding, Encoding::PLAIN);

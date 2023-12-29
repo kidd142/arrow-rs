@@ -3560,12 +3560,6 @@
 <a href="#3559" id="3559">3559</a>
 <a href="#3560" id="3560">3560</a>
 <a href="#3561" id="3561">3561</a>
-<a href="#3562" id="3562">3562</a>
-<a href="#3563" id="3563">3563</a>
-<a href="#3564" id="3564">3564</a>
-<a href="#3565" id="3565">3565</a>
-<a href="#3566" id="3566">3566</a>
-<a href="#3567" id="3567">3567</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -6152,14 +6146,8 @@
         }
 
         <span class="comment">// page location
-        </span><span class="macro">assert_eq!</span>(
-            <span class="number">0</span>,
-            offset_index.page_locations.get(<span class="number">0</span>).unwrap().first_row_index
-        );
-        <span class="macro">assert_eq!</span>(
-            <span class="number">4</span>,
-            offset_index.page_locations.get(<span class="number">1</span>).unwrap().first_row_index
-        );
+        </span><span class="macro">assert_eq!</span>(<span class="number">0</span>, offset_index.page_locations[<span class="number">0</span>].first_row_index);
+        <span class="macro">assert_eq!</span>(<span class="number">4</span>, offset_index.page_locations[<span class="number">1</span>].first_row_index);
     }
 
     <span class="doccomment">/// Verify min/max value truncation in the column index works as expected
@@ -6200,8 +6188,8 @@
             <span class="macro">assert_eq!</span>(stats.null_count(), <span class="number">0</span>);
             <span class="macro">assert_eq!</span>(stats.distinct_count(), <span class="prelude-val">None</span>);
             <span class="kw">if let </span>Statistics::FixedLenByteArray(stats) = stats {
-                <span class="kw">let </span>column_index_min_value = column_index.min_values.get(<span class="number">0</span>).unwrap();
-                <span class="kw">let </span>column_index_max_value = column_index.max_values.get(<span class="number">0</span>).unwrap();
+                <span class="kw">let </span>column_index_min_value = <span class="kw-2">&amp;</span>column_index.min_values[<span class="number">0</span>];
+                <span class="kw">let </span>column_index_max_value = <span class="kw-2">&amp;</span>column_index.max_values[<span class="number">0</span>];
 
                 <span class="comment">// Column index stats are truncated, while the column chunk's aren't.
                 </span><span class="macro">assert_ne!</span>(stats.min_bytes(), column_index_min_value.as_slice());
@@ -6267,8 +6255,8 @@
             <span class="macro">assert_eq!</span>(stats.null_count(), <span class="number">0</span>);
             <span class="macro">assert_eq!</span>(stats.distinct_count(), <span class="prelude-val">None</span>);
             <span class="kw">if let </span>Statistics::FixedLenByteArray(_stats) = stats {
-                <span class="kw">let </span>column_index_min_value = column_index.min_values.get(<span class="number">0</span>).unwrap();
-                <span class="kw">let </span>column_index_max_value = column_index.max_values.get(<span class="number">0</span>).unwrap();
+                <span class="kw">let </span>column_index_min_value = <span class="kw-2">&amp;</span>column_index.min_values[<span class="number">0</span>];
+                <span class="kw">let </span>column_index_max_value = <span class="kw-2">&amp;</span>column_index.max_values[<span class="number">0</span>];
 
                 <span class="macro">assert_eq!</span>(column_index_min_value.len(), <span class="number">1</span>);
                 <span class="macro">assert_eq!</span>(column_index_max_value.len(), <span class="number">1</span>);
