@@ -9603,6 +9603,8 @@
 <a href="#9601" id="9601">9601</a>
 <a href="#9602" id="9602">9602</a>
 <a href="#9603" id="9603">9603</a>
+<a href="#9604" id="9604">9604</a>
+<a href="#9605" id="9605">9605</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -17087,9 +17089,9 @@
 
         <span class="kw">let </span>a = StringArray::from(<span class="macro">vec!</span>[
             <span class="string">"2000-01-01"</span>,          <span class="comment">// valid date with leading 0s
+            </span><span class="string">"2000-01-01T12:00:00"</span>, <span class="comment">// valid datetime, will throw away the time part
             </span><span class="string">"2000-2-2"</span>,            <span class="comment">// valid date without leading 0s
             </span><span class="string">"2000-00-00"</span>,          <span class="comment">// invalid month and day
-            </span><span class="string">"2000-01-01T12:00:00"</span>, <span class="comment">// date + time is invalid
             </span><span class="string">"2000"</span>,                <span class="comment">// just a year is invalid
         </span>]);
         <span class="kw">let </span>array = Arc::new(a) <span class="kw">as </span>ArrayRef;
@@ -17105,17 +17107,19 @@
         <span class="macro">assert!</span>(c.is_valid(<span class="number">0</span>)); <span class="comment">// "2000-01-01"
         </span><span class="macro">assert_eq!</span>(date_value, c.value(<span class="number">0</span>));
 
+        <span class="macro">assert!</span>(c.is_valid(<span class="number">1</span>)); <span class="comment">// "2000-01-01T12:00:00"
+        </span><span class="macro">assert_eq!</span>(date_value, c.value(<span class="number">1</span>));
+
         <span class="kw">let </span>date_value = since(
             NaiveDate::from_ymd_opt(<span class="number">2000</span>, <span class="number">2</span>, <span class="number">2</span>).unwrap(),
             from_ymd(<span class="number">1970</span>, <span class="number">1</span>, <span class="number">1</span>).unwrap(),
         )
         .num_days() <span class="kw">as </span>i32;
-        <span class="macro">assert!</span>(c.is_valid(<span class="number">1</span>)); <span class="comment">// "2000-2-2"
-        </span><span class="macro">assert_eq!</span>(date_value, c.value(<span class="number">1</span>));
+        <span class="macro">assert!</span>(c.is_valid(<span class="number">2</span>)); <span class="comment">// "2000-2-2"
+        </span><span class="macro">assert_eq!</span>(date_value, c.value(<span class="number">2</span>));
 
         <span class="comment">// test invalid inputs
-        </span><span class="macro">assert!</span>(!c.is_valid(<span class="number">2</span>)); <span class="comment">// "2000-00-00"
-        </span><span class="macro">assert!</span>(!c.is_valid(<span class="number">3</span>)); <span class="comment">// "2000-01-01T12:00:00"
+        </span><span class="macro">assert!</span>(!c.is_valid(<span class="number">3</span>)); <span class="comment">// "2000-00-00"
         </span><span class="macro">assert!</span>(!c.is_valid(<span class="number">4</span>)); <span class="comment">// "2000"
     </span>}
 
