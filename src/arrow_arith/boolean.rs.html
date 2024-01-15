@@ -881,6 +881,39 @@
 <a href="#879" id="879">879</a>
 <a href="#880" id="880">880</a>
 <a href="#881" id="881">881</a>
+<a href="#882" id="882">882</a>
+<a href="#883" id="883">883</a>
+<a href="#884" id="884">884</a>
+<a href="#885" id="885">885</a>
+<a href="#886" id="886">886</a>
+<a href="#887" id="887">887</a>
+<a href="#888" id="888">888</a>
+<a href="#889" id="889">889</a>
+<a href="#890" id="890">890</a>
+<a href="#891" id="891">891</a>
+<a href="#892" id="892">892</a>
+<a href="#893" id="893">893</a>
+<a href="#894" id="894">894</a>
+<a href="#895" id="895">895</a>
+<a href="#896" id="896">896</a>
+<a href="#897" id="897">897</a>
+<a href="#898" id="898">898</a>
+<a href="#899" id="899">899</a>
+<a href="#900" id="900">900</a>
+<a href="#901" id="901">901</a>
+<a href="#902" id="902">902</a>
+<a href="#903" id="903">903</a>
+<a href="#904" id="904">904</a>
+<a href="#905" id="905">905</a>
+<a href="#906" id="906">906</a>
+<a href="#907" id="907">907</a>
+<a href="#908" id="908">908</a>
+<a href="#909" id="909">909</a>
+<a href="#910" id="910">910</a>
+<a href="#911" id="911">911</a>
+<a href="#912" id="912">912</a>
+<a href="#913" id="913">913</a>
+<a href="#914" id="914">914</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -907,7 +940,7 @@
 
 </span><span class="kw">use </span>arrow_array::<span class="kw-2">*</span>;
 <span class="kw">use </span>arrow_buffer::buffer::{bitwise_bin_op_helper, bitwise_quaternary_op_helper};
-<span class="kw">use </span>arrow_buffer::{BooleanBuffer, NullBuffer};
+<span class="kw">use </span>arrow_buffer::{buffer_bin_and_not, BooleanBuffer, NullBuffer};
 <span class="kw">use </span>arrow_schema::ArrowError;
 
 <span class="doccomment">/// Logical 'and' boolean values with Kleene logic
@@ -1155,6 +1188,27 @@
     binary_boolean_kernel(left, right, |a, b| a | b)
 }
 
+<span class="doccomment">/// Performs `AND_NOT` operation on two arrays. If either left or right value is null then the
+/// result is also null.
+/// # Error
+/// This function errors when the arrays have different lengths.
+/// # Example
+/// ```rust
+/// # use arrow_array::BooleanArray;
+/// # use arrow_arith::boolean::{and, not, and_not};
+/// let a = BooleanArray::from(vec![Some(false), Some(true), None]);
+/// let b = BooleanArray::from(vec![Some(true), Some(true), Some(false)]);
+/// let andn_ab = and_not(&amp;a, &amp;b).unwrap();
+/// assert_eq!(andn_ab, BooleanArray::from(vec![Some(false), Some(false), None]));
+/// // It's equal to and(left, not(right))
+/// assert_eq!(andn_ab, and(&amp;a, &amp;not(&amp;b).unwrap()).unwrap());
+</span><span class="kw">pub fn </span>and_not(left: <span class="kw-2">&amp;</span>BooleanArray, right: <span class="kw-2">&amp;</span>BooleanArray) -&gt; <span class="prelude-ty">Result</span>&lt;BooleanArray, ArrowError&gt; {
+    binary_boolean_kernel(left, right, |a, b| {
+        <span class="kw">let </span>buffer = buffer_bin_and_not(a.inner(), b.offset(), b.inner(), a.offset(), a.len());
+        BooleanBuffer::new(buffer, left.offset(), left.len())
+    })
+}
+
 <span class="doccomment">/// Performs unary `NOT` operation on an arrays. If value is null then the result is also
 /// null.
 /// # Error
@@ -1237,6 +1291,18 @@
         <span class="kw">let </span>expected = BooleanArray::from(<span class="macro">vec!</span>[<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>]);
 
         <span class="macro">assert_eq!</span>(c, expected);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_bool_array_and_not() {
+        <span class="kw">let </span>a = BooleanArray::from(<span class="macro">vec!</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">true</span>]);
+        <span class="kw">let </span>b = BooleanArray::from(<span class="macro">vec!</span>[<span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>]);
+        <span class="kw">let </span>c = and_not(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>b).unwrap();
+
+        <span class="kw">let </span>expected = BooleanArray::from(<span class="macro">vec!</span>[<span class="bool-val">false</span>, <span class="bool-val">false</span>, <span class="bool-val">true</span>, <span class="bool-val">false</span>]);
+
+        <span class="macro">assert_eq!</span>(c, expected);
+        <span class="macro">assert_eq!</span>(c, and(<span class="kw-2">&amp;</span>a, <span class="kw-2">&amp;</span>not(<span class="kw-2">&amp;</span>b).unwrap()).unwrap());
     }
 
     <span class="attr">#[test]
