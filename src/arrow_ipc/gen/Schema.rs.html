@@ -5121,6 +5121,15 @@
 <a href="#5119" id="5119">5119</a>
 <a href="#5120" id="5120">5120</a>
 <a href="#5121" id="5121">5121</a>
+<a href="#5122" id="5122">5122</a>
+<a href="#5123" id="5123">5123</a>
+<a href="#5124" id="5124">5124</a>
+<a href="#5125" id="5125">5125</a>
+<a href="#5126" id="5126">5126</a>
+<a href="#5127" id="5127">5127</a>
+<a href="#5128" id="5128">5128</a>
+<a href="#5129" id="5129">5129</a>
+<a href="#5130" id="5130">5130</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -6160,6 +6169,15 @@
             <span class="self">Self</span>::Little =&gt; <span class="prelude-val">Some</span>(<span class="string">"Little"</span>),
             <span class="self">Self</span>::Big =&gt; <span class="prelude-val">Some</span>(<span class="string">"Big"</span>),
             <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="doccomment">/// Returns true if the endianness of the source system matches the endianness of the target system.
+    </span><span class="kw">pub fn </span>equals_to_target_endianness(<span class="self">self</span>) -&gt; bool {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Little =&gt; <span class="macro">cfg!</span>(target_endian = <span class="string">"little"</span>),
+            <span class="self">Self</span>::Big =&gt; <span class="macro">cfg!</span>(target_endian = <span class="string">"big"</span>),
+            <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
         }
     }
 }

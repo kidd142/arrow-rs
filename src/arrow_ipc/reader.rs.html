@@ -1852,6 +1852,12 @@
 <a href="#1850" id="1850">1850</a>
 <a href="#1851" id="1851">1851</a>
 <a href="#1852" id="1852">1852</a>
+<a href="#1853" id="1853">1853</a>
+<a href="#1854" id="1854">1854</a>
+<a href="#1855" id="1855">1855</a>
+<a href="#1856" id="1856">1856</a>
+<a href="#1857" id="1857">1857</a>
+<a href="#1858" id="1858">1858</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -2644,6 +2650,12 @@
         <span class="kw">let </span>total_blocks = blocks.len();
 
         <span class="kw">let </span>ipc_schema = footer.schema().unwrap();
+        <span class="kw">if </span>!ipc_schema.endianness().equals_to_target_endianness() {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::IpcError(
+                <span class="string">"the endianness of the source system does not match the endianness of the target system."</span>.to_owned()
+            ));
+        }
+
         <span class="kw">let </span>schema = <span class="kw">crate</span>::convert::fb_to_schema(ipc_schema);
 
         <span class="kw">let </span><span class="kw-2">mut </span>custom_metadata = HashMap::new();
