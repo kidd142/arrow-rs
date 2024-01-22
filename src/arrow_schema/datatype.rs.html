@@ -906,6 +906,27 @@
 <a href="#904" id="904">904</a>
 <a href="#905" id="905">905</a>
 <a href="#906" id="906">906</a>
+<a href="#907" id="907">907</a>
+<a href="#908" id="908">908</a>
+<a href="#909" id="909">909</a>
+<a href="#910" id="910">910</a>
+<a href="#911" id="911">911</a>
+<a href="#912" id="912">912</a>
+<a href="#913" id="913">913</a>
+<a href="#914" id="914">914</a>
+<a href="#915" id="915">915</a>
+<a href="#916" id="916">916</a>
+<a href="#917" id="917">917</a>
+<a href="#918" id="918">918</a>
+<a href="#919" id="919">919</a>
+<a href="#920" id="920">920</a>
+<a href="#921" id="921">921</a>
+<a href="#922" id="922">922</a>
+<a href="#923" id="923">923</a>
+<a href="#924" id="924">924</a>
+<a href="#925" id="925">925</a>
+<a href="#926" id="926">926</a>
+<a href="#927" id="927">927</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -1053,10 +1074,31 @@
     /// ```
     </span>Timestamp(TimeUnit, <span class="prelude-ty">Option</span>&lt;Arc&lt;str&gt;&gt;),
     <span class="doccomment">/// A signed 32-bit date representing the elapsed time since UNIX epoch (1970-01-01)
-    /// in days (32 bits).
+    /// in days.
     </span>Date32,
     <span class="doccomment">/// A signed 64-bit date representing the elapsed time since UNIX epoch (1970-01-01)
-    /// in milliseconds (64 bits). Values are evenly divisible by 86400000.
+    /// in milliseconds.
+    ///
+    /// According to the specification (see [Schema.fbs]), this should be treated as the number of
+    /// days, in milliseconds, since the UNIX epoch. Therefore, values must be evenly divisible by
+    /// `86_400_000` (the number of milliseconds in a standard day).
+    ///
+    /// The reason for this is for compatibility with other language's native libraries,
+    /// such as Java, which historically lacked a dedicated date type
+    /// and only supported timestamps.
+    ///
+    /// Practically, validation that values of this type are evenly divisible by `86_400_000` is not enforced
+    /// by this library for performance and usability reasons. Date64 values will be treated similarly to the
+    /// `Timestamp(TimeUnit::Millisecond, None)` type, in that its values will be printed showing the time of
+    /// day if the value does not represent an exact day, and arithmetic can be done at the millisecond
+    /// granularity to change the time represented.
+    ///
+    /// Users should prefer using Date32 to cleanly represent the number of days, or one of the Timestamp
+    /// variants to include time as part of the representation, depending on their use case.
+    ///
+    /// For more details, see [#5288](https://github.com/apache/arrow-rs/issues/5288).
+    ///
+    /// [Schema.fbs]: https://github.com/apache/arrow/blob/main/format/Schema.fbs
     </span>Date64,
     <span class="doccomment">/// A signed 32-bit time representing the elapsed time since midnight in the unit of `TimeUnit`.
     /// Must be either seconds or milliseconds.
