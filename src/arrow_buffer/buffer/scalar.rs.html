@@ -423,7 +423,7 @@
                 is_aligned,
                 <span class="string">"Memory pointer is not aligned with the specified scalar type"
             </span>),
-            Deallocation::Custom(<span class="kw">_</span>) =&gt;
+            Deallocation::Custom(<span class="kw">_</span>, <span class="kw">_</span>) =&gt;
                 <span class="macro">assert!</span>(is_aligned, <span class="string">"Memory pointer from external source (e.g, FFI) is not aligned with the specified scalar type. Before importing buffer through FFI, please make sure the allocation is aligned."</span>),
         }
 

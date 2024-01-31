@@ -949,7 +949,7 @@
         len: usize,
         owner: Arc&lt;<span class="kw">dyn </span>Allocation&gt;,
     ) -&gt; <span class="self">Self </span>{
-        Buffer::build_with_arguments(ptr, len, Deallocation::Custom(owner))
+        Buffer::build_with_arguments(ptr, len, Deallocation::Custom(owner, len))
     }
 
     <span class="doccomment">/// Auxiliary method to create a new Buffer

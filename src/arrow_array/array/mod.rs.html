@@ -1040,6 +1040,19 @@
 <a href="#1038" id="1038">1038</a>
 <a href="#1039" id="1039">1039</a>
 <a href="#1040" id="1040">1040</a>
+<a href="#1041" id="1041">1041</a>
+<a href="#1042" id="1042">1042</a>
+<a href="#1043" id="1043">1043</a>
+<a href="#1044" id="1044">1044</a>
+<a href="#1045" id="1045">1045</a>
+<a href="#1046" id="1046">1046</a>
+<a href="#1047" id="1047">1047</a>
+<a href="#1048" id="1048">1048</a>
+<a href="#1049" id="1049">1049</a>
+<a href="#1050" id="1050">1050</a>
+<a href="#1051" id="1051">1051</a>
+<a href="#1052" id="1052">1052</a>
+<a href="#1053" id="1053">1053</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -1314,6 +1327,8 @@
 
     <span class="doccomment">/// Returns the total number of bytes of memory pointed to by this array.
     /// The buffers store bytes in the Arrow memory format, and include the data as well as the validity map.
+    /// Note that this does not always correspond to the exact memory usage of an array,
+    /// since multiple arrays can share the same buffers or slices thereof.
     </span><span class="kw">fn </span>get_buffer_memory_size(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize;
 
     <span class="doccomment">/// Returns the total number of bytes of memory occupied physically by this array.
@@ -1974,6 +1989,17 @@
             arr.get_array_memory_size() - empty.get_array_memory_size(),
             <span class="number">128 </span>* std::mem::size_of::&lt;i64&gt;()
         );
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_memory_size_primitive_sliced() {
+        <span class="kw">let </span>arr = PrimitiveArray::&lt;Int64Type&gt;::from_iter_values(<span class="number">0</span>..<span class="number">128</span>);
+        <span class="kw">let </span>slice1 = arr.slice(<span class="number">0</span>, <span class="number">64</span>);
+        <span class="kw">let </span>slice2 = arr.slice(<span class="number">64</span>, <span class="number">64</span>);
+
+        <span class="comment">// both slices report the full buffer memory usage, even though the buffers are shared
+        </span><span class="macro">assert_eq!</span>(slice1.get_array_memory_size(), arr.get_array_memory_size());
+        <span class="macro">assert_eq!</span>(slice2.get_array_memory_size(), arr.get_array_memory_size());
     }
 
     <span class="attr">#[test]
