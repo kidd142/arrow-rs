@@ -548,7 +548,7 @@
 ///     "🍎"
 /// );
 /// ```
-</span><span class="kw">pub trait </span>ArrayBuilder: Any + Send {
+</span><span class="kw">pub trait </span>ArrayBuilder: Any + Send + Sync {
     <span class="doccomment">/// Returns the number of array slots in the builder
     </span><span class="kw">fn </span>len(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize;
 
