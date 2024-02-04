@@ -9605,6 +9605,47 @@
 <a href="#9603" id="9603">9603</a>
 <a href="#9604" id="9604">9604</a>
 <a href="#9605" id="9605">9605</a>
+<a href="#9606" id="9606">9606</a>
+<a href="#9607" id="9607">9607</a>
+<a href="#9608" id="9608">9608</a>
+<a href="#9609" id="9609">9609</a>
+<a href="#9610" id="9610">9610</a>
+<a href="#9611" id="9611">9611</a>
+<a href="#9612" id="9612">9612</a>
+<a href="#9613" id="9613">9613</a>
+<a href="#9614" id="9614">9614</a>
+<a href="#9615" id="9615">9615</a>
+<a href="#9616" id="9616">9616</a>
+<a href="#9617" id="9617">9617</a>
+<a href="#9618" id="9618">9618</a>
+<a href="#9619" id="9619">9619</a>
+<a href="#9620" id="9620">9620</a>
+<a href="#9621" id="9621">9621</a>
+<a href="#9622" id="9622">9622</a>
+<a href="#9623" id="9623">9623</a>
+<a href="#9624" id="9624">9624</a>
+<a href="#9625" id="9625">9625</a>
+<a href="#9626" id="9626">9626</a>
+<a href="#9627" id="9627">9627</a>
+<a href="#9628" id="9628">9628</a>
+<a href="#9629" id="9629">9629</a>
+<a href="#9630" id="9630">9630</a>
+<a href="#9631" id="9631">9631</a>
+<a href="#9632" id="9632">9632</a>
+<a href="#9633" id="9633">9633</a>
+<a href="#9634" id="9634">9634</a>
+<a href="#9635" id="9635">9635</a>
+<a href="#9636" id="9636">9636</a>
+<a href="#9637" id="9637">9637</a>
+<a href="#9638" id="9638">9638</a>
+<a href="#9639" id="9639">9639</a>
+<a href="#9640" id="9640">9640</a>
+<a href="#9641" id="9641">9641</a>
+<a href="#9642" id="9642">9642</a>
+<a href="#9643" id="9643">9643</a>
+<a href="#9644" id="9644">9644</a>
+<a href="#9645" id="9645">9645</a>
+<a href="#9646" id="9646">9646</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -9748,6 +9789,8 @@
         }
         (<span class="kw">_</span>, List(list_to)) =&gt; can_cast_types(from_type, list_to.data_type()),
         (<span class="kw">_</span>, LargeList(list_to)) =&gt; can_cast_types(from_type, list_to.data_type()),
+        (<span class="kw">_</span>, FixedSizeList(list_to,size)) <span class="kw">if </span><span class="kw-2">*</span>size == <span class="number">1 </span>=&gt; {
+            can_cast_types(from_type, list_to.data_type())},
         <span class="comment">// cast one decimal type to another decimal type
         </span>(Decimal128(<span class="kw">_</span>, <span class="kw">_</span>), Decimal128(<span class="kw">_</span>, <span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
         (Decimal256(<span class="kw">_</span>, <span class="kw">_</span>), Decimal256(<span class="kw">_</span>, <span class="kw">_</span>)) =&gt; <span class="bool-val">true</span>,
@@ -10409,6 +10452,9 @@
         }
         (<span class="kw">_</span>, List(<span class="kw-2">ref </span>to)) =&gt; cast_values_to_list::&lt;i32&gt;(array, to, cast_options),
         (<span class="kw">_</span>, LargeList(<span class="kw-2">ref </span>to)) =&gt; cast_values_to_list::&lt;i64&gt;(array, to, cast_options),
+        (<span class="kw">_</span>, FixedSizeList(<span class="kw-2">ref </span>to, size)) <span class="kw">if </span><span class="kw-2">*</span>size == <span class="number">1 </span>=&gt; {
+            cast_values_to_fixed_size_list(array, to, <span class="kw-2">*</span>size, cast_options)
+        }
         (Decimal128(<span class="kw">_</span>, s1), Decimal128(p2, s2)) =&gt; {
             cast_decimal_to_decimal_same_type::&lt;Decimal128Type&gt;(
                 array.as_primitive(),
@@ -12644,6 +12690,18 @@
     <span class="kw">let </span>values = cast_with_options(array, to.data_type(), cast_options)<span class="question-mark">?</span>;
     <span class="kw">let </span>offsets = OffsetBuffer::from_lengths(std::iter::repeat(<span class="number">1</span>).take(values.len()));
     <span class="kw">let </span>list = GenericListArray::&lt;O&gt;::new(to.clone(), offsets, values, <span class="prelude-val">None</span>);
+    <span class="prelude-val">Ok</span>(Arc::new(list))
+}
+
+<span class="doccomment">/// Helper function that takes a primitive array and casts to a fixed size list array.
+</span><span class="kw">fn </span>cast_values_to_fixed_size_list(
+    array: <span class="kw-2">&amp;</span><span class="kw">dyn </span>Array,
+    to: <span class="kw-2">&amp;</span>FieldRef,
+    size: i32,
+    cast_options: <span class="kw-2">&amp;</span>CastOptions,
+) -&gt; <span class="prelude-ty">Result</span>&lt;ArrayRef, ArrowError&gt; {
+    <span class="kw">let </span>values = cast_with_options(array, to.data_type(), cast_options)<span class="question-mark">?</span>;
+    <span class="kw">let </span>list = FixedSizeListArray::new(to.clone(), size, values, <span class="prelude-val">None</span>);
     <span class="prelude-val">Ok</span>(Arc::new(list))
 }
 
@@ -17214,6 +17272,30 @@
         <span class="kw">let </span>actual = list_array3.as_any().downcast_ref::&lt;ListArray&gt;().unwrap();
         <span class="kw">let </span>expected = array3.as_any().downcast_ref::&lt;LargeListArray&gt;().unwrap();
         <span class="macro">assert_eq!</span>(expected.values(), actual.values());
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_cast_utf8_to_list() {
+        <span class="comment">// DataType::List
+        </span><span class="kw">let </span>array = Arc::new(StringArray::from(<span class="macro">vec!</span>[<span class="string">"5"</span>])) <span class="kw">as </span>ArrayRef;
+        <span class="kw">let </span>field = Arc::new(Field::new(<span class="string">""</span>, DataType::Int32, <span class="bool-val">false</span>));
+        <span class="kw">let </span>list_array = cast(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>DataType::List(field.clone())).unwrap();
+        <span class="kw">let </span>actual = list_array.as_list_opt::&lt;i32&gt;().unwrap();
+        <span class="kw">let </span>expect = ListArray::from_iter_primitive::&lt;Int32Type, <span class="kw">_</span>, <span class="kw">_</span>&gt;([<span class="prelude-val">Some</span>([<span class="prelude-val">Some</span>(<span class="number">5</span>)])]);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>expect.value(<span class="number">0</span>), <span class="kw-2">&amp;</span>actual.value(<span class="number">0</span>));
+
+        <span class="comment">// DataType::LargeList
+        </span><span class="kw">let </span>list_array = cast(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>DataType::LargeList(field.clone())).unwrap();
+        <span class="kw">let </span>actual = list_array.as_list_opt::&lt;i64&gt;().unwrap();
+        <span class="kw">let </span>expect = LargeListArray::from_iter_primitive::&lt;Int32Type, <span class="kw">_</span>, <span class="kw">_</span>&gt;([<span class="prelude-val">Some</span>([<span class="prelude-val">Some</span>(<span class="number">5</span>)])]);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>expect.value(<span class="number">0</span>), <span class="kw-2">&amp;</span>actual.value(<span class="number">0</span>));
+
+        <span class="comment">// DataType::FixedSizeList
+        </span><span class="kw">let </span>list_array = cast(<span class="kw-2">&amp;</span>array, <span class="kw-2">&amp;</span>DataType::FixedSizeList(field.clone(), <span class="number">1</span>)).unwrap();
+        <span class="kw">let </span>actual = list_array.as_fixed_size_list_opt().unwrap();
+        <span class="kw">let </span>expect =
+            FixedSizeListArray::from_iter_primitive::&lt;Int32Type, <span class="kw">_</span>, <span class="kw">_</span>&gt;([<span class="prelude-val">Some</span>([<span class="prelude-val">Some</span>(<span class="number">5</span>)])], <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span>expect.value(<span class="number">0</span>), <span class="kw-2">&amp;</span>actual.value(<span class="number">0</span>));
     }
 
     <span class="attr">#[test]
