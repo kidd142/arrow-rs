@@ -475,6 +475,15 @@
 <a href="#473" id="473">473</a>
 <a href="#474" id="474">474</a>
 <a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
+<a href="#477" id="477">477</a>
+<a href="#478" id="478">478</a>
+<a href="#479" id="479">479</a>
+<a href="#480" id="480">480</a>
+<a href="#481" id="481">481</a>
+<a href="#482" id="482">482</a>
+<a href="#483" id="483">483</a>
+<a href="#484" id="484">484</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -832,7 +841,16 @@
                 ));
             }
             <span class="kw">let </span>array = StructArray::from(array_data);
-            <span class="kw">return </span><span class="prelude-val">Ok</span>(array.into());
+            <span class="comment">// StructArray does not embed metadata from schema. We need to override
+            // the output schema with the schema from the capsule.
+            </span><span class="kw">let </span>schema = Arc::new(Schema::try_from(schema_ptr).map_err(to_py_err)<span class="question-mark">?</span>);
+            <span class="kw">let </span>(_fields, columns, nulls) = array.into_parts();
+            <span class="macro">assert_eq!</span>(
+                nulls.map(|n| n.null_count()).unwrap_or_default(),
+                <span class="number">0</span>,
+                <span class="string">"Cannot convert nullable StructArray to RecordBatch, see StructArray documentation"
+            </span>);
+            <span class="kw">return </span>RecordBatch::try_new(schema, columns).map_err(to_py_err);
         }
 
         validate_class(<span class="string">"RecordBatch"</span>, value)<span class="question-mark">?</span>;
