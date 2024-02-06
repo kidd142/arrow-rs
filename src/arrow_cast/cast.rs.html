@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-cast/src/cast.rs`."><title>cast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_cast" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0-nightly (b11fbfbf3 2024-02-03)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `arrow-cast/src/cast.rs`."><title>cast.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-5bc39a1768837dd0.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="arrow_cast" data-themes="" data-resource-suffix="" data-rustdoc-version="1.78.0-nightly (f067fd608 2024-02-05)" data-channel="nightly" data-search-js="search-dd67cee4cfa65049.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-4c98445ec4002617.js"></script><script defer src="../../static.files/src-script-e66d777a5a92e9b2.js"></script><script defer src="../../src-files.js"></script><script defer src="../../static.files/main-48f368f3872407c8.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-04d5337699b92874.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc src"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="src-sidebar-title">
             <h2>Files</h2></div></nav><div class="sidebar-resizer"></div>
     <main><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../arrow_cast/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
@@ -9646,6 +9646,83 @@
 <a href="#9644" id="9644">9644</a>
 <a href="#9645" id="9645">9645</a>
 <a href="#9646" id="9646">9646</a>
+<a href="#9647" id="9647">9647</a>
+<a href="#9648" id="9648">9648</a>
+<a href="#9649" id="9649">9649</a>
+<a href="#9650" id="9650">9650</a>
+<a href="#9651" id="9651">9651</a>
+<a href="#9652" id="9652">9652</a>
+<a href="#9653" id="9653">9653</a>
+<a href="#9654" id="9654">9654</a>
+<a href="#9655" id="9655">9655</a>
+<a href="#9656" id="9656">9656</a>
+<a href="#9657" id="9657">9657</a>
+<a href="#9658" id="9658">9658</a>
+<a href="#9659" id="9659">9659</a>
+<a href="#9660" id="9660">9660</a>
+<a href="#9661" id="9661">9661</a>
+<a href="#9662" id="9662">9662</a>
+<a href="#9663" id="9663">9663</a>
+<a href="#9664" id="9664">9664</a>
+<a href="#9665" id="9665">9665</a>
+<a href="#9666" id="9666">9666</a>
+<a href="#9667" id="9667">9667</a>
+<a href="#9668" id="9668">9668</a>
+<a href="#9669" id="9669">9669</a>
+<a href="#9670" id="9670">9670</a>
+<a href="#9671" id="9671">9671</a>
+<a href="#9672" id="9672">9672</a>
+<a href="#9673" id="9673">9673</a>
+<a href="#9674" id="9674">9674</a>
+<a href="#9675" id="9675">9675</a>
+<a href="#9676" id="9676">9676</a>
+<a href="#9677" id="9677">9677</a>
+<a href="#9678" id="9678">9678</a>
+<a href="#9679" id="9679">9679</a>
+<a href="#9680" id="9680">9680</a>
+<a href="#9681" id="9681">9681</a>
+<a href="#9682" id="9682">9682</a>
+<a href="#9683" id="9683">9683</a>
+<a href="#9684" id="9684">9684</a>
+<a href="#9685" id="9685">9685</a>
+<a href="#9686" id="9686">9686</a>
+<a href="#9687" id="9687">9687</a>
+<a href="#9688" id="9688">9688</a>
+<a href="#9689" id="9689">9689</a>
+<a href="#9690" id="9690">9690</a>
+<a href="#9691" id="9691">9691</a>
+<a href="#9692" id="9692">9692</a>
+<a href="#9693" id="9693">9693</a>
+<a href="#9694" id="9694">9694</a>
+<a href="#9695" id="9695">9695</a>
+<a href="#9696" id="9696">9696</a>
+<a href="#9697" id="9697">9697</a>
+<a href="#9698" id="9698">9698</a>
+<a href="#9699" id="9699">9699</a>
+<a href="#9700" id="9700">9700</a>
+<a href="#9701" id="9701">9701</a>
+<a href="#9702" id="9702">9702</a>
+<a href="#9703" id="9703">9703</a>
+<a href="#9704" id="9704">9704</a>
+<a href="#9705" id="9705">9705</a>
+<a href="#9706" id="9706">9706</a>
+<a href="#9707" id="9707">9707</a>
+<a href="#9708" id="9708">9708</a>
+<a href="#9709" id="9709">9709</a>
+<a href="#9710" id="9710">9710</a>
+<a href="#9711" id="9711">9711</a>
+<a href="#9712" id="9712">9712</a>
+<a href="#9713" id="9713">9713</a>
+<a href="#9714" id="9714">9714</a>
+<a href="#9715" id="9715">9715</a>
+<a href="#9716" id="9716">9716</a>
+<a href="#9717" id="9717">9717</a>
+<a href="#9718" id="9718">9718</a>
+<a href="#9719" id="9719">9719</a>
+<a href="#9720" id="9720">9720</a>
+<a href="#9721" id="9721">9721</a>
+<a href="#9722" id="9722">9722</a>
+<a href="#9723" id="9723">9723</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -9781,11 +9858,12 @@
             can_cast_types(list_from.data_type(), list_to.data_type())
         }
         (List(<span class="kw">_</span>), <span class="kw">_</span>) =&gt; <span class="bool-val">false</span>,
-        (FixedSizeList(list_from,<span class="kw">_</span>), List(list_to)) =&gt; {
-            list_from.data_type() == list_to.data_type()
-        }
+        (FixedSizeList(list_from,<span class="kw">_</span>), List(list_to)) |
         (FixedSizeList(list_from,<span class="kw">_</span>), LargeList(list_to)) =&gt; {
-            list_from.data_type() == list_to.data_type()
+            can_cast_types(list_from.data_type(), list_to.data_type())
+        }
+        (FixedSizeList(inner, size), FixedSizeList(inner_to, size_to)) <span class="kw">if </span>size == size_to =&gt; {
+            can_cast_types(inner.data_type(), inner_to.data_type())
         }
         (<span class="kw">_</span>, List(list_to)) =&gt; can_cast_types(from_type, list_to.data_type()),
         (<span class="kw">_</span>, LargeList(list_to)) =&gt; can_cast_types(from_type, list_to.data_type()),
@@ -10432,23 +10510,40 @@
                 <span class="string">"Cannot cast list to non-list data types"</span>.to_string(),
             )),
         },
-        (FixedSizeList(list_from, <span class="kw">_</span>), List(list_to)) =&gt; {
+        (FixedSizeList(list_from, size), List(list_to)) =&gt; {
             <span class="kw">if </span>list_to.data_type() != list_from.data_type() {
-                <span class="prelude-val">Err</span>(ArrowError::CastError(
-                    <span class="string">"cannot cast fixed-size-list to list with different child data"</span>.into(),
-                ))
+                <span class="comment">// To transform inner type, can first cast to FSL with new inner type.
+                </span><span class="kw">let </span>fsl_to = DataType::FixedSizeList(list_to.clone(), <span class="kw-2">*</span>size);
+                <span class="kw">let </span>array = cast_with_options(array, <span class="kw-2">&amp;</span>fsl_to, cast_options)<span class="question-mark">?</span>;
+                cast_fixed_size_list_to_list::&lt;i32&gt;(array.as_ref())
             } <span class="kw">else </span>{
                 cast_fixed_size_list_to_list::&lt;i32&gt;(array)
             }
         }
-        (FixedSizeList(list_from, <span class="kw">_</span>), LargeList(list_to)) =&gt; {
+        (FixedSizeList(list_from, size), LargeList(list_to)) =&gt; {
             <span class="kw">if </span>list_to.data_type() != list_from.data_type() {
-                <span class="prelude-val">Err</span>(ArrowError::CastError(
-                    <span class="string">"cannot cast fixed-size-list to largelist with different child data"</span>.into(),
-                ))
+                <span class="comment">// To transform inner type, can first cast to FSL with new inner type.
+                </span><span class="kw">let </span>fsl_to = DataType::FixedSizeList(list_to.clone(), <span class="kw-2">*</span>size);
+                <span class="kw">let </span>array = cast_with_options(array, <span class="kw-2">&amp;</span>fsl_to, cast_options)<span class="question-mark">?</span>;
+                cast_fixed_size_list_to_list::&lt;i64&gt;(array.as_ref())
             } <span class="kw">else </span>{
                 cast_fixed_size_list_to_list::&lt;i64&gt;(array)
             }
+        }
+        (FixedSizeList(<span class="kw">_</span>, size_from), FixedSizeList(list_to, size_to)) =&gt; {
+            <span class="kw">if </span>size_from != size_to {
+                <span class="kw">return </span><span class="prelude-val">Err</span>(ArrowError::CastError(
+                    <span class="string">"cannot cast fixed-size-list to fixed-size-list with different size"</span>.into(),
+                ));
+            }
+            <span class="kw">let </span>array = array.as_any().downcast_ref::&lt;FixedSizeListArray&gt;().unwrap();
+            <span class="kw">let </span>values = cast_with_options(array.values(), list_to.data_type(), cast_options)<span class="question-mark">?</span>;
+            <span class="prelude-val">Ok</span>(Arc::new(FixedSizeListArray::try_new(
+                list_to.clone(),
+                <span class="kw-2">*</span>size_from,
+                values,
+                array.nulls().cloned(),
+            )<span class="question-mark">?</span>))
         }
         (<span class="kw">_</span>, List(<span class="kw-2">ref </span>to)) =&gt; cast_values_to_list::&lt;i32&gt;(array, to, cast_options),
         (<span class="kw">_</span>, LargeList(<span class="kw-2">ref </span>to)) =&gt; cast_values_to_list::&lt;i64&gt;(array, to, cast_options),
@@ -17210,6 +17305,37 @@
     }
 
     <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_can_cast_fsl_to_fsl() {
+        <span class="kw">let </span>from_array = Arc::new(
+            FixedSizeListArray::from_iter_primitive::&lt;Float32Type, <span class="kw">_</span>, <span class="kw">_</span>&gt;(
+                [<span class="prelude-val">Some</span>([<span class="prelude-val">Some</span>(<span class="number">1.0</span>), <span class="prelude-val">Some</span>(<span class="number">2.0</span>)]), <span class="prelude-val">None</span>],
+                <span class="number">2</span>,
+            ),
+        ) <span class="kw">as </span>ArrayRef;
+        <span class="kw">let </span>to_array = Arc::new(
+            FixedSizeListArray::from_iter_primitive::&lt;Float16Type, <span class="kw">_</span>, <span class="kw">_</span>&gt;(
+                [
+                    <span class="prelude-val">Some</span>([<span class="prelude-val">Some</span>(f16::from_f32(<span class="number">1.0</span>)), <span class="prelude-val">Some</span>(f16::from_f32(<span class="number">2.0</span>))]),
+                    <span class="prelude-val">None</span>,
+                ],
+                <span class="number">2</span>,
+            ),
+        ) <span class="kw">as </span>ArrayRef;
+
+        <span class="macro">assert!</span>(can_cast_types(from_array.data_type(), to_array.data_type()));
+        <span class="kw">let </span>actual = cast(<span class="kw-2">&amp;</span>from_array, to_array.data_type()).unwrap();
+        <span class="macro">assert_eq!</span>(actual.data_type(), to_array.data_type());
+
+        <span class="kw">let </span>invalid_target =
+            DataType::FixedSizeList(Arc::new(Field::new(<span class="string">"item"</span>, DataType::Binary, <span class="bool-val">true</span>)), <span class="number">2</span>);
+        <span class="macro">assert!</span>(!can_cast_types(from_array.data_type(), <span class="kw-2">&amp;</span>invalid_target));
+
+        <span class="kw">let </span>invalid_size =
+            DataType::FixedSizeList(Arc::new(Field::new(<span class="string">"item"</span>, DataType::Float16, <span class="bool-val">true</span>)), <span class="number">5</span>);
+        <span class="macro">assert!</span>(!can_cast_types(from_array.data_type(), <span class="kw-2">&amp;</span>invalid_size));
+    }
+
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>test_can_cast_types_fixed_size_list_to_list() {
         <span class="comment">// DataType::List
         </span><span class="kw">let </span>array1 = Arc::new(make_fixed_size_list_array()) <span class="kw">as </span>ArrayRef;
@@ -17228,50 +17354,78 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_cast_fixed_size_list_to_list() {
-        <span class="comment">// DataType::List
-        </span><span class="kw">let </span>array1 = Arc::new(make_fixed_size_list_array()) <span class="kw">as </span>ArrayRef;
-        <span class="kw">let </span>list_array1 = cast(
-            <span class="kw-2">&amp;</span>array1,
-            <span class="kw-2">&amp;</span>DataType::List(Arc::new(Field::new(<span class="string">""</span>, DataType::Int32, <span class="bool-val">false</span>))),
-        )
-        .unwrap();
-        <span class="kw">let </span>actual = list_array1.as_any().downcast_ref::&lt;ListArray&gt;().unwrap();
-        <span class="kw">let </span>expected = array1
-            .as_any()
-            .downcast_ref::&lt;FixedSizeListArray&gt;()
-            .unwrap();
+        <span class="comment">// Important cases:
+        // 1. With/without nulls
+        // 2. LargeList and List
+        // 3. With and without inner casts
 
-        <span class="macro">assert_eq!</span>(expected.values(), actual.values());
-        <span class="macro">assert_eq!</span>(expected.len(), actual.len());
+        </span><span class="kw">let </span>cases = [
+            <span class="comment">// fixed_size_list&lt;i32, 2&gt; =&gt; list&lt;i32&gt;
+            </span>(
+                Arc::new(FixedSizeListArray::from_iter_primitive::&lt;Int32Type, <span class="kw">_</span>, <span class="kw">_</span>&gt;(
+                    [[<span class="number">1</span>, <span class="number">1</span>].map(<span class="prelude-val">Some</span>), [<span class="number">2</span>, <span class="number">2</span>].map(<span class="prelude-val">Some</span>)].map(<span class="prelude-val">Some</span>),
+                    <span class="number">2</span>,
+                )) <span class="kw">as </span>ArrayRef,
+                Arc::new(ListArray::from_iter_primitive::&lt;Int32Type, <span class="kw">_</span>, <span class="kw">_</span>&gt;([
+                    <span class="prelude-val">Some</span>([<span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">1</span>)]),
+                    <span class="prelude-val">Some</span>([<span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>)]),
+                ])) <span class="kw">as </span>ArrayRef,
+            ),
+            <span class="comment">// fixed_size_list&lt;i32, 2&gt; =&gt; list&lt;i32&gt; (nullable)
+            </span>(
+                Arc::new(FixedSizeListArray::from_iter_primitive::&lt;Int32Type, <span class="kw">_</span>, <span class="kw">_</span>&gt;(
+                    [<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>([<span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>)])],
+                    <span class="number">2</span>,
+                )) <span class="kw">as </span>ArrayRef,
+                Arc::new(ListArray::from_iter_primitive::&lt;Int32Type, <span class="kw">_</span>, <span class="kw">_</span>&gt;([
+                    <span class="prelude-val">None</span>,
+                    <span class="prelude-val">Some</span>([<span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>)]),
+                ])) <span class="kw">as </span>ArrayRef,
+            ),
+            <span class="comment">// fixed_size_list&lt;i32, 2&gt; =&gt; large_list&lt;i64&gt;
+            </span>(
+                Arc::new(FixedSizeListArray::from_iter_primitive::&lt;Int32Type, <span class="kw">_</span>, <span class="kw">_</span>&gt;(
+                    [[<span class="number">1</span>, <span class="number">1</span>].map(<span class="prelude-val">Some</span>), [<span class="number">2</span>, <span class="number">2</span>].map(<span class="prelude-val">Some</span>)].map(<span class="prelude-val">Some</span>),
+                    <span class="number">2</span>,
+                )) <span class="kw">as </span>ArrayRef,
+                Arc::new(LargeListArray::from_iter_primitive::&lt;Int64Type, <span class="kw">_</span>, <span class="kw">_</span>&gt;([
+                    <span class="prelude-val">Some</span>([<span class="prelude-val">Some</span>(<span class="number">1</span>), <span class="prelude-val">Some</span>(<span class="number">1</span>)]),
+                    <span class="prelude-val">Some</span>([<span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>)]),
+                ])) <span class="kw">as </span>ArrayRef,
+            ),
+            <span class="comment">// fixed_size_list&lt;i32, 2&gt; =&gt; large_list&lt;i64&gt; (nullable)
+            </span>(
+                Arc::new(FixedSizeListArray::from_iter_primitive::&lt;Int32Type, <span class="kw">_</span>, <span class="kw">_</span>&gt;(
+                    [<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>([<span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>)])],
+                    <span class="number">2</span>,
+                )) <span class="kw">as </span>ArrayRef,
+                Arc::new(LargeListArray::from_iter_primitive::&lt;Int64Type, <span class="kw">_</span>, <span class="kw">_</span>&gt;([
+                    <span class="prelude-val">None</span>,
+                    <span class="prelude-val">Some</span>([<span class="prelude-val">Some</span>(<span class="number">2</span>), <span class="prelude-val">Some</span>(<span class="number">2</span>)]),
+                ])) <span class="kw">as </span>ArrayRef,
+            ),
+        ];
 
-        <span class="comment">// DataType::LargeList
-        </span><span class="kw">let </span>array2 = Arc::new(make_fixed_size_list_array_for_large_list()) <span class="kw">as </span>ArrayRef;
-        <span class="kw">let </span>list_array2 = cast(
-            <span class="kw-2">&amp;</span>array2,
-            <span class="kw-2">&amp;</span>DataType::LargeList(Arc::new(Field::new(<span class="string">""</span>, DataType::Int64, <span class="bool-val">false</span>))),
-        )
-        .unwrap();
-        <span class="kw">let </span>actual = list_array2
-            .as_any()
-            .downcast_ref::&lt;LargeListArray&gt;()
-            .unwrap();
-        <span class="kw">let </span>expected = array2
-            .as_any()
-            .downcast_ref::&lt;FixedSizeListArray&gt;()
-            .unwrap();
-        <span class="macro">assert_eq!</span>(expected.values(), actual.values());
-        <span class="macro">assert_eq!</span>(expected.len(), actual.len());
+        <span class="kw">for </span>(array, expected) <span class="kw">in </span>cases {
+            <span class="kw">let </span>array = Arc::new(array) <span class="kw">as </span>ArrayRef;
 
-        <span class="comment">// Cast previous LargeList to List
-        </span><span class="kw">let </span>array3 = Arc::new(actual.clone()) <span class="kw">as </span>ArrayRef;
-        <span class="kw">let </span>list_array3 = cast(
-            <span class="kw-2">&amp;</span>array3,
-            <span class="kw-2">&amp;</span>DataType::List(Arc::new(Field::new(<span class="string">""</span>, DataType::Int64, <span class="bool-val">false</span>))),
-        )
-        .unwrap();
-        <span class="kw">let </span>actual = list_array3.as_any().downcast_ref::&lt;ListArray&gt;().unwrap();
-        <span class="kw">let </span>expected = array3.as_any().downcast_ref::&lt;LargeListArray&gt;().unwrap();
-        <span class="macro">assert_eq!</span>(expected.values(), actual.values());
+            <span class="macro">assert!</span>(
+                can_cast_types(array.data_type(), expected.data_type()),
+                <span class="string">"can_cast_types claims we cannot cast {:?} to {:?}"</span>,
+                array.data_type(),
+                expected.data_type()
+            );
+
+            <span class="kw">let </span>list_array = cast(<span class="kw-2">&amp;</span>array, expected.data_type())
+                .unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">"Failed to cast {:?} to {:?}"</span>, array, expected));
+            <span class="macro">assert_eq!</span>(
+                list_array.as_ref(),
+                <span class="kw-2">&amp;</span>expected,
+                <span class="string">"Incorrect result from casting {:?} to {:?}"</span>,
+                array,
+                expected
+            );
+        }
     }
 
     <span class="attr">#[test]
