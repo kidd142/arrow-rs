@@ -2484,6 +2484,7 @@
 <a href="#2482" id="2482">2482</a>
 <a href="#2483" id="2483">2483</a>
 <a href="#2484" id="2484">2484</a>
+<a href="#2485" id="2485">2485</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -3342,13 +3343,14 @@
 
         <span class="kw">let </span>(slice, null_buffer) = builder.slices_mut();
 
-        <span class="kw">match </span>try_for_each_valid_idx(len, <span class="number">0</span>, null_count, null_buffer.as_deref(), |idx| {
+        <span class="kw">let </span>r = try_for_each_valid_idx(len, <span class="number">0</span>, null_count, null_buffer.as_deref(), |idx| {
             <span class="kw">unsafe </span>{ <span class="kw-2">*</span>slice.get_unchecked_mut(idx) = op(<span class="kw-2">*</span>slice.get_unchecked(idx))<span class="question-mark">? </span>};
             <span class="prelude-val">Ok</span>::&lt;<span class="kw">_</span>, E&gt;(())
-        }) {
-            <span class="prelude-val">Ok</span>(<span class="kw">_</span>) =&gt; {}
-            <span class="prelude-val">Err</span>(err) =&gt; <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(err)),
-        };
+        });
+
+        <span class="kw">if let </span><span class="prelude-val">Err</span>(err) = r {
+            <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="prelude-val">Err</span>(err));
+        }
 
         <span class="prelude-val">Ok</span>(<span class="prelude-val">Ok</span>(builder.finish()))
     }
