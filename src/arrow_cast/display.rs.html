@@ -2133,9 +2133,9 @@
         <span class="macro">assert_eq!</span>(pretty[<span class="number">2</span>], <span class="string">"0 days 0 hours 0 mins 0.000001000 secs"</span>);
         <span class="macro">assert_eq!</span>(iso[<span class="number">3</span>], <span class="string">"-PT0.000001S"</span>);
         <span class="macro">assert_eq!</span>(pretty[<span class="number">3</span>], <span class="string">"0 days 0 hours 0 mins -0.000001000 secs"</span>);
-        <span class="macro">assert_eq!</span>(iso[<span class="number">4</span>], <span class="string">"P45DT50554.123456789S"</span>);
+        <span class="macro">assert_eq!</span>(iso[<span class="number">4</span>], <span class="string">"PT3938554.123456789S"</span>);
         <span class="macro">assert_eq!</span>(pretty[<span class="number">4</span>], <span class="string">"45 days 14 hours 2 mins 34.123456789 secs"</span>);
-        <span class="macro">assert_eq!</span>(iso[<span class="number">5</span>], <span class="string">"-P45DT50554.123456789S"</span>);
+        <span class="macro">assert_eq!</span>(iso[<span class="number">5</span>], <span class="string">"-PT3938554.123456789S"</span>);
         <span class="macro">assert_eq!</span>(pretty[<span class="number">5</span>], <span class="string">"-45 days -14 hours -2 mins -34.123456789 secs"</span>);
 
         <span class="kw">let </span>array = DurationMicrosecondArray::from(<span class="macro">vec!</span>[
@@ -2157,9 +2157,9 @@
         <span class="macro">assert_eq!</span>(pretty[<span class="number">2</span>], <span class="string">"0 days 0 hours 0 mins 0.001000 secs"</span>);
         <span class="macro">assert_eq!</span>(iso[<span class="number">3</span>], <span class="string">"-PT0.001S"</span>);
         <span class="macro">assert_eq!</span>(pretty[<span class="number">3</span>], <span class="string">"0 days 0 hours 0 mins -0.001000 secs"</span>);
-        <span class="macro">assert_eq!</span>(iso[<span class="number">4</span>], <span class="string">"P45DT50554.123456S"</span>);
+        <span class="macro">assert_eq!</span>(iso[<span class="number">4</span>], <span class="string">"PT3938554.123456S"</span>);
         <span class="macro">assert_eq!</span>(pretty[<span class="number">4</span>], <span class="string">"45 days 14 hours 2 mins 34.123456 secs"</span>);
-        <span class="macro">assert_eq!</span>(iso[<span class="number">5</span>], <span class="string">"-P45DT50554.123456S"</span>);
+        <span class="macro">assert_eq!</span>(iso[<span class="number">5</span>], <span class="string">"-PT3938554.123456S"</span>);
         <span class="macro">assert_eq!</span>(pretty[<span class="number">5</span>], <span class="string">"-45 days -14 hours -2 mins -34.123456 secs"</span>);
 
         <span class="kw">let </span>array = DurationMillisecondArray::from(<span class="macro">vec!</span>[
@@ -2181,9 +2181,9 @@
         <span class="macro">assert_eq!</span>(pretty[<span class="number">2</span>], <span class="string">"0 days 0 hours 0 mins 1.000 secs"</span>);
         <span class="macro">assert_eq!</span>(iso[<span class="number">3</span>], <span class="string">"-PT1S"</span>);
         <span class="macro">assert_eq!</span>(pretty[<span class="number">3</span>], <span class="string">"0 days 0 hours 0 mins -1.000 secs"</span>);
-        <span class="macro">assert_eq!</span>(iso[<span class="number">4</span>], <span class="string">"P45DT50554.123S"</span>);
+        <span class="macro">assert_eq!</span>(iso[<span class="number">4</span>], <span class="string">"PT3938554.123S"</span>);
         <span class="macro">assert_eq!</span>(pretty[<span class="number">4</span>], <span class="string">"45 days 14 hours 2 mins 34.123 secs"</span>);
-        <span class="macro">assert_eq!</span>(iso[<span class="number">5</span>], <span class="string">"-P45DT50554.123S"</span>);
+        <span class="macro">assert_eq!</span>(iso[<span class="number">5</span>], <span class="string">"-PT3938554.123S"</span>);
         <span class="macro">assert_eq!</span>(pretty[<span class="number">5</span>], <span class="string">"-45 days -14 hours -2 mins -34.123 secs"</span>);
 
         <span class="kw">let </span>array = DurationSecondArray::from(<span class="macro">vec!</span>[
@@ -2205,9 +2205,9 @@
         <span class="macro">assert_eq!</span>(pretty[<span class="number">2</span>], <span class="string">"0 days 0 hours 16 mins 40 secs"</span>);
         <span class="macro">assert_eq!</span>(iso[<span class="number">3</span>], <span class="string">"-PT1000S"</span>);
         <span class="macro">assert_eq!</span>(pretty[<span class="number">3</span>], <span class="string">"0 days 0 hours -16 mins -40 secs"</span>);
-        <span class="macro">assert_eq!</span>(iso[<span class="number">4</span>], <span class="string">"P45DT50554S"</span>);
+        <span class="macro">assert_eq!</span>(iso[<span class="number">4</span>], <span class="string">"PT3938554S"</span>);
         <span class="macro">assert_eq!</span>(pretty[<span class="number">4</span>], <span class="string">"45 days 14 hours 2 mins 34 secs"</span>);
-        <span class="macro">assert_eq!</span>(iso[<span class="number">5</span>], <span class="string">"-P45DT50554S"</span>);
+        <span class="macro">assert_eq!</span>(iso[<span class="number">5</span>], <span class="string">"-PT3938554S"</span>);
         <span class="macro">assert_eq!</span>(pretty[<span class="number">5</span>], <span class="string">"-45 days -14 hours -2 mins -34 secs"</span>);
     }
 
