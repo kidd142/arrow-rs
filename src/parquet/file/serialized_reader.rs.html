@@ -1757,6 +1757,19 @@
 <a href="#1755" id="1755">1755</a>
 <a href="#1756" id="1756">1756</a>
 <a href="#1757" id="1757">1757</a>
+<a href="#1758" id="1758">1758</a>
+<a href="#1759" id="1759">1759</a>
+<a href="#1760" id="1760">1760</a>
+<a href="#1761" id="1761">1761</a>
+<a href="#1762" id="1762">1762</a>
+<a href="#1763" id="1763">1763</a>
+<a href="#1764" id="1764">1764</a>
+<a href="#1765" id="1765">1765</a>
+<a href="#1766" id="1766">1766</a>
+<a href="#1767" id="1767">1767</a>
+<a href="#1768" id="1768">1768</a>
+<a href="#1769" id="1769">1769</a>
+<a href="#1770" id="1770">1770</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -3006,6 +3019,19 @@
         <span class="kw">let </span>metadata = reader.metadata();
         <span class="macro">assert_eq!</span>(metadata.num_row_groups(), <span class="number">0</span>);
         <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_file_reader_invalid_metadata() {
+        <span class="kw">let </span>data = [
+            <span class="number">255</span>, <span class="number">172</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">50</span>, <span class="number">82</span>, <span class="number">65</span>, <span class="number">73</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">169</span>, <span class="number">168</span>, <span class="number">168</span>, <span class="number">162</span>, <span class="number">87</span>, <span class="number">255</span>, <span class="number">16</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>,
+            <span class="number">80</span>, <span class="number">65</span>, <span class="number">82</span>, <span class="number">49</span>,
+        ];
+        <span class="kw">let </span>ret = SerializedFileReader::new(Bytes::copy_from_slice(<span class="kw-2">&amp;</span>data));
+        <span class="macro">assert_eq!</span>(
+            ret.err().unwrap().to_string(),
+            <span class="string">"Parquet error: Could not parse metadata: bad data"
+        </span>);
     }
 
     <span class="attr">#[test]

@@ -6575,7 +6575,7 @@
         )
       )
     } <span class="kw">else </span>{
-      <span class="prelude-val">Ok</span>(ret.expect(<span class="string">"return value should have been constructed"</span>))
+      ret.ok_or_else(|| thrift::Error::Protocol(ProtocolError::new(ProtocolErrorKind::InvalidData, <span class="string">"return value should have been constructed"</span>)))
     }
   }
   <span class="kw">fn </span>write_to_out_protocol&lt;T: TOutputProtocol&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, o_prot: <span class="kw-2">&amp;mut </span>T) -&gt; thrift::Result&lt;()&gt; {
@@ -7057,7 +7057,7 @@
         )
       )
     } <span class="kw">else </span>{
-      <span class="prelude-val">Ok</span>(ret.expect(<span class="string">"return value should have been constructed"</span>))
+      ret.ok_or_else(|| thrift::Error::Protocol(ProtocolError::new(ProtocolErrorKind::InvalidData, <span class="string">"return value should have been constructed"</span>)))
     }
   }
   <span class="kw">fn </span>write_to_out_protocol&lt;T: TOutputProtocol&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, o_prot: <span class="kw-2">&amp;mut </span>T) -&gt; thrift::Result&lt;()&gt; {
@@ -7831,7 +7831,7 @@
         )
       )
     } <span class="kw">else </span>{
-      <span class="prelude-val">Ok</span>(ret.expect(<span class="string">"return value should have been constructed"</span>))
+      ret.ok_or_else(|| thrift::Error::Protocol(ProtocolError::new(ProtocolErrorKind::InvalidData, <span class="string">"return value should have been constructed"</span>)))
     }
   }
   <span class="kw">fn </span>write_to_out_protocol&lt;T: TOutputProtocol&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, o_prot: <span class="kw-2">&amp;mut </span>T) -&gt; thrift::Result&lt;()&gt; {
@@ -7944,7 +7944,7 @@
         )
       )
     } <span class="kw">else </span>{
-      <span class="prelude-val">Ok</span>(ret.expect(<span class="string">"return value should have been constructed"</span>))
+      ret.ok_or_else(|| thrift::Error::Protocol(ProtocolError::new(ProtocolErrorKind::InvalidData, <span class="string">"return value should have been constructed"</span>)))
     }
   }
   <span class="kw">fn </span>write_to_out_protocol&lt;T: TOutputProtocol&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, o_prot: <span class="kw-2">&amp;mut </span>T) -&gt; thrift::Result&lt;()&gt; {
@@ -8056,7 +8056,7 @@
         )
       )
     } <span class="kw">else </span>{
-      <span class="prelude-val">Ok</span>(ret.expect(<span class="string">"return value should have been constructed"</span>))
+      ret.ok_or_else(|| thrift::Error::Protocol(ProtocolError::new(ProtocolErrorKind::InvalidData, <span class="string">"return value should have been constructed"</span>)))
     }
   }
   <span class="kw">fn </span>write_to_out_protocol&lt;T: TOutputProtocol&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, o_prot: <span class="kw-2">&amp;mut </span>T) -&gt; thrift::Result&lt;()&gt; {
@@ -9052,7 +9052,7 @@
         )
       )
     } <span class="kw">else </span>{
-      <span class="prelude-val">Ok</span>(ret.expect(<span class="string">"return value should have been constructed"</span>))
+      ret.ok_or_else(|| thrift::Error::Protocol(ProtocolError::new(ProtocolErrorKind::InvalidData, <span class="string">"return value should have been constructed"</span>)))
     }
   }
   <span class="kw">fn </span>write_to_out_protocol&lt;T: TOutputProtocol&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, o_prot: <span class="kw-2">&amp;mut </span>T) -&gt; thrift::Result&lt;()&gt; {
@@ -9506,7 +9506,7 @@
         )
       )
     } <span class="kw">else </span>{
-      <span class="prelude-val">Ok</span>(ret.expect(<span class="string">"return value should have been constructed"</span>))
+      ret.ok_or_else(|| thrift::Error::Protocol(ProtocolError::new(ProtocolErrorKind::InvalidData, <span class="string">"return value should have been constructed"</span>)))
     }
   }
   <span class="kw">fn </span>write_to_out_protocol&lt;T: TOutputProtocol&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, o_prot: <span class="kw-2">&amp;mut </span>T) -&gt; thrift::Result&lt;()&gt; {
@@ -10079,7 +10079,7 @@
         )
       )
     } <span class="kw">else </span>{
-      <span class="prelude-val">Ok</span>(ret.expect(<span class="string">"return value should have been constructed"</span>))
+      ret.ok_or_else(|| thrift::Error::Protocol(ProtocolError::new(ProtocolErrorKind::InvalidData, <span class="string">"return value should have been constructed"</span>)))
     }
   }
   <span class="kw">fn </span>write_to_out_protocol&lt;T: TOutputProtocol&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, o_prot: <span class="kw-2">&amp;mut </span>T) -&gt; thrift::Result&lt;()&gt; {
