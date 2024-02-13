@@ -226,6 +226,11 @@
 <a href="#224" id="224">224</a>
 <a href="#225" id="225">225</a>
 <a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -245,6 +250,7 @@
 
 </span><span class="kw">use </span>arrow_array::{BooleanArray, GenericStringArray, OffsetSizeTrait};
 <span class="kw">use </span>arrow_schema::ArrowError;
+<span class="kw">use </span>memchr::memchr2;
 <span class="kw">use </span>regex::{Regex, RegexBuilder};
 
 <span class="doccomment">/// A string based predicate
@@ -267,19 +273,19 @@
 <span class="kw">impl</span>&lt;<span class="lifetime">'a</span>&gt; Predicate&lt;<span class="lifetime">'a</span>&gt; {
     <span class="doccomment">/// Create a predicate for the given like pattern
     </span><span class="kw">pub fn </span>like(pattern: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, ArrowError&gt; {
-        <span class="kw">if </span>!pattern.contains(is_like_pattern) {
+        <span class="kw">if </span>!contains_like_pattern(pattern) {
             <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Eq(pattern))
         } <span class="kw">else if </span>pattern.ends_with(<span class="string">'%'</span>)
             &amp;&amp; !pattern.ends_with(<span class="string">"\\%"</span>)
-            &amp;&amp; !pattern[..pattern.len() - <span class="number">1</span>].contains(is_like_pattern)
+            &amp;&amp; !contains_like_pattern(<span class="kw-2">&amp;</span>pattern[..pattern.len() - <span class="number">1</span>])
         {
             <span class="prelude-val">Ok</span>(<span class="self">Self</span>::StartsWith(<span class="kw-2">&amp;</span>pattern[..pattern.len() - <span class="number">1</span>]))
-        } <span class="kw">else if </span>pattern.starts_with(<span class="string">'%'</span>) &amp;&amp; !pattern[<span class="number">1</span>..].contains(is_like_pattern) {
+        } <span class="kw">else if </span>pattern.starts_with(<span class="string">'%'</span>) &amp;&amp; !contains_like_pattern(<span class="kw-2">&amp;</span>pattern[<span class="number">1</span>..]) {
             <span class="prelude-val">Ok</span>(<span class="self">Self</span>::EndsWith(<span class="kw-2">&amp;</span>pattern[<span class="number">1</span>..]))
         } <span class="kw">else if </span>pattern.starts_with(<span class="string">'%'</span>)
             &amp;&amp; pattern.ends_with(<span class="string">'%'</span>)
             &amp;&amp; !pattern.ends_with(<span class="string">"\\%"</span>)
-            &amp;&amp; !pattern[<span class="number">1</span>..pattern.len() - <span class="number">1</span>].contains(is_like_pattern)
+            &amp;&amp; !contains_like_pattern(<span class="kw-2">&amp;</span>pattern[<span class="number">1</span>..pattern.len() - <span class="number">1</span>])
         {
             <span class="prelude-val">Ok</span>(<span class="self">Self</span>::Contains(<span class="kw-2">&amp;</span>pattern[<span class="number">1</span>..pattern.len() - <span class="number">1</span>]))
         } <span class="kw">else </span>{
@@ -290,14 +296,14 @@
     <span class="doccomment">/// Create a predicate for the given ilike pattern
     </span><span class="kw">pub fn </span>ilike(pattern: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>str, is_ascii: bool) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, ArrowError&gt; {
         <span class="kw">if </span>is_ascii &amp;&amp; pattern.is_ascii() {
-            <span class="kw">if </span>!pattern.contains(is_like_pattern) {
+            <span class="kw">if </span>!contains_like_pattern(pattern) {
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="self">Self</span>::IEqAscii(pattern));
             } <span class="kw">else if </span>pattern.ends_with(<span class="string">'%'</span>)
                 &amp;&amp; !pattern.ends_with(<span class="string">"\\%"</span>)
-                &amp;&amp; !pattern[..pattern.len() - <span class="number">1</span>].contains(is_like_pattern)
+                &amp;&amp; !contains_like_pattern(<span class="kw-2">&amp;</span>pattern[..pattern.len() - <span class="number">1</span>])
             {
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="self">Self</span>::IStartsWithAscii(<span class="kw-2">&amp;</span>pattern[..pattern.len() - <span class="number">1</span>]));
-            } <span class="kw">else if </span>pattern.starts_with(<span class="string">'%'</span>) &amp;&amp; !pattern[<span class="number">1</span>..].contains(is_like_pattern) {
+            } <span class="kw">else if </span>pattern.starts_with(<span class="string">'%'</span>) &amp;&amp; !contains_like_pattern(<span class="kw-2">&amp;</span>pattern[<span class="number">1</span>..]) {
                 <span class="kw">return </span><span class="prelude-val">Ok</span>(<span class="self">Self</span>::IEndsWithAscii(<span class="kw-2">&amp;</span>pattern[<span class="number">1</span>..]));
             }
         }
@@ -415,6 +421,10 @@
 <span class="kw">fn </span>is_like_pattern(c: char) -&gt; bool {
     c == <span class="string">'%' </span>|| c == <span class="string">'_'
 </span>}
+
+<span class="kw">fn </span>contains_like_pattern(pattern: <span class="kw-2">&amp;</span>str) -&gt; bool {
+    memchr2(<span class="string">b'%'</span>, <span class="string">b'_'</span>, pattern.as_bytes()).is_some()
+}
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
