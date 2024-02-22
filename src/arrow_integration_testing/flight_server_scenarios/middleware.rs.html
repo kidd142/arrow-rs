@@ -150,6 +150,13 @@
 <a href="#148" id="148">148</a>
 <a href="#149" id="149">149</a>
 <a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -172,8 +179,8 @@
 <span class="kw">use </span>arrow_flight::{
     flight_descriptor::DescriptorType, flight_service_server::FlightService,
     flight_service_server::FlightServiceServer, Action, ActionType, Criteria, Empty, FlightData,
-    FlightDescriptor, FlightInfo, HandshakeRequest, HandshakeResponse, PutResult, SchemaResult,
-    Ticket,
+    FlightDescriptor, FlightInfo, HandshakeRequest, HandshakeResponse, PollInfo, PutResult,
+    SchemaResult, Ticket,
 };
 <span class="kw">use </span>futures::Stream;
 <span class="kw">use </span>tonic::{transport::Server, Request, Response, Status, Streaming};
@@ -270,6 +277,13 @@
         }
 
         <span class="prelude-val">Err</span>(status)
+    }
+
+    <span class="kw">async fn </span>poll_flight_info(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        _request: Request&lt;FlightDescriptor&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;PollInfo&gt;, Status&gt; {
+        <span class="prelude-val">Err</span>(Status::unimplemented(<span class="string">"Not yet implemented"</span>))
     }
 
     <span class="kw">async fn </span>do_put(

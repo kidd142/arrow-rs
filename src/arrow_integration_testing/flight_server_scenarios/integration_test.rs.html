@@ -390,6 +390,14 @@
 <a href="#388" id="388">388</a>
 <a href="#389" id="389">389</a>
 <a href="#390" id="390">390</a>
+<a href="#391" id="391">391</a>
+<a href="#392" id="392">392</a>
+<a href="#393" id="393">393</a>
+<a href="#394" id="394">394</a>
+<a href="#395" id="395">395</a>
+<a href="#396" id="396">396</a>
+<a href="#397" id="397">397</a>
+<a href="#398" id="398">398</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -424,7 +432,7 @@
     flight_descriptor::DescriptorType, flight_service_server::FlightService,
     flight_service_server::FlightServiceServer, Action, ActionType, Criteria, Empty, FlightData,
     FlightDescriptor, FlightEndpoint, FlightInfo, HandshakeRequest, HandshakeResponse, IpcMessage,
-    PutResult, SchemaAsIpc, SchemaResult, Ticket,
+    PollInfo, PutResult, SchemaAsIpc, SchemaResult, Ticket,
 };
 <span class="kw">use </span>futures::{channel::mpsc, sink::SinkExt, Stream, StreamExt};
 <span class="kw">use </span>std::convert::TryInto;
@@ -588,12 +596,20 @@
                     total_records: total_records <span class="kw">as </span>i64,
                     total_bytes: -<span class="number">1</span>,
                     ordered: <span class="bool-val">false</span>,
+                    app_metadata: <span class="macro">vec!</span>[].into(),
                 };
 
                 <span class="prelude-val">Ok</span>(Response::new(info))
             }
             other =&gt; <span class="prelude-val">Err</span>(Status::unimplemented(<span class="macro">format!</span>(<span class="string">"Request type: {other}"</span>))),
         }
+    }
+
+    <span class="kw">async fn </span>poll_flight_info(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        _request: Request&lt;FlightDescriptor&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;PollInfo&gt;, Status&gt; {
+        <span class="prelude-val">Err</span>(Status::unimplemented(<span class="string">"Not yet implemented"</span>))
     }
 
     <span class="kw">async fn </span>do_put(

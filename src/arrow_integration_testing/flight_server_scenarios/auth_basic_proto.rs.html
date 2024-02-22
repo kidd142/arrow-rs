@@ -218,6 +218,14 @@
 <a href="#216" id="216">216</a>
 <a href="#217" id="217">217</a>
 <a href="#218" id="218">218</a>
+<a href="#219" id="219">219</a>
+<a href="#220" id="220">220</a>
+<a href="#221" id="221">221</a>
+<a href="#222" id="222">222</a>
+<a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
 </pre></div><pre class="rust"><code><span class="comment">// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
@@ -241,7 +249,7 @@
 <span class="kw">use </span>arrow_flight::{
     flight_service_server::FlightService, flight_service_server::FlightServiceServer, Action,
     ActionType, BasicAuth, Criteria, Empty, FlightData, FlightDescriptor, FlightInfo,
-    HandshakeRequest, HandshakeResponse, PutResult, SchemaResult, Ticket,
+    HandshakeRequest, HandshakeResponse, PollInfo, PutResult, SchemaResult, Ticket,
 };
 <span class="kw">use </span>futures::{channel::mpsc, sink::SinkExt, Stream, StreamExt};
 <span class="kw">use </span>tokio::sync::Mutex;
@@ -394,6 +402,14 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         request: Request&lt;FlightDescriptor&gt;,
     ) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;FlightInfo&gt;, Status&gt; {
+        <span class="self">self</span>.check_auth(request.metadata()).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="prelude-val">Err</span>(Status::unimplemented(<span class="string">"Not yet implemented"</span>))
+    }
+
+    <span class="kw">async fn </span>poll_flight_info(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        request: Request&lt;FlightDescriptor&gt;,
+    ) -&gt; <span class="prelude-ty">Result</span>&lt;Response&lt;PollInfo&gt;, Status&gt; {
         <span class="self">self</span>.check_auth(request.metadata()).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Err</span>(Status::unimplemented(<span class="string">"Not yet implemented"</span>))
     }
